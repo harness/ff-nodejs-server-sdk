@@ -179,7 +179,10 @@ paths:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/Pagination'
-                  - $ref: '#/components/schemas/Evaluations'
+                  - type: object
+                    properties:
+                      evaluations:
+                        $ref: '#/components/schemas/Evaluations'
   '/client/env/{environmentUUID}/target/{target}/evaluations/{feature}':
     get:
       summary: Get feature evaluations for target

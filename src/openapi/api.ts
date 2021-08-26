@@ -1028,7 +1028,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getEvaluations(environmentUUID: string, target: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Pagination & Array>> {
+        async getEvaluations(environmentUUID: string, target: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Pagination & object>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getEvaluations(environmentUUID, target, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1128,7 +1128,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getEvaluations(environmentUUID: string, target: string, options?: any): AxiosPromise<Pagination & Array> {
+        getEvaluations(environmentUUID: string, target: string, options?: any): AxiosPromise<Pagination & object> {
             return localVarFp.getEvaluations(environmentUUID, target, options).then((request) => request(axios, basePath));
         },
         /**
