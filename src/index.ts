@@ -43,7 +43,7 @@ export class CfClient {
     return this.authToken;
   }
 
-  fetchData() {
+  fetchData(): Promise<[void, void]> {
     const flags = this.api
       .getFeatureConfig(this.environment, {
         params: {
