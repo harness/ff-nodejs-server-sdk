@@ -42,7 +42,7 @@ export class PollingProcessor {
     const startTime = new Date().getTime();
     const pollAgain = () => {
       const elapsed = new Date().getTime() - startTime;
-      const sleepFor = Math.max(this.options.pollInterval * 1000 - elapsed, 0);
+      const sleepFor = Math.max(this.options.pollInterval - elapsed, 0);
 
       setTimeout(() => this.poll(), sleepFor);
     };
@@ -50,7 +50,6 @@ export class PollingProcessor {
     Promise.all([this.retrieveFlags(), this.retrieveSegments()])
       .catch((error) => {
         log.error(error);
-        pollAgain();
       })
       .finally(pollAgain);
   }

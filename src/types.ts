@@ -3,7 +3,8 @@ import { ConsoleLog, Logger } from './log';
 
 export const BASE_URL = 'https://config.ff.harness.io/api/1.0',
   EVENTS_URL = 'https://events.ff.harness.io/api/1.0',
-  MINUTE = 60,
+  SECOND = 1000,
+  MINUTE = 60 * SECOND,
   PULL_INTERVAL = 1 * MINUTE,
   PERSIST_INTERVAL = 1 * MINUTE,
   EVENTS_SYNC_INTERVAL = 1 * MINUTE;

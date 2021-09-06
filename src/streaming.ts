@@ -95,9 +95,9 @@ export class StreamProcessor {
     try {
       const response = await fn(msg.identifier, this.environment);
       const data: CacheValueType = response.data;
-      if (msg.event == 'create' || msg.event == 'patch') {
+      if (msg.event === 'create' || msg.event === 'patch') {
         this.options.cache.set(formatFlagKey(msg.identifier), data);
-      } else if (msg.event == 'delete') {
+      } else if (msg.event === 'delete') {
         delete this.options.cache[keyFn(msg.identifier)];
       }
     } catch (error) {

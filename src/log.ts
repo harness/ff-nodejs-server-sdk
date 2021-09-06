@@ -1,29 +1,27 @@
 export interface Logger {
-  trace(message?: any, ...optionalParams: any[]): void;
-  debug(message?: any, ...optionalParams: any[]): void;
-  info(message?: any, ...optionalParams: any[]): void;
-  warn(message?: any, ...optionalParams: any[]): void;
-  error(message?: any, ...optionalParams: any[]): void;
-  [x: string]: any;
+  trace(message?: unknown, ...optionalParams: unknown[]): void;
+  debug(message?: unknown, ...optionalParams: unknown[]): void;
+  info(message?: unknown, ...optionalParams: unknown[]): void;
+  warn(message?: unknown, ...optionalParams: unknown[]): void;
+  error(message?: unknown, ...optionalParams: unknown[]): void;
 }
 
 // Wrapper for console
 export class ConsoleLog implements Logger {
-  [x: string]: any;
 
-  trace(message?: any, ...optionalParams: any[]): void {
+  trace(message?: unknown, ...optionalParams: unknown[]): void {
     console.trace(message, ...optionalParams);
   }
-  debug(message?: any, ...optionalParams: any[]): void {
+  debug(message?: unknown, ...optionalParams: unknown[]): void {
     console.debug(message, ...optionalParams);
   }
-  info(message?: any, ...optionalParams: any[]): void {
+  info(message?: unknown, ...optionalParams: unknown[]): void {
     console.info(message, ...optionalParams);
   }
-  warn(message?: any, ...optionalParams: any[]): void {
+  warn(message?: unknown, ...optionalParams: unknown[]): void {
     console.warn(message, ...optionalParams);
   }
-  error(message?: any, ...optionalParams: any[]): void {
+  error(message?: unknown, ...optionalParams: unknown[]): void {
     console.error(message, ...optionalParams);
   }
 }

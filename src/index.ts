@@ -4,7 +4,7 @@ import { Configuration, DefaultApi, Target } from './openapi';
 import { log, VERSION } from './utils';
 import { PollingProcessor } from './polling';
 import { StreamProcessor } from './streaming';
-import events = require('events');
+import * as events from 'events';
 
 export class CfClient {
   private api: DefaultApi;
@@ -59,19 +59,19 @@ export class CfClient {
       this.eventBus,
     );
 
-    this.streamProcessor = new StreamProcessor(
-      this.api,
-      this.sdkKey,
-      this.environment,
-      this.authToken,
-      this.options,
-      this.cluster,
-      this.eventBus,
-    );
-
     // start processors
     this.pollProcessor.start();
     if (this.options.enableStream) {
+      this.streamProcessor = new StreamProcessor(
+        this.api,
+        this.sdkKey,
+        this.environment,
+        this.authToken,
+        this.options,
+        this.cluster,
+        this.eventBus,
+      );
+
       this.streamProcessor.start();
     }
 
