@@ -1,7 +1,10 @@
 import jwt_decode from 'jwt-decode';
 import { Claims, defaultOptions, Options } from './types';
 import { Configuration, DefaultApi, Target } from './openapi';
-import { VERSION } from './utils';
+import { log, VERSION } from './utils';
+import { PollingProcessor } from './polling';
+import { StreamProcessor } from './streaming';
+import * as events from 'events';
 
 export class CfClient {
   private api: DefaultApi;
@@ -11,6 +14,9 @@ export class CfClient {
   private configuration: Configuration;
   private options: Options;
   private cluster = '1';
+  private eventBus = new events.EventEmitter();
+  private pollProcessor: PollingProcessor;
+  private streamProcessor: StreamProcessor;
 
   constructor(sdkKey: string, options: Options = {}) {
     this.sdkKey = sdkKey;
@@ -43,45 +49,33 @@ export class CfClient {
     return this.authToken;
   }
 
-  fetchData(): Promise<[void, void]> {
-    const flags = this.api
-      .getFeatureConfig(this.environment, {
-        params: {
-          cluster: this.cluster,
-        },
-      })
-      .then((response) => {
-        // prepare cache for storing flags
-        console.log(response.data);
-      })
-      .catch((error: Error) => {
-        console.error('Error loading flags', error);
-        throw error;
-      });
-    const segments = this.api
-      .getAllSegments(this.environment, {
-        params: {
-          cluster: this.cluster,
-        },
-      })
-      .then((response) => {
-        // prepare cache for storing segments
-        console.log(response.data);
-      })
-      .catch((error: Error) => {
-        console.error('Error loading segments', error);
-        throw error;
-      });
-
-    return Promise.all([flags, segments]);
-  }
-
   async run(): Promise<void> {
     await this.authenticate();
-    await this.fetchData();
+    this.pollProcessor = new PollingProcessor(
+      this.environment,
+      this.cluster,
+      this.api,
+      this.options,
+      this.eventBus,
+    );
+
+    // start processors
+    this.pollProcessor.start();
     if (this.options.enableStream) {
-      // setup SSE client
+      this.streamProcessor = new StreamProcessor(
+        this.api,
+        this.sdkKey,
+        this.environment,
+        this.authToken,
+        this.options,
+        this.cluster,
+        this.eventBus,
+      );
+
+      this.streamProcessor.start();
     }
+
+    log.info('finished setting up processors');
   }
 
   boolVariation(
@@ -92,8 +86,15 @@ export class CfClient {
     console.log(identifier, target);
     return defaultValue;
   }
+
+  close(): void {
+    this.pollProcessor.close();
+    if (this.options.enableStream) {
+      this.streamProcessor.close();
+    }
+  }
 }
 
 // need to setup example project and remove this later
-const client = new CfClient('sdk key');
+const client = new CfClient('1c100d25-4c3f-487b-b198-3b3d01df5794');
 client.boolVariation('test', null, false);
