@@ -1,7 +1,8 @@
 import jwt_decode from 'jwt-decode';
 import { Claims, defaultOptions, Options } from './types';
 import { Configuration, DefaultApi, Target } from './openapi';
-import { log, VERSION } from './utils';
+import { log } from './utils';
+import { VERSION } from './version';
 import { PollingProcessor } from './polling';
 import { StreamProcessor } from './streaming';
 import * as events from 'events';
@@ -94,7 +95,3 @@ export class CfClient {
     }
   }
 }
-
-// need to setup example project and remove this later
-const client = new CfClient('1c100d25-4c3f-487b-b198-3b3d01df5794');
-client.boolVariation('test', null, false);
