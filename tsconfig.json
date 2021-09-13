@@ -15,8 +15,7 @@
     "noImplicitAny": false,
     "noImplicitThis": false,
     "strictNullChecks": false,
-    "declaration": true,
-    "resolveJsonModule": true
+    "declaration": true
   },
   "include": [
     "src/**/*",
