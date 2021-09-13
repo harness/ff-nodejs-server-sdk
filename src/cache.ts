@@ -1,31 +1,15 @@
-import { FeatureConfig, Segment } from "./openapi";
+import { KeyValueStore } from "./types";
 
-export type CacheValueType = FeatureConfig | Segment;
-
-export interface Cache {
-  set(key: string, value: CacheValueType): void;
-  get(key: string): CacheValueType;
-  del(key: string): void;
-}
-
-export class SimpleCache implements Cache {
+export class SimpleCache implements KeyValueStore {
   private cache = {};
 
-  set(key: string, value: CacheValueType): void {
+  set(key: string, value: unknown): void {
     this.cache[key] = value;
   }
-  get(key: string): CacheValueType {
+  get(key: string): unknown {
     return this.cache[key];
   }
   del(key: string): void {
     delete this.cache[key];
   }
-}
-
-export const formatFlagKey = (key: string): string => {
-    return `flags/${key}`
-}
-
-export const formatSegmentKey = (key: string): string => {
-    return `segments/${key}`
 }

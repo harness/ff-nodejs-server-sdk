@@ -1,13 +1,18 @@
 import jwt_decode from 'jwt-decode';
-import { Claims, defaultOptions, Options } from './types';
+import { Claims, Options } from './types';
 import { Configuration, DefaultApi, Target } from './openapi';
-import { log } from './utils';
 import { VERSION } from './version';
 import { PollingProcessor } from './polling';
 import { StreamProcessor } from './streaming';
 import * as events from 'events';
+import { Evaluator } from './evaluator';
+import { defaultOptions } from './constants';
+import { Repository, StorageRepository } from './repository';
 
+const log = defaultOptions.logger;
 export class CfClient {
+  private evaluator: Evaluator;
+  private repository: Repository;
   private api: DefaultApi;
   private sdkKey: string;
   private authToken: string;
@@ -26,6 +31,12 @@ export class CfClient {
     this.configuration = new Configuration({
       basePath: this.options.baseUrl,
     });
+
+    this.repository = new StorageRepository(
+      this.options.cache,
+      this.options.store,
+    );
+    this.evaluator = new Evaluator(this.repository);
 
     this.api = new DefaultApi(this.configuration);
     this.run();
@@ -58,6 +69,7 @@ export class CfClient {
       this.api,
       this.options,
       this.eventBus,
+      this.repository
     );
 
     // start processors
@@ -71,6 +83,7 @@ export class CfClient {
         this.options,
         this.cluster,
         this.eventBus,
+        this.repository
       );
 
       this.streamProcessor.start();
@@ -85,7 +98,7 @@ export class CfClient {
     defaultValue: false,
   ): boolean {
     console.log(identifier, target);
-    return defaultValue;
+    return this.evaluator.boolVariation(identifier, target, defaultValue);
   }
 
   close(): void {

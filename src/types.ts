@@ -1,14 +1,7 @@
-import { Cache, SimpleCache } from './cache';
-import { ConsoleLog, Logger } from './log';
+import { Logger } from './log';
+import { FeatureConfig, Segment } from './openapi';
 
-export const BASE_URL = 'https://config.ff.harness.io/api/1.0',
-  EVENTS_URL = 'https://events.ff.harness.io/api/1.0',
-  SECOND = 1000,
-  MINUTE = 60 * SECOND,
-  PULL_INTERVAL = 1 * MINUTE,
-  PERSIST_INTERVAL = 1 * MINUTE,
-  EVENTS_SYNC_INTERVAL = 1 * MINUTE;
-
+export type Type = boolean | string | number | Record<string, unknown>;
 export interface Options {
   baseUrl?: string;
   eventsUrl?: string;
@@ -17,21 +10,10 @@ export interface Options {
   eventsSyncInterval?: number;
   enableStream?: boolean;
   enableAnalytics?: boolean;
-  cache?: Cache;
+  cache?: KeyValueStore;
+  store?: KeyValueStore;
   logger?: Logger;
 }
-
-export const defaultOptions: Options = {
-  baseUrl: BASE_URL,
-  eventsUrl: EVENTS_URL,
-  pollInterval: PULL_INTERVAL,
-  persistInterval: PERSIST_INTERVAL,
-  eventsSyncInterval: EVENTS_SYNC_INTERVAL,
-  enableStream: true,
-  enableAnalytics: true,
-  cache: new SimpleCache(),
-  logger: new ConsoleLog(),
-};
 
 export interface Claims {
   environment: string;
@@ -58,4 +40,29 @@ export enum Event {
   DISCONNECTED = 'disconnected',
   CHANGED = 'changed',
   ERROR = 'error'
+}
+
+export interface Operator {
+    startsWith(value: string[]): boolean;
+    endsWith(value: string[]): boolean;
+    match(value: string[]): boolean;
+    contains(value: string[]): boolean;
+    equalSensitive(value: string[]): boolean;
+    equal(value: string[]): boolean;
+    greaterThan(value: string[]): boolean;
+    greaterThanEqual(value: string[]): boolean;
+    lessThan(value: string[]): boolean;
+    lessThanEqual(value: string[]): boolean;
+    inList(value: string[]): boolean;
+}
+
+export interface Query {
+  getFlag(identifier: string): FeatureConfig;
+  getSegment(identifier: string): Segment;
+}
+
+export interface KeyValueStore {
+  set(key: string, value: unknown): void;
+  get(key: string): unknown;
+  del(key: string): void;
 }

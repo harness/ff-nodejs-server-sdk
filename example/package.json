@@ -10,6 +10,6 @@
   },
   "author": "enver.bisevac@harness.io",
   "dependencies": {
-    "ff-nodejs-server-sdk": "file:../"
+    "ff-nodejs-server-sdk": "file:.."
   }
 }

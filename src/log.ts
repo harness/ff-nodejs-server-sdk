@@ -8,7 +8,6 @@ export interface Logger {
 
 // Wrapper for console
 export class ConsoleLog implements Logger {
-
   trace(message?: unknown, ...optionalParams: unknown[]): void {
     console.trace(message, ...optionalParams);
   }
