@@ -8,7 +8,7 @@ import {
   ONE_HUNDRED,
   STARTS_WITH_OPERATOR,
 } from './constants';
-import { Operator, Query, Type } from './types';
+import { Operator, Query, Target, Type } from './types';
 import { Bool } from './boolean';
 import { Json } from './json';
 import { Num } from './number';
@@ -20,8 +20,9 @@ import {
   FeatureConfigKindEnum,
   FeatureState,
   ServingRule,
-  Target,
   Variation,
+  Target as ApiTarget,
+  VariationMap,
 } from './openapi';
 import murmurhash from 'murmurhash';
 
@@ -37,10 +38,10 @@ export class Evaluator {
   }
 
   private findVariation(
-    fc: FeatureConfig,
+    variations: Variation[],
     identifier: string,
   ): Variation | undefined {
-    return fc.variations.find(
+    return variations.find(
       (value: Variation) => value.identifier === identifier,
     );
   }
@@ -52,11 +53,15 @@ export class Evaluator {
   ): number {
     const value = [bucketBy, property].join(':');
     const hash = parseInt(murmurhash(value).toString());
-    return (hash % normalizer) + 1
+    return (hash % normalizer) + 1;
   }
 
   private getNormalizedNumber(property: Type, bucketBy: string): number {
-    return this.getNormalizedNumberWithNormalizer(property, bucketBy, ONE_HUNDRED);
+    return this.getNormalizedNumberWithNormalizer(
+      property,
+      bucketBy,
+      ONE_HUNDRED,
+    );
   }
 
   private isEnabled(
@@ -70,12 +75,19 @@ export class Evaluator {
     return percentage > 0 && bucketId <= percentage;
   }
 
-  private getKeyName(distribution: Distribution, target: Target): string | undefined {
+  private getKeyName(
+    distribution: Distribution,
+    target: Target,
+  ): string | undefined {
+    let variation = '';
     for (const _var of distribution.variations) {
+      variation = _var.variation;
       if (this.isEnabled(target, distribution.bucketBy, _var.weight))
         return _var.variation;
     }
-    return undefined;
+    return this.isEnabled(target, distribution.bucketBy, ONE_HUNDRED)
+      ? variation
+      : undefined;
   }
 
   private getOperator(target: Target, attribute: string): Operator | undefined {
@@ -90,6 +102,59 @@ export class Evaluator {
       case 'object':
         return new Json();
     }
+  }
+
+  private isTargetInList(target: Target, targets: Target[]): boolean {
+    return (
+      targets.find((elem) => elem.identifier === target.identifier) != undefined
+    );
+  }
+
+  private convertApiTargetsToEvalTargets(targets: ApiTarget[]): Target[] {
+    return targets.map(elem => ({
+      identifier: elem.identifier,
+      name: elem.name,
+      anonymous: elem.anonymous,
+      attributes: elem.attributes
+    } as Target))
+  }
+
+  private isTargetIncludedOrExcludedInSegment(
+    segments: string[],
+    target: Target,
+  ): boolean {
+    for (const segmentIdentifier of segments) {
+      const segment = this.query.getSegment(segmentIdentifier);
+
+      if (segment) {
+        // Should Target be excluded - if in excluded list we return false
+        if (this.isTargetInList(target, this.convertApiTargetsToEvalTargets(segment.excluded))) {
+          // log.debug(
+          //   "Target %s excluded from segment %s via exclude list\n",
+          //   target.getName(), segment.getName());
+          return false;
+        }
+
+        // Should Target be included - if in included list we return false
+        if (this.isTargetInList(target, this.convertApiTargetsToEvalTargets(segment.included))) {
+          // log.debug(
+          //   "Target %s included in segment %s via include list\n",
+          //   target.getName(), segment.getName());
+          return true;
+        }
+
+        // Should Target be included via segment rules
+        if (segment.rules) {
+          if (this.evaluateClauses(segment.rules, target)) {
+            // log.debug(
+            //   "Target %s included in segment %s via rules\n",
+            //   target.getName(), segment.getName());
+            return true;
+          }
+        }
+      }
+    }
+    return false;
   }
 
   private evaluateClause(clause: Clause, target: Target): boolean {
@@ -134,12 +199,11 @@ export class Evaluator {
   }
 
   private evaluateRules(
-    fc: FeatureConfig,
+    rules: ServingRule[],
     target: Target,
-  ): Variation | undefined {
+  ): string | undefined {
     let identifier: string;
-    for (const rule of fc.rules) {
-
+    for (const rule of rules) {
       // if evaluation is false just continue to next rule
       if (!this.evaluateRule(rule, target)) continue;
 
@@ -154,27 +218,61 @@ export class Evaluator {
       }
 
       // evaluation succeded, find variation in flag
-      return this.findVariation(fc, identifier);
+      return identifier;
     }
     // there is no rules return undefined
     return undefined;
   }
 
-  private evaluateFlag(fc: FeatureConfig, target: Target): Variation | undefined {
-    if (fc.state === FeatureState.Off) {
-      return this.findVariation(fc, fc.offVariation);
-    }
-    let variation = this.evaluateRules(fc, target);
-    if (!variation) {
-      // if variation is undefined then use flag default serve
-      if (fc.defaultServe.distribution) {
-        const identifier = this.getKeyName(fc.defaultServe.distribution, target);
-        variation = this.findVariation(fc, identifier);
-      } else {
-        variation = this.findVariation(fc, fc.defaultServe.variation);
+  private evaluateVariationMap(
+    variationToTargetMap: VariationMap[],
+    target: Target,
+  ): string | undefined {
+    if (!variationToTargetMap) return undefined;
+
+    for (const variationMap of variationToTargetMap) {
+      // find target
+      const targetMap = variationMap.targets?.find(
+        (elem) => elem.identifier === target.identifier,
+      );
+      if (targetMap) return variationMap.variation;
+
+      // find target in segment
+      const segmentIdentifiers = variationMap.targetSegments;
+      if (segmentIdentifiers && this.isTargetIncludedOrExcludedInSegment(segmentIdentifiers, target)) {
+        return variationMap.variation;
       }
     }
-    return variation
+
+    return undefined;
+  }
+
+  private evaluateFlag(
+    fc: FeatureConfig,
+    target: Target,
+  ): Variation | undefined {
+    if (fc.state === FeatureState.Off) {
+      return this.findVariation(fc.variations, fc.offVariation);
+    }
+
+    // process first variationMaps
+    let variation = this.evaluateVariationMap(fc.variationToTargetMap, target);
+    if (variation) return this.findVariation(fc.variations, variation);
+
+    // not found in variationMaps proceed with rules processor
+    variation = this.evaluateRules(fc.rules, target);
+    if (variation) return this.findVariation(fc.variations, variation);
+
+    // not found in rules proceed with default serve
+    variation = fc.defaultServe.variation;
+    // default serve variation is undefined so continue with distribution
+    if (fc.defaultServe.distribution) {
+      variation = this.getKeyName(
+        fc.defaultServe.distribution,
+        target,
+      );
+    }
+    return this.findVariation(fc.variations, variation);
   }
 
   boolVariation(
@@ -189,7 +287,7 @@ export class Evaluator {
 
     const variation = this.evaluateFlag(fc, target);
     if (variation) {
-      return variation.value.toLowerCase() === 'true'
+      return variation.value.toLowerCase() === 'true';
     }
 
     return defaultValue;
@@ -225,7 +323,7 @@ export class Evaluator {
 
     const variation = this.evaluateFlag(fc, target);
     if (variation) {
-      return parseFloat(variation.value)
+      return parseFloat(variation.value);
     }
 
     return defaultValue;
@@ -243,7 +341,7 @@ export class Evaluator {
 
     const variation = this.evaluateFlag(fc, target);
     if (variation) {
-      return JSON.parse(variation.value)
+      return JSON.parse(variation.value);
     }
 
     return defaultValue;

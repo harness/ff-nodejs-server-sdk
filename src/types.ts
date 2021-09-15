@@ -66,3 +66,10 @@ export interface KeyValueStore {
   get(key: string): unknown;
   del(key: string): void;
 }
+
+export interface Target {
+  identifier: string;
+  name: string;
+  anonymous?: boolean;
+  attributes?: Record<string, unknown>;
+}
