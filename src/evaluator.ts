@@ -6,6 +6,7 @@ import {
   GT_OPERATOR,
   IN_OPERATOR,
   ONE_HUNDRED,
+  SEGMENT_MATCH_OPERATOR,
   STARTS_WITH_OPERATOR,
 } from './constants';
 import { Operator, Query, Target, Type } from './types';
@@ -111,12 +112,15 @@ export class Evaluator {
   }
 
   private convertApiTargetsToEvalTargets(targets: ApiTarget[]): Target[] {
-    return targets.map(elem => ({
-      identifier: elem.identifier,
-      name: elem.name,
-      anonymous: elem.anonymous,
-      attributes: elem.attributes
-    } as Target))
+    return targets.map(
+      (elem) =>
+        ({
+          identifier: elem.identifier,
+          name: elem.name,
+          anonymous: elem.anonymous,
+          attributes: elem.attributes,
+        } as Target),
+    );
   }
 
   private isTargetIncludedOrExcludedInSegment(
@@ -128,7 +132,12 @@ export class Evaluator {
 
       if (segment) {
         // Should Target be excluded - if in excluded list we return false
-        if (this.isTargetInList(target, this.convertApiTargetsToEvalTargets(segment.excluded))) {
+        if (
+          this.isTargetInList(
+            target,
+            this.convertApiTargetsToEvalTargets(segment.excluded),
+          )
+        ) {
           // log.debug(
           //   "Target %s excluded from segment %s via exclude list\n",
           //   target.getName(), segment.getName());
@@ -136,7 +145,12 @@ export class Evaluator {
         }
 
         // Should Target be included - if in included list we return false
-        if (this.isTargetInList(target, this.convertApiTargetsToEvalTargets(segment.included))) {
+        if (
+          this.isTargetInList(
+            target,
+            this.convertApiTargetsToEvalTargets(segment.included),
+          )
+        ) {
           // log.debug(
           //   "Target %s included in segment %s via include list\n",
           //   target.getName(), segment.getName());
@@ -179,6 +193,8 @@ export class Evaluator {
         return operator.endsWith(clause.values);
       case CONTAINS_OPERATOR:
         return operator.contains(clause.values);
+      case SEGMENT_MATCH_OPERATOR:
+        return this.isTargetIncludedOrExcludedInSegment(clause.values, target);
     }
     return false;
   }
@@ -239,7 +255,10 @@ export class Evaluator {
 
       // find target in segment
       const segmentIdentifiers = variationMap.targetSegments;
-      if (segmentIdentifiers && this.isTargetIncludedOrExcludedInSegment(segmentIdentifiers, target)) {
+      if (
+        segmentIdentifiers &&
+        this.isTargetIncludedOrExcludedInSegment(segmentIdentifiers, target)
+      ) {
         return variationMap.variation;
       }
     }
@@ -267,10 +286,7 @@ export class Evaluator {
     variation = fc.defaultServe.variation;
     // default serve variation is undefined so continue with distribution
     if (fc.defaultServe.distribution) {
-      variation = this.getKeyName(
-        fc.defaultServe.distribution,
-        target,
-      );
+      variation = this.getKeyName(fc.defaultServe.distribution, target);
     }
     return this.findVariation(fc.variations, variation);
   }
