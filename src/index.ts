@@ -97,7 +97,6 @@ export class CfClient {
     target: Target,
     defaultValue: false,
   ): boolean {
-    console.log(identifier, target);
     return this.evaluator.boolVariation(identifier, target, defaultValue);
   }
 
