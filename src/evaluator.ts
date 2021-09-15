@@ -134,7 +134,7 @@ export class Evaluator {
           return false;
         }
 
-        // Should Target be included - if in included list we return false
+        // Should Target be included - if in included list we return true
         if (
           this.convertApiTargetsToEvalTargets(segment.included).includes(target)
         ) {
