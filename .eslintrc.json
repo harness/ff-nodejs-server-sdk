@@ -17,5 +17,7 @@
     "plugin:jest/recommended",
     "prettier"
   ],
-  "rules": {}
+  "rules": {
+    "@typescript-eslint/no-unused-vars": [2, { "argsIgnorePattern": "^_" }]
+  }
 }

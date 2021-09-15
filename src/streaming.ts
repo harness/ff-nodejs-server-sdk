@@ -1,15 +1,17 @@
 import * as EventSource from 'eventsource';
 import EventEmitter from 'events';
 import { AxiosPromise } from 'axios';
-import { CacheValueType, formatFlagKey } from './cache';
-import { DefaultApi } from './openapi';
+import { DefaultApi, FeatureConfig, Segment } from './openapi';
 import { Event, Options, StreamMsg } from './types';
-import { log } from './utils';
+import { Repository } from './repository';
+import { defaultOptions } from './constants';
+
+const log = defaultOptions.logger;
 
 type FetchFunction = (
   identifier: string,
   environment: string,
-) => AxiosPromise<CacheValueType>;
+) => AxiosPromise<FeatureConfig | Segment>;
 
 export class StreamProcessor {
   static readonly CONNECTED = 1;
@@ -22,6 +24,7 @@ export class StreamProcessor {
   private eventBus: EventEmitter;
   private api: DefaultApi;
   private eventSource: EventSource;
+  private repository: Repository;
 
   constructor(
     api: DefaultApi,
@@ -31,6 +34,7 @@ export class StreamProcessor {
     options: Options,
     cluster: string,
     eventBus: EventEmitter,
+    repository: Repository,
   ) {
     this.api = api;
     this.apiKey = apiKey;
@@ -39,6 +43,7 @@ export class StreamProcessor {
     this.options = options;
     this.cluster = cluster;
     this.eventBus = eventBus;
+    this.repository = repository;
   }
 
   start(): void {
@@ -72,13 +77,15 @@ export class StreamProcessor {
         this.msgProcessor(
           msg,
           this.api.getFeatureConfigByIdentifier.bind(this.api),
-          formatFlagKey,
+          this.repository.setFlag.bind(this.repository),
+          this.repository.deleteFlag.bind(this.repository)
         );
       } else if (msg.domain === 'target-segment') {
         this.msgProcessor(
           msg,
           this.api.getSegmentByIdentifier.bind(this.api),
-          formatFlagKey,
+          this.repository.setSegment.bind(this.repository),
+          this.repository.deleteSegment.bind(this.repository)
         );
       }
     });
@@ -89,16 +96,17 @@ export class StreamProcessor {
   private async msgProcessor(
     msg: StreamMsg,
     fn: FetchFunction,
-    keyFn: (key: string) => string,
+    setFn: (identifier: string, data: FeatureConfig | Segment) => void,
+    delFn: (identifier: string) => void,
   ): Promise<void> {
     log.info("Processing message", msg);
     try {
       const response = await fn(msg.identifier, this.environment);
-      const data: CacheValueType = response.data;
+      const data: FeatureConfig | Segment = response.data;
       if (msg.event === 'create' || msg.event === 'patch') {
-        this.options.cache.set(formatFlagKey(msg.identifier), data);
+        setFn(msg.identifier, data);
       } else if (msg.event === 'delete') {
-        delete this.options.cache[keyFn(msg.identifier)];
+        delFn(msg.identifier);
       }
     } catch (error) {
       log.error(

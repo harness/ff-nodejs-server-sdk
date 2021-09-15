@@ -1,9 +1,11 @@
 import { AxiosResponse } from 'axios';
-import { formatFlagKey, formatSegmentKey } from './cache';
-import { log } from './utils';
 import { DefaultApi, FeatureConfig, Segment } from './openapi';
 import { Event, Options } from './types';
 import EventEmitter from 'events';
+import { Repository } from './repository';
+import { defaultOptions } from './constants';
+
+const log = defaultOptions.logger;
 
 export class PollingProcessor {
   private environment: string;
@@ -11,6 +13,7 @@ export class PollingProcessor {
   private api: DefaultApi;
   private stopped = false;
   private options: Options;
+  private repository: Repository
 
   constructor(
     environment: string,
@@ -18,11 +21,13 @@ export class PollingProcessor {
     api: DefaultApi,
     options: Options,
     eventBus: EventEmitter,
+    repository: Repository
   ) {
     this.api = api;
     this.options = options;
     this.environment = environment;
     this.cluster = cluster;
+    this.repository = repository;
 
     // register listener for stream events
     eventBus.on(Event.CONNECTED, () => {
@@ -66,7 +71,7 @@ export class PollingProcessor {
       });
       log.debug('Fetching flags finished');
       response.data.forEach((fc: FeatureConfig) =>
-        this.options.cache.set(formatFlagKey(fc.feature), fc),
+        this.repository.setFlag(fc.feature, fc)
       );
     } catch (error) {
       log.error('Error loading flags', error);
@@ -85,7 +90,7 @@ export class PollingProcessor {
       log.debug('Fetching segments finished');
       // prepare cache for storing segments
       response.data.forEach((segment: Segment) =>
-        this.options.cache.set(formatSegmentKey(segment.identifier), segment),
+        this.repository.setSegment(segment.identifier, segment),
       );
     } catch (error) {
       log.error('Error loading segments', error);
