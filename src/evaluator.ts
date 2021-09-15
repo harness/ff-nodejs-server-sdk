@@ -76,19 +76,18 @@ export class Evaluator {
     return percentage > 0 && bucketId <= percentage;
   }
 
-  private getKeyName(
+  private evaluateDistribution(
     distribution: Distribution,
     target: Target,
   ): string | undefined {
+    if (!distribution) return undefined;
     let variation = '';
     for (const _var of distribution.variations) {
       variation = _var.variation;
       if (this.isEnabled(target, distribution.bucketBy, _var.weight))
         return _var.variation;
     }
-    return this.isEnabled(target, distribution.bucketBy, ONE_HUNDRED)
-      ? variation
-      : undefined;
+    return variation;
   }
 
   private getOperator(target: Target, attribute: string): Operator | undefined {
@@ -103,12 +102,6 @@ export class Evaluator {
       case 'object':
         return new Json();
     }
-  }
-
-  private isTargetInList(target: Target, targets: Target[]): boolean {
-    return (
-      targets.find((elem) => elem.identifier === target.identifier) != undefined
-    );
   }
 
   private convertApiTargetsToEvalTargets(targets: ApiTarget[]): Target[] {
@@ -133,10 +126,7 @@ export class Evaluator {
       if (segment) {
         // Should Target be excluded - if in excluded list we return false
         if (
-          this.isTargetInList(
-            target,
-            this.convertApiTargetsToEvalTargets(segment.excluded),
-          )
+          this.convertApiTargetsToEvalTargets(segment.excluded).includes(target)
         ) {
           // log.debug(
           //   "Target %s excluded from segment %s via exclude list\n",
@@ -146,10 +136,7 @@ export class Evaluator {
 
         // Should Target be included - if in included list we return false
         if (
-          this.isTargetInList(
-            target,
-            this.convertApiTargetsToEvalTargets(segment.included),
-          )
+          this.convertApiTargetsToEvalTargets(segment.included).includes(target)
         ) {
           // log.debug(
           //   "Target %s included in segment %s via include list\n",
@@ -158,13 +145,11 @@ export class Evaluator {
         }
 
         // Should Target be included via segment rules
-        if (segment.rules) {
-          if (this.evaluateClauses(segment.rules, target)) {
-            // log.debug(
-            //   "Target %s included in segment %s via rules\n",
-            //   target.getName(), segment.getName());
-            return true;
-          }
+        if (segment.rules && this.evaluateClauses(segment.rules, target)) {
+          // log.debug(
+          //   "Target %s included in segment %s via rules\n",
+          //   target.getName(), segment.getName());
+          return true;
         }
       }
     }
@@ -225,7 +210,7 @@ export class Evaluator {
 
       // rule matched, check if there is distribution
       if (rule.serve.distribution) {
-        identifier = this.getKeyName(rule.serve.distribution, target);
+        identifier = this.evaluateDistribution(rule.serve.distribution, target);
       }
 
       // rule matched, here must be variation if distribution is undefined or null
@@ -270,23 +255,13 @@ export class Evaluator {
     fc: FeatureConfig,
     target: Target,
   ): Variation | undefined {
-    if (fc.state === FeatureState.Off) {
-      return this.findVariation(fc.variations, fc.offVariation);
-    }
-
-    // process first variationMaps
-    let variation = this.evaluateVariationMap(fc.variationToTargetMap, target);
-    if (variation) return this.findVariation(fc.variations, variation);
-
-    // not found in variationMaps proceed with rules processor
-    variation = this.evaluateRules(fc.rules, target);
-    if (variation) return this.findVariation(fc.variations, variation);
-
-    // not found in rules proceed with default serve
-    variation = fc.defaultServe.variation;
-    // default serve variation is undefined so continue with distribution
-    if (fc.defaultServe.distribution) {
-      variation = this.getKeyName(fc.defaultServe.distribution, target);
+    let variation = fc.offVariation;
+    if (fc.state === FeatureState.On) {
+      variation =
+        this.evaluateVariationMap(fc.variationToTargetMap, target) ||
+        this.evaluateRules(fc.rules, target) ||
+        this.evaluateDistribution(fc.defaultServe.distribution, target) ||
+        fc.defaultServe.variation;
     }
     return this.findVariation(fc.variations, variation);
   }
