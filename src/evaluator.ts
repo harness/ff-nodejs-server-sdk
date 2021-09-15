@@ -6,9 +6,10 @@ import {
   GT_OPERATOR,
   IN_OPERATOR,
   ONE_HUNDRED,
+  SEGMENT_MATCH_OPERATOR,
   STARTS_WITH_OPERATOR,
 } from './constants';
-import { Operator, Query, Type } from './types';
+import { Operator, Query, Target, Type } from './types';
 import { Bool } from './boolean';
 import { Json } from './json';
 import { Num } from './number';
@@ -20,8 +21,9 @@ import {
   FeatureConfigKindEnum,
   FeatureState,
   ServingRule,
-  Target,
   Variation,
+  Target as ApiTarget,
+  VariationMap,
 } from './openapi';
 import murmurhash from 'murmurhash';
 
@@ -37,10 +39,10 @@ export class Evaluator {
   }
 
   private findVariation(
-    fc: FeatureConfig,
+    variations: Variation[],
     identifier: string,
   ): Variation | undefined {
-    return fc.variations.find(
+    return variations.find(
       (value: Variation) => value.identifier === identifier,
     );
   }
@@ -52,11 +54,15 @@ export class Evaluator {
   ): number {
     const value = [bucketBy, property].join(':');
     const hash = parseInt(murmurhash(value).toString());
-    return (hash % normalizer) + 1
+    return (hash % normalizer) + 1;
   }
 
   private getNormalizedNumber(property: Type, bucketBy: string): number {
-    return this.getNormalizedNumberWithNormalizer(property, bucketBy, ONE_HUNDRED);
+    return this.getNormalizedNumberWithNormalizer(
+      property,
+      bucketBy,
+      ONE_HUNDRED,
+    );
   }
 
   private isEnabled(
@@ -70,12 +76,18 @@ export class Evaluator {
     return percentage > 0 && bucketId <= percentage;
   }
 
-  private getKeyName(distribution: Distribution, target: Target): string | undefined {
+  private evaluateDistribution(
+    distribution: Distribution,
+    target: Target,
+  ): string | undefined {
+    if (!distribution) return undefined;
+    let variation = '';
     for (const _var of distribution.variations) {
+      variation = _var.variation;
       if (this.isEnabled(target, distribution.bucketBy, _var.weight))
         return _var.variation;
     }
-    return undefined;
+    return variation;
   }
 
   private getOperator(target: Target, attribute: string): Operator | undefined {
@@ -90,6 +102,58 @@ export class Evaluator {
       case 'object':
         return new Json();
     }
+  }
+
+  private convertApiTargetsToEvalTargets(targets: ApiTarget[]): Target[] {
+    return targets.map(
+      (elem) =>
+        ({
+          identifier: elem.identifier,
+          name: elem.name,
+          anonymous: elem.anonymous,
+          attributes: elem.attributes,
+        } as Target),
+    );
+  }
+
+  private isTargetIncludedOrExcludedInSegment(
+    segments: string[],
+    target: Target,
+  ): boolean {
+    for (const segmentIdentifier of segments) {
+      const segment = this.query.getSegment(segmentIdentifier);
+
+      if (segment) {
+        // Should Target be excluded - if in excluded list we return false
+        if (
+          this.convertApiTargetsToEvalTargets(segment.excluded).includes(target)
+        ) {
+          // log.debug(
+          //   "Target %s excluded from segment %s via exclude list\n",
+          //   target.getName(), segment.getName());
+          return false;
+        }
+
+        // Should Target be included - if in included list we return true
+        if (
+          this.convertApiTargetsToEvalTargets(segment.included).includes(target)
+        ) {
+          // log.debug(
+          //   "Target %s included in segment %s via include list\n",
+          //   target.getName(), segment.getName());
+          return true;
+        }
+
+        // Should Target be included via segment rules
+        if (segment.rules && this.evaluateClauses(segment.rules, target)) {
+          // log.debug(
+          //   "Target %s included in segment %s via rules\n",
+          //   target.getName(), segment.getName());
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   private evaluateClause(clause: Clause, target: Target): boolean {
@@ -114,6 +178,8 @@ export class Evaluator {
         return operator.endsWith(clause.values);
       case CONTAINS_OPERATOR:
         return operator.contains(clause.values);
+      case SEGMENT_MATCH_OPERATOR:
+        return this.isTargetIncludedOrExcludedInSegment(clause.values, target);
     }
     return false;
   }
@@ -134,18 +200,17 @@ export class Evaluator {
   }
 
   private evaluateRules(
-    fc: FeatureConfig,
+    rules: ServingRule[],
     target: Target,
-  ): Variation | undefined {
+  ): string | undefined {
     let identifier: string;
-    for (const rule of fc.rules) {
-
+    for (const rule of rules) {
       // if evaluation is false just continue to next rule
       if (!this.evaluateRule(rule, target)) continue;
 
       // rule matched, check if there is distribution
       if (rule.serve.distribution) {
-        identifier = this.getKeyName(rule.serve.distribution, target);
+        identifier = this.evaluateDistribution(rule.serve.distribution, target);
       }
 
       // rule matched, here must be variation if distribution is undefined or null
@@ -154,27 +219,51 @@ export class Evaluator {
       }
 
       // evaluation succeded, find variation in flag
-      return this.findVariation(fc, identifier);
+      return identifier;
     }
     // there is no rules return undefined
     return undefined;
   }
 
-  private evaluateFlag(fc: FeatureConfig, target: Target): Variation | undefined {
-    if (fc.state === FeatureState.Off) {
-      return this.findVariation(fc, fc.offVariation);
-    }
-    let variation = this.evaluateRules(fc, target);
-    if (!variation) {
-      // if variation is undefined then use flag default serve
-      if (fc.defaultServe.distribution) {
-        const identifier = this.getKeyName(fc.defaultServe.distribution, target);
-        variation = this.findVariation(fc, identifier);
-      } else {
-        variation = this.findVariation(fc, fc.defaultServe.variation);
+  private evaluateVariationMap(
+    variationToTargetMap: VariationMap[],
+    target: Target,
+  ): string | undefined {
+    if (!variationToTargetMap) return undefined;
+
+    for (const variationMap of variationToTargetMap) {
+      // find target
+      const targetMap = variationMap.targets?.find(
+        (elem) => elem.identifier === target.identifier,
+      );
+      if (targetMap) return variationMap.variation;
+
+      // find target in segment
+      const segmentIdentifiers = variationMap.targetSegments;
+      if (
+        segmentIdentifiers &&
+        this.isTargetIncludedOrExcludedInSegment(segmentIdentifiers, target)
+      ) {
+        return variationMap.variation;
       }
     }
-    return variation
+
+    return undefined;
+  }
+
+  private evaluateFlag(
+    fc: FeatureConfig,
+    target: Target,
+  ): Variation | undefined {
+    let variation = fc.offVariation;
+    if (fc.state === FeatureState.On) {
+      variation =
+        this.evaluateVariationMap(fc.variationToTargetMap, target) ||
+        this.evaluateRules(fc.rules, target) ||
+        this.evaluateDistribution(fc.defaultServe.distribution, target) ||
+        fc.defaultServe.variation;
+    }
+    return this.findVariation(fc.variations, variation);
   }
 
   boolVariation(
@@ -189,7 +278,7 @@ export class Evaluator {
 
     const variation = this.evaluateFlag(fc, target);
     if (variation) {
-      return variation.value.toLowerCase() === 'true'
+      return variation.value.toLowerCase() === 'true';
     }
 
     return defaultValue;
@@ -225,7 +314,7 @@ export class Evaluator {
 
     const variation = this.evaluateFlag(fc, target);
     if (variation) {
-      return parseFloat(variation.value)
+      return parseFloat(variation.value);
     }
 
     return defaultValue;
@@ -243,7 +332,7 @@ export class Evaluator {
 
     const variation = this.evaluateFlag(fc, target);
     if (variation) {
-      return JSON.parse(variation.value)
+      return JSON.parse(variation.value);
     }
 
     return defaultValue;

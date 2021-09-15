@@ -1,6 +1,6 @@
 import jwt_decode from 'jwt-decode';
-import { Claims, Options } from './types';
-import { Configuration, DefaultApi, Target } from './openapi';
+import { Claims, Options, Target } from './types';
+import { Configuration, DefaultApi } from './openapi';
 import { VERSION } from './version';
 import { PollingProcessor } from './polling';
 import { StreamProcessor } from './streaming';
@@ -69,7 +69,7 @@ export class CfClient {
       this.api,
       this.options,
       this.eventBus,
-      this.repository
+      this.repository,
     );
 
     // start processors
@@ -83,7 +83,7 @@ export class CfClient {
         this.options,
         this.cluster,
         this.eventBus,
-        this.repository
+        this.repository,
       );
 
       this.streamProcessor.start();
@@ -95,9 +95,33 @@ export class CfClient {
   boolVariation(
     identifier: string,
     target: Target,
-    defaultValue: false,
+    defaultValue = false,
   ): boolean {
     return this.evaluator.boolVariation(identifier, target, defaultValue);
+  }
+
+  stringVariation(
+    identifier: string,
+    target: Target,
+    defaultValue = '',
+  ): string {
+    return this.evaluator.stringVariation(identifier, target, defaultValue);
+  }
+
+  numberVariation(
+    identifier: string,
+    target: Target,
+    defaultValue = 0,
+  ): number {
+    return this.evaluator.numberVariation(identifier, target, defaultValue);
+  }
+
+  jsonVariation(
+    identifier: string,
+    target: Target,
+    defaultValue = {},
+  ): Record<string, unknown> {
+    return this.evaluator.jsonVariation(identifier, target, defaultValue);
   }
 
   close(): void {
