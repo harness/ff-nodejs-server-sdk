@@ -1,6 +1,5 @@
 import { SimpleCache } from "./cache";
 import { ConsoleLog } from "./log";
-import { FileStore } from "./store";
 import { Options } from "./types";
 
 export const ONE_HUNDRED = 100;
@@ -31,6 +30,5 @@ export const defaultOptions: Options = {
   enableStream: true,
   enableAnalytics: true,
   cache: new SimpleCache(),
-  store: new FileStore(),
   logger: new ConsoleLog(),
 };
