@@ -77,7 +77,9 @@ export class Evaluator {
     percentage: number,
   ): boolean {
     const property = this.getAttrValue(target, bucketBy);
-    if (!property) return false;
+    if (!property) {
+      return false;
+    }
     const bucketId = this.getNormalizedNumber(property, bucketBy);
     return percentage > 0 && bucketId <= percentage;
   }
@@ -86,12 +88,15 @@ export class Evaluator {
     distribution: Distribution,
     target: Target,
   ): string | undefined {
-    if (!distribution) return undefined;
+    if (!distribution) {
+      return undefined;
+    }
     let variation = '';
     for (const _var of distribution.variations) {
       variation = _var.variation;
-      if (this.isEnabled(target, distribution.bucketBy, _var.weight))
+      if (this.isEnabled(target, distribution.bucketBy, _var.weight)) {
         return _var.variation;
+      }
     }
     return variation;
   }
@@ -212,7 +217,9 @@ export class Evaluator {
     let identifier: string;
     for (const rule of rules) {
       // if evaluation is false just continue to next rule
-      if (!this.evaluateRule(rule, target)) continue;
+      if (!this.evaluateRule(rule, target)) {
+        continue;
+      }
 
       // rule matched, check if there is distribution
       if (rule.serve.distribution) {
@@ -235,14 +242,18 @@ export class Evaluator {
     variationToTargetMap: VariationMap[],
     target: Target,
   ): string | undefined {
-    if (!variationToTargetMap) return undefined;
+    if (!variationToTargetMap) {
+      return undefined;
+    }
 
     for (const variationMap of variationToTargetMap) {
       // find target
       const targetMap = variationMap.targets?.find(
         (elem) => elem.identifier === target.identifier,
       );
-      if (targetMap) return variationMap.variation;
+      if (targetMap) {
+        return variationMap.variation;
+      }
 
       // find target in segment
       const segmentIdentifiers = variationMap.targetSegments;
@@ -285,7 +296,9 @@ export class Evaluator {
 
     const variation = this.evaluateFlag(fc, target);
     if (variation) {
-      if (callback) callback(fc, target, variation);
+      if (callback) {
+        callback(fc, target, variation);
+      }
       return variation.value.toLowerCase() === 'true';
     }
 
@@ -305,7 +318,9 @@ export class Evaluator {
 
     const variation = this.evaluateFlag(fc, target);
     if (variation) {
-      if (callback) callback(fc, target, variation);
+      if (callback) {
+        callback(fc, target, variation);
+      }
       return variation.value;
     }
 
@@ -325,7 +340,9 @@ export class Evaluator {
 
     const variation = this.evaluateFlag(fc, target);
     if (variation) {
-      if (callback) callback(fc, target, variation);
+      if (callback) {
+        callback(fc, target, variation);
+      }
       return parseFloat(variation.value);
     }
 
@@ -345,7 +362,9 @@ export class Evaluator {
 
     const variation = this.evaluateFlag(fc, target);
     if (variation) {
-      if (callback) callback(fc, target, variation);
+      if (callback) {
+        callback(fc, target, variation);
+      }
       return JSON.parse(variation.value);
     }
 

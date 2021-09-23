@@ -73,10 +73,10 @@ export const MetricsProcessor = (
   };
 
   const _formatKey = (event: AnalyticsEvent): string => {
-    const feature = event.featureConfig.feature,
-      variation = event.variation.identifier,
-      value = event.variation.value,
-      target = GLOBAL_TARGET;
+    const feature = event.featureConfig.feature;
+    const variation = event.variation.identifier;
+    const value = event.variation.value;
+    const target = GLOBAL_TARGET;
     return `${feature}/${variation}/${value}/${target}`;
   };
 
@@ -88,15 +88,18 @@ export const MetricsProcessor = (
     const targetData: TargetData[] = [];
     const metricsData: MetricsData[] = [];
 
-    for (const [, event] of data) {
+    for (const event of data.values()) {
       if (event.target && !event.target.anonymous) {
         const targetAttributes: KeyValue[] = [];
-        if (event.target.attributes)
-          for (const [key, value] of Object.entries(event.target.attributes))
+        if (event.target.attributes) {
+          for (const [key, value] of Object.entries(event.target.attributes)) {
             targetAttributes.push({ key, value: value as string });
-
+          }
+        }
         let targetName = event.target.identifier;
-        if (event.target.name) targetName = event.target.name;
+        if (event.target.name) {
+          targetName = event.target.name;
+        }
 
         const td: TargetData = {
           identifier: event.target.identifier,
