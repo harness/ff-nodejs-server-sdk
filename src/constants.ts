@@ -1,8 +1,22 @@
-import { SimpleCache } from "./cache";
-import { ConsoleLog } from "./log";
-import { Options } from "./types";
+import { SimpleCache } from './cache';
+import { ConsoleLog } from './log';
+import { Options } from './types';
 
 export const ONE_HUNDRED = 100;
+
+export const FF_METRIC_TYPE = 'FFMETRICS',
+  FEATURE_IDENTIFIER_ATTRIBUTE = 'featureIdentifier',
+  FEATURE_NAME_ATTRIBUTE = 'featureName',
+  VARIATION_IDENTIFIER_ATTRIBUTE = 'variationIdentifier',
+  VARIATION_VALUE_ATTRIBUTE = 'featureValue',
+  TARGET_ATTRIBUTE = 'target',
+  SDK_VERSION_ATTRIBUTE = 'SDK_VERSION',
+  SDK_VERSION = '1.0.0',
+  SDK_TYPE_ATTRIBUTE = 'SDK_TYPE',
+  SDK_TYPE = 'server',
+  SDK_LANGUAGE_ATTRIBUTE = 'SDK_LANGUAGE',
+  SDK_LANGUAGE = 'python',
+  GLOBAL_TARGET = 'global';
 
 export const SEGMENT_MATCH_OPERATOR = 'segmentMatch',
   IN_OPERATOR = 'in',

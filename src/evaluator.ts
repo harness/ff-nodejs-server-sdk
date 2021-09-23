@@ -27,6 +27,12 @@ import {
 } from './openapi';
 import murmurhash from 'murmurhash';
 
+type Callback = (
+  fc: FeatureConfig,
+  target: Target,
+  variation: Variation,
+) => void;
+
 export class Evaluator {
   private query: Query;
 
@@ -71,7 +77,9 @@ export class Evaluator {
     percentage: number,
   ): boolean {
     const property = this.getAttrValue(target, bucketBy);
-    if (!property) return false;
+    if (!property) {
+      return false;
+    }
     const bucketId = this.getNormalizedNumber(property, bucketBy);
     return percentage > 0 && bucketId <= percentage;
   }
@@ -80,12 +88,15 @@ export class Evaluator {
     distribution: Distribution,
     target: Target,
   ): string | undefined {
-    if (!distribution) return undefined;
+    if (!distribution) {
+      return undefined;
+    }
     let variation = '';
     for (const _var of distribution.variations) {
       variation = _var.variation;
-      if (this.isEnabled(target, distribution.bucketBy, _var.weight))
+      if (this.isEnabled(target, distribution.bucketBy, _var.weight)) {
         return _var.variation;
+      }
     }
     return variation;
   }
@@ -206,7 +217,9 @@ export class Evaluator {
     let identifier: string;
     for (const rule of rules) {
       // if evaluation is false just continue to next rule
-      if (!this.evaluateRule(rule, target)) continue;
+      if (!this.evaluateRule(rule, target)) {
+        continue;
+      }
 
       // rule matched, check if there is distribution
       if (rule.serve.distribution) {
@@ -229,14 +242,18 @@ export class Evaluator {
     variationToTargetMap: VariationMap[],
     target: Target,
   ): string | undefined {
-    if (!variationToTargetMap) return undefined;
+    if (!variationToTargetMap) {
+      return undefined;
+    }
 
     for (const variationMap of variationToTargetMap) {
       // find target
       const targetMap = variationMap.targets?.find(
         (elem) => elem.identifier === target.identifier,
       );
-      if (targetMap) return variationMap.variation;
+      if (targetMap) {
+        return variationMap.variation;
+      }
 
       // find target in segment
       const segmentIdentifiers = variationMap.targetSegments;
@@ -270,14 +287,18 @@ export class Evaluator {
     identifier: string,
     target: Target,
     defaultValue = false,
+    callback: Callback = undefined,
   ): boolean {
     const fc = this.query.getFlag(identifier);
-    if (fc.kind !== FeatureConfigKindEnum.Boolean) {
+    if (!fc || fc.kind !== FeatureConfigKindEnum.Boolean) {
       return defaultValue;
     }
 
     const variation = this.evaluateFlag(fc, target);
     if (variation) {
+      if (callback) {
+        callback(fc, target, variation);
+      }
       return variation.value.toLowerCase() === 'true';
     }
 
@@ -288,14 +309,18 @@ export class Evaluator {
     identifier: string,
     target: Target,
     defaultValue = '',
+    callback: Callback = undefined,
   ): string {
     const fc = this.query.getFlag(identifier);
-    if (fc.kind !== FeatureConfigKindEnum.String) {
+    if (!fc || fc.kind !== FeatureConfigKindEnum.String) {
       return defaultValue;
     }
 
     const variation = this.evaluateFlag(fc, target);
     if (variation) {
+      if (callback) {
+        callback(fc, target, variation);
+      }
       return variation.value;
     }
 
@@ -306,14 +331,18 @@ export class Evaluator {
     identifier: string,
     target: Target,
     defaultValue = 0,
+    callback: Callback = undefined,
   ): number {
     const fc = this.query.getFlag(identifier);
-    if (fc.kind !== FeatureConfigKindEnum.Int) {
+    if (!fc || fc.kind !== FeatureConfigKindEnum.Int) {
       return defaultValue;
     }
 
     const variation = this.evaluateFlag(fc, target);
     if (variation) {
+      if (callback) {
+        callback(fc, target, variation);
+      }
       return parseFloat(variation.value);
     }
 
@@ -324,14 +353,18 @@ export class Evaluator {
     identifier: string,
     target: Target,
     defaultValue = {},
+    callback: Callback = undefined,
   ): Record<string, unknown> {
     const fc = this.query.getFlag(identifier);
-    if (fc.kind !== FeatureConfigKindEnum.Json) {
+    if (!fc || fc.kind !== FeatureConfigKindEnum.Json) {
       return defaultValue;
     }
 
     const variation = this.evaluateFlag(fc, target);
     if (variation) {
+      if (callback) {
+        callback(fc, target, variation);
+      }
       return JSON.parse(variation.value);
     }
 
