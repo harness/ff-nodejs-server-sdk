@@ -90,11 +90,11 @@ export const MetricsProcessor = (
 
     for (const event of data.values()) {
       if (event.target && !event.target.anonymous) {
-        const targetAttributes: KeyValue[] = [];
+        let targetAttributes: KeyValue[] = [];
         if (event.target.attributes) {
-          for (const [key, value] of Object.entries(event.target.attributes)) {
-            targetAttributes.push({ key, value: value as string });
-          }
+          targetAttributes = Object.entries(event.target.attributes).map(
+            ([key, value]) => ({ key, value: value as string}),
+          );
         }
         let targetName = event.target.identifier;
         if (event.target.name) {
