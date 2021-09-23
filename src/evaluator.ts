@@ -27,6 +27,12 @@ import {
 } from './openapi';
 import murmurhash from 'murmurhash';
 
+type Callback = (
+  fc: FeatureConfig,
+  target: Target,
+  variation: Variation,
+) => void;
+
 export class Evaluator {
   private query: Query;
 
@@ -270,6 +276,7 @@ export class Evaluator {
     identifier: string,
     target: Target,
     defaultValue = false,
+    callback: Callback = undefined,
   ): boolean {
     const fc = this.query.getFlag(identifier);
     if (!fc || fc.kind !== FeatureConfigKindEnum.Boolean) {
@@ -278,6 +285,7 @@ export class Evaluator {
 
     const variation = this.evaluateFlag(fc, target);
     if (variation) {
+      if (callback) callback(fc, target, variation);
       return variation.value.toLowerCase() === 'true';
     }
 
@@ -288,6 +296,7 @@ export class Evaluator {
     identifier: string,
     target: Target,
     defaultValue = '',
+    callback: Callback = undefined,
   ): string {
     const fc = this.query.getFlag(identifier);
     if (!fc || fc.kind !== FeatureConfigKindEnum.String) {
@@ -296,6 +305,7 @@ export class Evaluator {
 
     const variation = this.evaluateFlag(fc, target);
     if (variation) {
+      if (callback) callback(fc, target, variation);
       return variation.value;
     }
 
@@ -306,6 +316,7 @@ export class Evaluator {
     identifier: string,
     target: Target,
     defaultValue = 0,
+    callback: Callback = undefined,
   ): number {
     const fc = this.query.getFlag(identifier);
     if (!fc || fc.kind !== FeatureConfigKindEnum.Int) {
@@ -314,6 +325,7 @@ export class Evaluator {
 
     const variation = this.evaluateFlag(fc, target);
     if (variation) {
+      if (callback) callback(fc, target, variation);
       return parseFloat(variation.value);
     }
 
@@ -324,6 +336,7 @@ export class Evaluator {
     identifier: string,
     target: Target,
     defaultValue = {},
+    callback: Callback = undefined,
   ): Record<string, unknown> {
     const fc = this.query.getFlag(identifier);
     if (!fc || fc.kind !== FeatureConfigKindEnum.Json) {
@@ -332,6 +345,7 @@ export class Evaluator {
 
     const variation = this.evaluateFlag(fc, target);
     if (variation) {
+      if (callback) callback(fc, target, variation);
       return JSON.parse(variation.value);
     }
 

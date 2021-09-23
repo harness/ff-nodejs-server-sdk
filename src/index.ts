@@ -1,6 +1,6 @@
 import jwt_decode from 'jwt-decode';
 import { Claims, Options, Target } from './types';
-import { Configuration, ClientApi } from './openapi';
+import { Configuration, ClientApi, FeatureConfig, Variation } from './openapi';
 import { VERSION } from './version';
 import { PollingProcessor } from './polling';
 import { StreamProcessor } from './streaming';
@@ -108,7 +108,14 @@ export class CfClient {
     target: Target,
     defaultValue = false,
   ): boolean {
-    return this.evaluator.boolVariation(identifier, target, defaultValue);
+    return this.evaluator.boolVariation(
+      identifier,
+      target,
+      defaultValue,
+      (fc: FeatureConfig, target: Target, variation: Variation) => {
+        this.metricsProcessor.enqueue(target, fc, variation);
+      },
+    );
   }
 
   stringVariation(
@@ -116,7 +123,14 @@ export class CfClient {
     target: Target,
     defaultValue = '',
   ): string {
-    return this.evaluator.stringVariation(identifier, target, defaultValue);
+    return this.evaluator.stringVariation(
+      identifier,
+      target,
+      defaultValue,
+      (fc: FeatureConfig, target: Target, variation: Variation) => {
+        this.metricsProcessor.enqueue(target, fc, variation);
+      },
+    );
   }
 
   numberVariation(
@@ -124,7 +138,14 @@ export class CfClient {
     target: Target,
     defaultValue = 0,
   ): number {
-    return this.evaluator.numberVariation(identifier, target, defaultValue);
+    return this.evaluator.numberVariation(
+      identifier,
+      target,
+      defaultValue,
+      (fc: FeatureConfig, target: Target, variation: Variation) => {
+        this.metricsProcessor.enqueue(target, fc, variation);
+      },
+    );
   }
 
   jsonVariation(
@@ -132,7 +153,14 @@ export class CfClient {
     target: Target,
     defaultValue = {},
   ): Record<string, unknown> {
-    return this.evaluator.jsonVariation(identifier, target, defaultValue);
+    return this.evaluator.jsonVariation(
+      identifier,
+      target,
+      defaultValue,
+      (fc: FeatureConfig, target: Target, variation: Variation) => {
+        this.metricsProcessor.enqueue(target, fc, variation);
+      },
+    );
   }
 
   close(): void {

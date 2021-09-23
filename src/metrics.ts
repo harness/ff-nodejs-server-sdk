@@ -41,7 +41,7 @@ export const MetricsProcessor = (
   conf: Configuration,
   options: Options,
 ): MetricsProcessorInterface => {
-  let data: Record<string, AnalyticsEvent>;
+  const data: Map<string, AnalyticsEvent> = new Map<string, AnalyticsEvent>();
   let syncInterval: NodeJS.Timeout;
 
   const configuration = new Configuration({
@@ -88,7 +88,7 @@ export const MetricsProcessor = (
     const targetData: TargetData[] = [];
     const metricsData: MetricsData[] = [];
 
-    for (const [, event] of Object.entries(data)) {
+    for (const [, event] of data) {
       if (event.target && !event.target.anonymous) {
         const targetAttributes: KeyValue[] = [];
         if (event.target.attributes)
@@ -129,11 +129,27 @@ export const MetricsProcessor = (
 
   const _send = (): void => {
     const metrics: Metrics = _summarize();
-    api.postMetrics(environment, metrics, {
-      params: {
-        cluster: cluster,
-      },
-    });
+    if (metrics) {
+      log.debug('Start sending metrics data');
+      api
+        .postMetrics(environment, metrics, {
+          params: {
+            cluster: cluster,
+          },
+        })
+        .then((response) => {
+          log.debug('Metrics server returns: ', response.status);
+          if (response.status >= 400) {
+            log.error(
+              'Error while sending metrics data with status code: ',
+              response.status,
+            );
+          }
+        })
+        .catch((error: Error) => {
+          log.debug('Metrics server returns error: ', error);
+        });
+    }
   };
 
   const start = (): void => {
