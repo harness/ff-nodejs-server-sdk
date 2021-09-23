@@ -1,6 +1,6 @@
 import jwt_decode from 'jwt-decode';
 import { Claims, Options, Target } from './types';
-import { Configuration, DefaultApi } from './openapi';
+import { Configuration, ClientApi } from './openapi';
 import { VERSION } from './version';
 import { PollingProcessor } from './polling';
 import { StreamProcessor } from './streaming';
@@ -8,12 +8,13 @@ import * as events from 'events';
 import { Evaluator } from './evaluator';
 import { defaultOptions } from './constants';
 import { Repository, StorageRepository } from './repository';
+import { MetricsProcessor, MetricsProcessorInterface } from './metrics';
 
 const log = defaultOptions.logger;
 export class CfClient {
   private evaluator: Evaluator;
   private repository: Repository;
-  private api: DefaultApi;
+  private api: ClientApi;
   private sdkKey: string;
   private authToken: string;
   private environment: string;
@@ -23,6 +24,7 @@ export class CfClient {
   private eventBus = new events.EventEmitter();
   private pollProcessor: PollingProcessor;
   private streamProcessor: StreamProcessor;
+  private metricsProcessor: MetricsProcessorInterface;
 
   constructor(sdkKey: string, options: Options = {}) {
     this.sdkKey = sdkKey;
@@ -30,6 +32,11 @@ export class CfClient {
 
     this.configuration = new Configuration({
       basePath: this.options.baseUrl,
+      baseOptions: {
+        headers: {
+          'User-Agent': `NodeJsSDK/${VERSION}`,
+        },
+      },
     });
 
     this.repository = new StorageRepository(
@@ -38,7 +45,7 @@ export class CfClient {
     );
     this.evaluator = new Evaluator(this.repository);
 
-    this.api = new DefaultApi(this.configuration);
+    this.api = new ClientApi(this.configuration);
     this.run();
   }
 
@@ -53,11 +60,6 @@ export class CfClient {
 
     this.environment = decoded.environment;
     this.cluster = decoded.clusterIdentifier || '1';
-    this.configuration.baseOptions = {
-      headers: {
-        'User-Agent': `NodeJsSDK/${VERSION}`,
-      },
-    };
     return this.authToken;
   }
 
@@ -71,9 +73,8 @@ export class CfClient {
       this.eventBus,
       this.repository,
     );
-
-    // start processors
     this.pollProcessor.start();
+
     if (this.options.enableStream) {
       this.streamProcessor = new StreamProcessor(
         this.api,
@@ -87,6 +88,16 @@ export class CfClient {
       );
 
       this.streamProcessor.start();
+    }
+
+    if (this.options.enableAnalytics) {
+      this.metricsProcessor = MetricsProcessor(
+        this.environment,
+        this.cluster,
+        this.configuration,
+        this.options,
+      );
+      this.metricsProcessor.start();
     }
 
     log.info('finished setting up processors');
@@ -128,6 +139,9 @@ export class CfClient {
     this.pollProcessor.close();
     if (this.options.enableStream) {
       this.streamProcessor.close();
+    }
+    if (this.options.enableAnalytics) {
+      this.metricsProcessor.close();
     }
   }
 }

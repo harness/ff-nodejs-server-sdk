@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import { DefaultApi, FeatureConfig, Segment } from './openapi';
+import { ClientApi, FeatureConfig, Segment } from './openapi';
 import { Event, Options } from './types';
 import EventEmitter from 'events';
 import { Repository } from './repository';
@@ -10,7 +10,7 @@ const log = defaultOptions.logger;
 export class PollingProcessor {
   private environment: string;
   private cluster: string;
-  private api: DefaultApi;
+  private api: ClientApi;
   private stopped = false;
   private options: Options;
   private repository: Repository
@@ -18,7 +18,7 @@ export class PollingProcessor {
   constructor(
     environment: string,
     cluster: string,
-    api: DefaultApi,
+    api: ClientApi,
     options: Options,
     eventBus: EventEmitter,
     repository: Repository

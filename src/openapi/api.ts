@@ -276,6 +276,84 @@ export enum FeatureState {
 /**
  * 
  * @export
+ * @interface KeyValue
+ */
+export interface KeyValue {
+    /**
+     * 
+     * @type {string}
+     * @memberof KeyValue
+     */
+    key: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof KeyValue
+     */
+    value: string;
+}
+/**
+ * 
+ * @export
+ * @interface Metrics
+ */
+export interface Metrics {
+    /**
+     * 
+     * @type {Array<TargetData>}
+     * @memberof Metrics
+     */
+    targetData?: Array<TargetData>;
+    /**
+     * 
+     * @type {Array<MetricsData>}
+     * @memberof Metrics
+     */
+    metricsData?: Array<MetricsData>;
+}
+/**
+ * 
+ * @export
+ * @interface MetricsData
+ */
+export interface MetricsData {
+    /**
+     * time at when this data was recorded
+     * @type {number}
+     * @memberof MetricsData
+     */
+    timestamp: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof MetricsData
+     */
+    count: number;
+    /**
+     * This can be of type FeatureMetrics
+     * @type {string}
+     * @memberof MetricsData
+     */
+    metricsType: MetricsDataMetricsTypeEnum;
+    /**
+     * 
+     * @type {Array<KeyValue>}
+     * @memberof MetricsData
+     */
+    attributes: Array<KeyValue>;
+}
+
+/**
+    * @export
+    * @enum {string}
+    */
+export enum MetricsDataMetricsTypeEnum {
+    Ffmetrics = 'FFMETRICS'
+}
+
+/**
+ * 
+ * @export
  * @interface ModelError
  */
 export interface ModelError {
@@ -554,6 +632,31 @@ export interface Target {
 /**
  * 
  * @export
+ * @interface TargetData
+ */
+export interface TargetData {
+    /**
+     * 
+     * @type {string}
+     * @memberof TargetData
+     */
+    identifier: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TargetData
+     */
+    name: string;
+    /**
+     * 
+     * @type {Array<KeyValue>}
+     * @memberof TargetData
+     */
+    attributes: Array<KeyValue>;
+}
+/**
+ * 
+ * @export
  * @interface TargetMap
  */
 export interface TargetMap {
@@ -647,10 +750,10 @@ export interface WeightedVariation {
 }
 
 /**
- * DefaultApi - axios parameter creator
+ * ClientApi - axios parameter creator
  * @export
  */
-export const DefaultApiAxiosParamCreator = function (configuration?: Configuration) {
+export const ClientApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
          * Used to retrieve all target segments for certain account id.
@@ -979,11 +1082,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 };
 
 /**
- * DefaultApi - functional programming interface
+ * ClientApi - functional programming interface
  * @export
  */
-export const DefaultApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = DefaultApiAxiosParamCreator(configuration)
+export const ClientApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = ClientApiAxiosParamCreator(configuration)
     return {
         /**
          * Used to retrieve all target segments for certain account id.
@@ -1082,11 +1185,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
 };
 
 /**
- * DefaultApi - factory interface
+ * ClientApi - factory interface
  * @export
  */
-export const DefaultApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = DefaultApiFp(configuration)
+export const ClientApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = ClientApiFp(configuration)
     return {
         /**
          * Used to retrieve all target segments for certain account id.
@@ -1177,22 +1280,22 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
 };
 
 /**
- * DefaultApi - object-oriented interface
+ * ClientApi - object-oriented interface
  * @export
- * @class DefaultApi
+ * @class ClientApi
  * @extends {BaseAPI}
  */
-export class DefaultApi extends BaseAPI {
+export class ClientApi extends BaseAPI {
     /**
      * Used to retrieve all target segments for certain account id.
      * @summary Authenticate with the admin server.
      * @param {AuthenticationRequest} [authenticationRequest] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
+     * @memberof ClientApi
      */
     public authenticate(authenticationRequest?: AuthenticationRequest, options?: any) {
-        return DefaultApiFp(this.configuration).authenticate(authenticationRequest, options).then((request) => request(this.axios, this.basePath));
+        return ClientApiFp(this.configuration).authenticate(authenticationRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1201,10 +1304,10 @@ export class DefaultApi extends BaseAPI {
      * @param {string} environmentUUID Unique identifier for the environment object in the API.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
+     * @memberof ClientApi
      */
     public getAllSegments(environmentUUID: string, options?: any) {
-        return DefaultApiFp(this.configuration).getAllSegments(environmentUUID, options).then((request) => request(this.axios, this.basePath));
+        return ClientApiFp(this.configuration).getAllSegments(environmentUUID, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1215,10 +1318,10 @@ export class DefaultApi extends BaseAPI {
      * @param {string} target Unique identifier for the target object in the API.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
+     * @memberof ClientApi
      */
     public getEvaluationByIdentifier(environmentUUID: string, feature: string, target: string, options?: any) {
-        return DefaultApiFp(this.configuration).getEvaluationByIdentifier(environmentUUID, feature, target, options).then((request) => request(this.axios, this.basePath));
+        return ClientApiFp(this.configuration).getEvaluationByIdentifier(environmentUUID, feature, target, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1228,10 +1331,10 @@ export class DefaultApi extends BaseAPI {
      * @param {string} target Unique identifier for the target object in the API.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
+     * @memberof ClientApi
      */
     public getEvaluations(environmentUUID: string, target: string, options?: any) {
-        return DefaultApiFp(this.configuration).getEvaluations(environmentUUID, target, options).then((request) => request(this.axios, this.basePath));
+        return ClientApiFp(this.configuration).getEvaluations(environmentUUID, target, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1240,10 +1343,10 @@ export class DefaultApi extends BaseAPI {
      * @param {string} environmentUUID Unique identifier for the environment object in the API.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
+     * @memberof ClientApi
      */
     public getFeatureConfig(environmentUUID: string, options?: any) {
-        return DefaultApiFp(this.configuration).getFeatureConfig(environmentUUID, options).then((request) => request(this.axios, this.basePath));
+        return ClientApiFp(this.configuration).getFeatureConfig(environmentUUID, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1253,10 +1356,10 @@ export class DefaultApi extends BaseAPI {
      * @param {string} environmentUUID Unique identifier for the environment object in the API.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
+     * @memberof ClientApi
      */
     public getFeatureConfigByIdentifier(identifier: string, environmentUUID: string, options?: any) {
-        return DefaultApiFp(this.configuration).getFeatureConfigByIdentifier(identifier, environmentUUID, options).then((request) => request(this.axios, this.basePath));
+        return ClientApiFp(this.configuration).getFeatureConfigByIdentifier(identifier, environmentUUID, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1266,10 +1369,10 @@ export class DefaultApi extends BaseAPI {
      * @param {string} environmentUUID Unique identifier for the environment object in the API
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
+     * @memberof ClientApi
      */
     public getSegmentByIdentifier(identifier: string, environmentUUID: string, options?: any) {
-        return DefaultApiFp(this.configuration).getSegmentByIdentifier(identifier, environmentUUID, options).then((request) => request(this.axios, this.basePath));
+        return ClientApiFp(this.configuration).getSegmentByIdentifier(identifier, environmentUUID, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1278,10 +1381,126 @@ export class DefaultApi extends BaseAPI {
      * @param {string} aPIKey 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
+     * @memberof ClientApi
      */
     public stream(aPIKey: string, options?: any) {
-        return DefaultApiFp(this.configuration).stream(aPIKey, options).then((request) => request(this.axios, this.basePath));
+        return ClientApiFp(this.configuration).stream(aPIKey, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * MetricsApi - axios parameter creator
+ * @export
+ */
+export const MetricsApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Send metrics to Analytics server
+         * @summary Send metrics to the Analytics server.
+         * @param {string} environment environment parameter in query.
+         * @param {Metrics} [metrics] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        postMetrics: async (environment: string, metrics?: Metrics, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'environment' is not null or undefined
+            assertParamExists('postMetrics', 'environment', environment)
+            const localVarPath = `/metrics/{environment}`
+                .replace(`{${"environment"}}`, encodeURIComponent(String(environment)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(metrics, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * MetricsApi - functional programming interface
+ * @export
+ */
+export const MetricsApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = MetricsApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Send metrics to Analytics server
+         * @summary Send metrics to the Analytics server.
+         * @param {string} environment environment parameter in query.
+         * @param {Metrics} [metrics] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async postMetrics(environment: string, metrics?: Metrics, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.postMetrics(environment, metrics, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * MetricsApi - factory interface
+ * @export
+ */
+export const MetricsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = MetricsApiFp(configuration)
+    return {
+        /**
+         * Send metrics to Analytics server
+         * @summary Send metrics to the Analytics server.
+         * @param {string} environment environment parameter in query.
+         * @param {Metrics} [metrics] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        postMetrics(environment: string, metrics?: Metrics, options?: any): AxiosPromise<void> {
+            return localVarFp.postMetrics(environment, metrics, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * MetricsApi - object-oriented interface
+ * @export
+ * @class MetricsApi
+ * @extends {BaseAPI}
+ */
+export class MetricsApi extends BaseAPI {
+    /**
+     * Send metrics to Analytics server
+     * @summary Send metrics to the Analytics server.
+     * @param {string} environment environment parameter in query.
+     * @param {Metrics} [metrics] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MetricsApi
+     */
+    public postMetrics(environment: string, metrics?: Metrics, options?: any) {
+        return MetricsApiFp(this.configuration).postMetrics(environment, metrics, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

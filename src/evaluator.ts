@@ -272,7 +272,7 @@ export class Evaluator {
     defaultValue = false,
   ): boolean {
     const fc = this.query.getFlag(identifier);
-    if (fc.kind !== FeatureConfigKindEnum.Boolean) {
+    if (!fc || fc.kind !== FeatureConfigKindEnum.Boolean) {
       return defaultValue;
     }
 
@@ -290,7 +290,7 @@ export class Evaluator {
     defaultValue = '',
   ): string {
     const fc = this.query.getFlag(identifier);
-    if (fc.kind !== FeatureConfigKindEnum.String) {
+    if (!fc || fc.kind !== FeatureConfigKindEnum.String) {
       return defaultValue;
     }
 
@@ -308,7 +308,7 @@ export class Evaluator {
     defaultValue = 0,
   ): number {
     const fc = this.query.getFlag(identifier);
-    if (fc.kind !== FeatureConfigKindEnum.Int) {
+    if (!fc || fc.kind !== FeatureConfigKindEnum.Int) {
       return defaultValue;
     }
 
@@ -326,7 +326,7 @@ export class Evaluator {
     defaultValue = {},
   ): Record<string, unknown> {
     const fc = this.query.getFlag(identifier);
-    if (fc.kind !== FeatureConfigKindEnum.Json) {
+    if (!fc || fc.kind !== FeatureConfigKindEnum.Json) {
       return defaultValue;
     }
 

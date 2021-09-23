@@ -1,7 +1,7 @@
 import * as EventSource from 'eventsource';
 import EventEmitter from 'events';
 import { AxiosPromise } from 'axios';
-import { DefaultApi, FeatureConfig, Segment } from './openapi';
+import { ClientApi, FeatureConfig, Segment } from './openapi';
 import { Event, Options, StreamMsg } from './types';
 import { Repository } from './repository';
 import { defaultOptions } from './constants';
@@ -22,12 +22,12 @@ export class StreamProcessor {
   private options: Options;
   private cluster: string;
   private eventBus: EventEmitter;
-  private api: DefaultApi;
+  private api: ClientApi;
   private eventSource: EventSource;
   private repository: Repository;
 
   constructor(
-    api: DefaultApi,
+    api: ClientApi,
     apiKey: string,
     environment: string,
     jwtToken: string,
