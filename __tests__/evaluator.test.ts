@@ -34,6 +34,7 @@ for (const file of files) {
   try {
     const data = fs.readFileSync(path.join(directory, file), 'utf8');
     const usecase = JSON.parse(data) as Usecase;
+    usecase.flag.feature += file;
     repository.setFlag(usecase.flag.feature, usecase.flag);
 
     Object.entries(usecase.expected).forEach(([targetIdentifier, value]) => {
