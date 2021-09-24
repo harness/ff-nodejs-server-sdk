@@ -44,7 +44,6 @@ for (const file of files) {
         value,
         usecase,
       ];
-      console.log(file, targetIdentifier, value)
       results.push(result);
     });
   } catch (err) {
@@ -57,7 +56,7 @@ for (const file of files) {
 describe('evaluation flag', () => {
   test.each(results)(
     `Usecase %p with target %p and expected value %p`,
-    (file: string, targetIdentifier: string, expected: unknown, usecase: Usecase) => {
+    (_file: string, targetIdentifier: string, expected: unknown, usecase: Usecase) => {
       let target: Target;
       if (targetIdentifier === '_no_target') {
         target = undefined;
@@ -85,9 +84,6 @@ describe('evaluation flag', () => {
           got = evaluator.jsonVariation(usecase.flag.feature, target, {});
           break;
       }
-      console.log(
-        `Usecase ${file} with target ${targetIdentifier} and expected value ${expected} got ${got}`,
-      );
       expect(expected).toBe(got);
   })
 });
