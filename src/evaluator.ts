@@ -214,6 +214,9 @@ export class Evaluator {
     rules: ServingRule[],
     target: Target,
   ): string | undefined {
+    if (!target || !rules) {
+      return undefined;
+    }
     let identifier: string;
     for (const rule of rules) {
       // if evaluation is false just continue to next rule
@@ -234,7 +237,6 @@ export class Evaluator {
       // evaluation succeded, find variation in flag
       return identifier;
     }
-    // there is no rules return undefined
     return undefined;
   }
 
@@ -242,7 +244,7 @@ export class Evaluator {
     variationToTargetMap: VariationMap[],
     target: Target,
   ): string | undefined {
-    if (!variationToTargetMap) {
+    if (!target || !variationToTargetMap) {
       return undefined;
     }
 
