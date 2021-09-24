@@ -1,0 +1,44 @@
+{
+  "flag": {
+    "defaultServe": { "distribution": null, "variation": "true" },
+    "environment": "demoenv",
+    "feature": "AlfaTest",
+    "kind": "boolean",
+    "offVariation": "false",
+    "prerequisites": [],
+    "project": "FeatureFlagsDemo",
+    "rules": [],
+    "state": "on",
+    "variationToTargetMap": null,
+    "variations": [
+      {
+        "description": null,
+        "identifier": "true",
+        "name": "Enable Page",
+        "value": "true"
+      },
+      {
+        "description": null,
+        "identifier": "false",
+        "name": "Disable Page",
+        "value": "false"
+      }
+    ]
+  },
+  "targets": [
+    {
+      "identifier": "harness",
+      "name": "Harness"
+    },
+    {
+      "identifier": "enver",
+      "attributes": {
+        "email": "enver.bisevac@harness.io"
+      }
+    }
+  ],
+  "expected": {
+    "_no_target": true,
+    "harness": true
+  }
+}

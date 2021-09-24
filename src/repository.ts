@@ -15,7 +15,7 @@ export class StorageRepository implements Repository {
   private cache: KeyValueStore;
   private store: KeyValueStore;
 
-  constructor(cache: KeyValueStore, store: KeyValueStore) {
+  constructor(cache: KeyValueStore, store?: KeyValueStore) {
     if (!cache) {
       throw new Error('Cache is required argument and connot be undefined');
     }
