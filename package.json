@@ -2,9 +2,13 @@
   "name": "ff-nodejs-server-sdk",
   "version": "0.0.1",
   "description": "Feature flags SDK for NodeJS environments",
-  "main": "dist/sdk.cjs",
-  "module": "dist/sdk.mjs",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    "import": "./dist/esm/index.js",
+    "require": "./dist/cjs/index.js"
+  },
   "engines": {
     "node": ">= 12"
   },
@@ -28,12 +32,13 @@
     "typescript": "~4.3.5"
   },
   "scripts": {
-    "clean": "rimraf coverage dist tmp",
+    "clean": "rimraf coverage tmp",
     "versioning": "node -p \"'export const VERSION = ' + JSON.stringify(require('./package.json').version) + ';'\" > src/version.ts",
     "prebuild": "npm run clean; npm run versioning; npm run lint",
-    "build:esm": "esbuild ./src/index.ts --tsconfig=tsconfig.modules.json --minify --bundle --target=node12.22.5 --platform=node --format=esm --external:fs --outfile=./dist/sdk.mjs",
-    "build:cjs": "esbuild ./src/index.ts --tsconfig=tsconfig.release.json --minify --bundle --target=node12.22.5 --platform=node --format=cjs --external:fs --outfile=./dist/sdk.cjs",
-    "build": "npm run build:esm; npm run build:cjs",
+    "dts": "tsc ./src/index.ts --declaration --emitDeclarationOnly --esModuleInterop --downlevelIteration --outfile ./dist/index.d.ts",
+    "build:esm": "esbuild ./src/index.ts --tsconfig=tsconfig.modules.json --minify --bundle --sourcemap --target=node12.22.5 --platform=node --format=esm --outfile=./dist/esm/index.js --external:eventsource --external:axios",
+    "build:cjs": "esbuild ./src/index.ts --tsconfig=tsconfig.release.json --minify --bundle --sourcemap --target=node12.22.5 --platform=node --format=cjs --outfile=./dist/cjs/index.js",
+    "build": "npm run build:esm; npm run build:cjs; npm run dts",
     "build:watch": "tsc -w -p tsconfig.release.json",
     "lint": "eslint ./src --ext .ts,.tsx",
     "test": "jest --coverage",
