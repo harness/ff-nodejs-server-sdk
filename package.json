@@ -37,7 +37,7 @@
     "prebuild": "npm run clean; npm run versioning; npm run lint",
     "dts": "tsc ./src/index.ts --declaration --emitDeclarationOnly --esModuleInterop --downlevelIteration --outfile ./dist/index.d.ts",
     "build:esm": "esbuild ./src/index.ts --tsconfig=tsconfig.modules.json --minify --bundle --sourcemap --target=node12.22.5 --platform=node --format=esm --outfile=./dist/esm/index.js --external:eventsource --external:axios",
-    "build:cjs": "esbuild ./src/index.ts --tsconfig=tsconfig.release.json --minify --bundle --sourcemap --target=node12.22.5 --platform=node --format=cjs --outfile=./dist/cjs/index.js",
+    "build:cjs": "esbuild ./src/index.ts --tsconfig=tsconfig.release.json --minify --bundle --sourcemap --target=node12.22.5 --platform=node --format=cjs --outfile=./dist/cjs/index.js --external:eventsource --external:axios",
     "build": "npm run build:esm; npm run build:cjs; npm run dts",
     "build:watch": "tsc -w -p tsconfig.release.json",
     "lint": "eslint ./src --ext .ts,.tsx",
