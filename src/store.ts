@@ -1,4 +1,4 @@
-import * as Keyv from 'keyv';
+import Keyv from 'keyv';
 import { KeyvFile } from 'keyv-file';
 import { KeyValueStore } from "./types";
 
