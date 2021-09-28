@@ -1,4 +1,4 @@
-import * as EventSource from 'eventsource';
+import EventSource from 'eventsource';
 import EventEmitter from 'events';
 import { AxiosPromise } from 'axios';
 import { ClientApi, FeatureConfig, Segment } from './openapi';

@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "NodeJS Server SDK sample",
   "main": "index.js",
-  "type": "module",
   "scripts": {
+    "cf": "node index_cf.mjs",
+    "client": "node index.mjs",
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
