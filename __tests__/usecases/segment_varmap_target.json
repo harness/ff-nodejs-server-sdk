@@ -1,0 +1,74 @@
+{
+    "flag": {
+      "defaultServe": { "distribution": null, "variation": "true" },
+      "environment": "demoenv",
+      "feature": "demo_feature",
+      "kind": "boolean",
+      "offVariation": "false",
+      "prerequisites": [],
+      "project": "FeatureFlagsDemo",
+      "rules": [
+        {
+          "ruleId": "",
+          "priority": 1000,
+          "clauses": [
+            {
+              "id": "",
+              "attribute": "",
+              "op": "segmentMatch",
+              "values": ["flagteam"]
+            }
+          ],
+          "serve": {
+            "distribution": null,
+            "variation": "false"
+          }
+        }
+      ],
+      "state": "on",
+      "variationToTargetMap": [
+        {
+          "variation": "false",
+          "targetSegments": [
+            "flagteam"
+          ]
+        }
+      ],
+      "variations": [
+        {
+          "description": null,
+          "identifier": "true",
+          "name": "Enable Page",
+          "value": "true"
+        },
+        {
+          "description": null,
+          "identifier": "false",
+          "name": "Disable Page",
+          "value": "false"
+        }
+      ]
+    },
+    "segments": [
+      {
+        "identifier": "flagteam",
+        "name": "FlagTeam",
+        "environment": "demoenv",
+        "included": ["harness"],
+        "excluded": [],
+        "rules": [],
+        "version": 1
+      }
+    ],
+    "targets": [
+      {
+        "identifier": "harness",
+        "name": "Harness"
+      }
+    ],
+    "expected": {
+      "_no_target": true,
+      "harness": false
+    }
+  }
+  
