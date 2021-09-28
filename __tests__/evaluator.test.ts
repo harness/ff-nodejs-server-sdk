@@ -3,7 +3,7 @@ import * as path from 'path';
 
 import { SimpleCache } from '../src/cache';
 import { StorageRepository } from '../src/repository';
-import { FeatureConfig, FeatureConfigKindEnum } from '../src/openapi';
+import { FeatureConfig, FeatureConfigKindEnum, Segment } from '../src/openapi';
 import { Evaluator } from '../src/evaluator';
 import { Target } from '../src/types';
 
@@ -11,6 +11,7 @@ const directory = path.join(__dirname, 'usecases');
 
 interface Usecase {
   flag: FeatureConfig;
+  segments: Segment[];
   targets: Target[];
   expected: Record<string, unknown>;
 }
@@ -37,13 +38,12 @@ for (const file of files) {
     usecase.flag.feature += file;
     repository.setFlag(usecase.flag.feature, usecase.flag);
 
+    usecase.segments?.forEach((segment: Segment) =>
+      repository.setSegment(segment.identifier, segment),
+    );
+
     Object.entries(usecase.expected).forEach(([targetIdentifier, value]) => {
-      const result = [
-        file,
-        targetIdentifier,
-        value,
-        usecase,
-      ];
+      const result = [file, targetIdentifier, value, usecase];
       results.push(result);
     });
   } catch (err) {
@@ -56,7 +56,12 @@ for (const file of files) {
 describe('evaluation flag', () => {
   test.each(results)(
     `Usecase %p with target %p and expected value %p`,
-    (_file: string, targetIdentifier: string, expected: unknown, usecase: Usecase) => {
+    (
+      _file: string,
+      targetIdentifier: string,
+      expected: unknown,
+      usecase: Usecase,
+    ) => {
       let target: Target;
       if (targetIdentifier === '_no_target') {
         target = undefined;
@@ -65,25 +70,30 @@ describe('evaluation flag', () => {
           (item) => item.identifier === targetIdentifier,
         );
       }
-      let got: unknown;
+      let received: unknown;
       switch (usecase.flag.kind) {
         case FeatureConfigKindEnum.Boolean:
-          got = evaluator.boolVariation(
+          received = evaluator.boolVariation(
             usecase.flag.feature,
             target,
             false,
           );
           break;
         case FeatureConfigKindEnum.String:
-          got = evaluator.stringVariation(usecase.flag.feature, target, '');
+          received = evaluator.stringVariation(
+            usecase.flag.feature,
+            target,
+            '',
+          );
           break;
         case FeatureConfigKindEnum.Int:
-          got = evaluator.numberVariation(usecase.flag.feature, target, 0);
+          received = evaluator.numberVariation(usecase.flag.feature, target, 0);
           break;
         case FeatureConfigKindEnum.Json:
-          got = evaluator.jsonVariation(usecase.flag.feature, target, {});
+          received = evaluator.jsonVariation(usecase.flag.feature, target, {});
           break;
       }
-      expect(expected).toBe(got);
-  })
+      expect(received).toBe(expected);
+    },
+  );
 });

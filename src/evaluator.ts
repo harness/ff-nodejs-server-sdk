@@ -173,8 +173,7 @@ export class Evaluator {
     }
 
     const operator = this.getOperator(target, clause.attribute);
-    const _op = clause.op.toLowerCase();
-    switch (_op) {
+    switch (clause.op) {
       case IN_OPERATOR:
         return operator.inList(clause.values);
       case EQUAL_OPERATOR:
