@@ -1,6 +1,6 @@
 {
   "name": "ff-nodejs-server-sdk",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Feature flags SDK for NodeJS environments",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -11,6 +11,10 @@
   },
   "engines": {
     "node": ">= 12"
+  },
+  "homepage": "https://ngdocs.harness.io/category/vjolt35atg-feature-flags",
+  "bugs": {
+    "url": "https://github.com/drone/ff-nodejs-server-sdk/issues"
   },
   "devDependencies": {
     "@openapitools/openapi-generator-cli": "^2.3.10",
@@ -47,7 +51,12 @@
   },
   "author": "Enver Bisevac <enver.bisevac@harness.io>",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/drone/ff-nodejs-server-sdk"
+  },
   "dependencies": {
+    "axios": "^0.21.1",
     "eventsource": "^1.1.0",
     "jwt-decode": "^3.1.2",
     "keyv": "^4.0.3",
@@ -56,6 +65,10 @@
     "node-cache": "^5.1.2",
     "tslib": "~2.3.0"
   },
+  "bundledDependencies": [
+    "axios",
+    "eventsource"
+  ],
   "volta": {
     "node": "12.22.5"
   },
