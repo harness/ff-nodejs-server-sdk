@@ -11,11 +11,10 @@ export const FF_METRIC_TYPE = 'FFMETRICS',
   VARIATION_VALUE_ATTRIBUTE = 'featureValue',
   TARGET_ATTRIBUTE = 'target',
   SDK_VERSION_ATTRIBUTE = 'SDK_VERSION',
-  SDK_VERSION = '1.0.0',
   SDK_TYPE_ATTRIBUTE = 'SDK_TYPE',
   SDK_TYPE = 'server',
   SDK_LANGUAGE_ATTRIBUTE = 'SDK_LANGUAGE',
-  SDK_LANGUAGE = 'python',
+  SDK_LANGUAGE = 'javascript',
   GLOBAL_TARGET = 'global';
 
 export const SEGMENT_MATCH_OPERATOR = 'segmentMatch',

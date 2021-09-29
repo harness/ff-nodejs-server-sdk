@@ -1,7 +1,15 @@
 import {
   defaultOptions,
   FEATURE_IDENTIFIER_ATTRIBUTE,
+  FEATURE_NAME_ATTRIBUTE,
   GLOBAL_TARGET,
+  SDK_LANGUAGE,
+  SDK_LANGUAGE_ATTRIBUTE,
+  SDK_TYPE,
+  SDK_TYPE_ATTRIBUTE,
+  SDK_VERSION_ATTRIBUTE,
+  TARGET_ATTRIBUTE,
+  VARIATION_IDENTIFIER_ATTRIBUTE,
 } from './constants';
 import {
   Configuration,
@@ -15,6 +23,7 @@ import {
   MetricsDataMetricsTypeEnum,
 } from './openapi';
 import { Options, Target } from './types';
+import { VERSION } from './version';
 
 const log = defaultOptions.logger;
 
@@ -63,12 +72,12 @@ export const MetricsProcessor = (
     };
 
     const key = _formatKey(event);
-    const found = data[key];
+    const found = data.get(key);
     if (found) {
       found.count++;
     } else {
       event.count = 1;
-      data[key] = event;
+      data.set(key, event);
     }
   };
 
@@ -85,10 +94,15 @@ export const MetricsProcessor = (
       log.debug('No metrics data!');
       return;
     }
+
     const targetData: TargetData[] = [];
     const metricsData: MetricsData[] = [];
 
-    for (const event of data.values()) {
+    // clone map and clear data
+    const clonedData = new Map(data);
+    data.clear();
+
+    for (const event of clonedData.values()) {
       if (event.target && !event.target.anonymous) {
         let targetAttributes: KeyValue[] = [];
         if (event.target.attributes) {
@@ -114,7 +128,34 @@ export const MetricsProcessor = (
           key: FEATURE_IDENTIFIER_ATTRIBUTE,
           value: event.featureConfig.feature,
         },
+        {
+          key: FEATURE_NAME_ATTRIBUTE,
+          value: event.featureConfig.feature,
+        },
+        {
+          key: VARIATION_IDENTIFIER_ATTRIBUTE,
+          value: event.variation.identifier
+        },
+        {
+          key: SDK_TYPE_ATTRIBUTE,
+          value: SDK_TYPE
+        },
+        {
+          key: SDK_LANGUAGE_ATTRIBUTE,
+          value: SDK_LANGUAGE
+        },
+        {
+          key: SDK_VERSION_ATTRIBUTE,
+          value: VERSION
+        },
+        {
+          key: TARGET_ATTRIBUTE,
+          value: event.target.identifier
+        }
       ];
+
+      // private target attributes
+      // need more info
 
       const md: MetricsData = {
         timestamp: Date.now(),
