@@ -22,8 +22,7 @@ To sign up, https://app.harness.io/auth/#/signup/
 ### Import the package (CommonJS)
 
 ```
-const pkg = require('ff-nodejs-server-sdk');
-const { Client } = pkg;
+const { Client } = require('ff-nodejs-server-sdk');
 ```
 
 ### Import the package (ES modules)
