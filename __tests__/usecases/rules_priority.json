@@ -1,0 +1,77 @@
+{
+  "flag": {
+    "defaultServe": { "distribution": null, "variation": "true" },
+    "environment": "demoenv",
+    "feature": "AlfaTest",
+    "kind": "boolean",
+    "offVariation": "false",
+    "prerequisites": [],
+    "project": "FeatureFlagsDemo",
+    "rules": [
+      {
+        "ruleId": "",
+        "priority": 1000,
+        "clauses": [
+          {
+            "id": "",
+            "attribute": "identifier",
+            "op": "equal",
+            "values": ["harness"]
+          }
+        ],
+        "serve": {
+          "distribution": null,
+          "variation": "true"
+        }
+      },
+      {
+        "ruleId": "",
+        "priority": 999,
+        "clauses": [
+          {
+            "id": "",
+            "attribute": "identifier",
+            "op": "equal",
+            "values": ["harness"]
+          }
+        ],
+        "serve": {
+          "distribution": null,
+          "variation": "false"
+        }
+      }
+    ],
+    "state": "on",
+    "variationToTargetMap": null,
+    "variations": [
+      {
+        "description": null,
+        "identifier": "true",
+        "name": "Enable Page",
+        "value": "true"
+      },
+      {
+        "description": null,
+        "identifier": "false",
+        "name": "Disable Page",
+        "value": "false"
+      }
+    ]
+  },
+  "targets": [
+    {
+      "identifier": "harness",
+      "name": "Harness"
+    },
+    {
+      "identifier": "enver",
+      "attributes": {
+        "email": "enver.bisevac@harness.io"
+      }
+    }
+  ],
+  "expected": {
+    "_no_target": true,
+    "harness": false
+  }
+}

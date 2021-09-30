@@ -216,6 +216,11 @@ export class Evaluator {
     if (!target || !rules) {
       return undefined;
     }
+
+    rules.sort((a: ServingRule, b: ServingRule) =>
+      a.priority > b.priority ? 1 : -1,
+    );
+
     let identifier: string;
     for (const rule of rules) {
       // if evaluation is false just continue to next rule
