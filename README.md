@@ -60,6 +60,11 @@ const target = {
 const value = client.boolVariation('test', target, false);
 ```
 
+### Shutting down SDK
+```
+client.close();
+```
+
 ### Avaialable public methods
 ```
 const value = client.boolVariation('test', target, false);
