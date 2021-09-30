@@ -25,6 +25,9 @@ export class StorageRepository implements Repository {
 
   setFlag(identifier: string, fc: FeatureConfig): void {
     const flagKey = this.formatFlagKey(identifier);
+    if (!this.checkFlagVersion(flagKey, fc)) {
+      return;
+    }
     if (this.store) {
       this.store.set(flagKey, fc);
       this.cache.del(flagKey);
@@ -35,6 +38,9 @@ export class StorageRepository implements Repository {
 
   setSegment(identifier: string, segment: Segment): void {
     const segmentKey = this.formatSegmentKey(identifier);
+    if (!this.checkSegmentVersion(segmentKey, segment)) {
+      return;
+    }
     if (this.store) {
       this.store.set(segmentKey, segment);
       this.cache.del(segmentKey);
@@ -59,7 +65,7 @@ export class StorageRepository implements Repository {
     this.cache.del(segmentKey);
   }
 
-  getFlag(identifier: string): FeatureConfig {
+  getFlag(identifier: string, cacheable = true): FeatureConfig {
     const flagKey = this.formatFlagKey(identifier);
     let flag = this.cache.get(flagKey) as FeatureConfig;
     if (flag) {
@@ -67,7 +73,7 @@ export class StorageRepository implements Repository {
     }
     if (this.store) {
       flag = this.store.get(flagKey) as FeatureConfig;
-      if (flag) {
+      if (flag && cacheable) {
         this.cache.set(flagKey, flag);
       }
       return flag;
@@ -75,7 +81,7 @@ export class StorageRepository implements Repository {
     return undefined;
   }
 
-  getSegment(identifier: string): Segment {
+  getSegment(identifier: string, cacheable = true): Segment {
     const segmentKey = this.formatSegmentKey(identifier);
     let segment = this.cache.get(segmentKey) as Segment;
     if (segment) {
@@ -83,12 +89,22 @@ export class StorageRepository implements Repository {
     }
     if (this.store) {
       segment = this.store.get(segmentKey) as Segment;
-      if (segment) {
+      if (segment && cacheable) {
         this.cache.set(segmentKey, segment);
       }
       return segment;
     }
     return undefined;
+  }
+
+  private checkFlagVersion(key: string, flag: FeatureConfig): boolean {
+    const oldFlag = this.getFlag(key, false); // dont set cacheable, we are just checking the version
+    return !oldFlag || !oldFlag.version || oldFlag.version < flag?.version;
+  }
+
+  private checkSegmentVersion(key: string, segment: Segment): boolean {
+    const oldSegment = this.getSegment(key, false); // dont set cacheable, we are just checking the version
+    return !oldSegment || !oldSegment.version || oldSegment.version < segment?.version;
   }
 
   private formatFlagKey(key: string): string {
