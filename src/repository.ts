@@ -25,7 +25,7 @@ export class StorageRepository implements Repository {
 
   setFlag(identifier: string, fc: FeatureConfig): void {
     const flagKey = this.formatFlagKey(identifier);
-    if (!this.checkFlagVersion(flagKey, fc)) {
+    if (this.isFlagOutdated(flagKey, fc)) {
       return;
     }
     if (this.store) {
@@ -38,7 +38,7 @@ export class StorageRepository implements Repository {
 
   setSegment(identifier: string, segment: Segment): void {
     const segmentKey = this.formatSegmentKey(identifier);
-    if (!this.checkSegmentVersion(segmentKey, segment)) {
+    if (this.isSegmentOutdated(segmentKey, segment)) {
       return;
     }
     if (this.store) {
@@ -97,14 +97,14 @@ export class StorageRepository implements Repository {
     return undefined;
   }
 
-  private checkFlagVersion(key: string, flag: FeatureConfig): boolean {
+  private isFlagOutdated(key: string, flag: FeatureConfig): boolean {
     const oldFlag = this.getFlag(key, false); // dont set cacheable, we are just checking the version
-    return !oldFlag || !oldFlag.version || oldFlag.version < flag?.version;
+    return oldFlag?.version && oldFlag.version > flag?.version;
   }
 
-  private checkSegmentVersion(key: string, segment: Segment): boolean {
+  private isSegmentOutdated(key: string, segment: Segment): boolean {
     const oldSegment = this.getSegment(key, false); // dont set cacheable, we are just checking the version
-    return !oldSegment || !oldSegment.version || oldSegment.version < segment?.version;
+    return oldSegment?.version && oldSegment.version > segment?.version;
   }
 
   private formatFlagKey(key: string): string {
