@@ -11,7 +11,7 @@ export class PollingProcessor {
   private environment: string;
   private cluster: string;
   private api: ClientApi;
-  private stopped = false;
+  private stopped = true;
   private options: Options;
   private repository: Repository
 
@@ -35,7 +35,7 @@ export class PollingProcessor {
     });
 
     eventBus.on(Event.DISCONNECTED, () => {
-      this.resume();
+      this.start();
     });
   }
 
@@ -99,21 +99,21 @@ export class PollingProcessor {
   }
 
   start(): void {
+    if (!this.stopped) {
+      log.info('PollingProcessor already started');
+      return;
+    }
     log.info(
       'Starting PollingProcessor with request interval: ',
       this.options.pollInterval,
     );
+    this.stopped = false;
     this.poll();
   }
 
   private stop(): void {
-    log.info('Pausing PollingProcessor');
+    log.info('Stopping PollingProcessor');
     this.stopped = true;
-  }
-
-  resume(): void {
-    log.info('Resuming PollingProcessor');
-    this.stopped = false;
   }
 
   close(): void {
