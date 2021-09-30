@@ -218,7 +218,7 @@ export class Evaluator {
     }
 
     rules.sort((a: ServingRule, b: ServingRule) =>
-      a.priority > b.priority ? 1 : b.priority > a.priority ? -1 : 0,
+      a.priority > b.priority ? 1 : -1,
     );
 
     let identifier: string;
