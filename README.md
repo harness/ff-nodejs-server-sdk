@@ -15,6 +15,97 @@ To sign up, https://app.harness.io/auth/#/signup/
 
 ## Getting Started
 
+### Setup
+
+```npm install @harness/ff-nodejs-server-sdk```
+
+### Import the package (CommonJS)
+
+```
+const { Client } = require('ff-nodejs-server-sdk');
+```
+
+### Import the package (ES modules)
+
+```
+import { Client } from 'ff-nodejs-server-sdk';
+```
+
+### Initialize
+
+This is the most simple way to initialize SDK using only a server type key
+```
+const client = new Client('your server type SDK key');
+```
+
+Advanced initialization can be done using options
+```
+const client = new Client('your server type SDK key', {
+  enableStream: false
+});
+```
+
+### Define a target
+```
+const target = {
+  identifier: 'harness',
+  name: 'Harness',
+  attributes: {}
+};
+```
+
+### Evaluate the flag with default value set to false
+```
+const value = client.boolVariation('test', target, false);
+```
+
+### Shutting down SDK
+```
+client.close();
+```
+
+### Avaialable public methods
+```
+const value = client.boolVariation('test', target, false);
+const value = client.stringVariation('test', target, 'BLACK');
+const value = client.numberVariation('test', target, 1);
+const value = client.jsonVariation('test', target, {});
+```
+
+### Avaialable options
+
+```
+  baseUrl: string;
+  eventsUrl: string;
+  pollInterval: number;
+  eventsSyncInterval: number;
+  enableStream: boolean;
+  enableAnalytics: boolean;
+  cache: KeyValueStore;
+  store: KeyValueStore;
+  logger: Logger;
+```
+
+## Singleton example
+
+```
+import CfClient from 'ff-nodejs-server-sdk';
+
+CfClient.init('your server type SDK key');
+
+const FLAG_KEY = 'test_bool';
+const target = {
+  identifier: 'harness',
+  name: 'Harness',
+  attributes: {}
+};
+const defaultValue = false;
+
+setInterval(() => {
+    const value = CfClient.boolVariation(FLAG_KEY, target, defaultValue);
+    console.log("Evaluation for flag test and target none: ", value);
+}, 10000);
+```
 ## License
 
 Licensed under the APLv2.

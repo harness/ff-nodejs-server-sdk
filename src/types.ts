@@ -6,7 +6,6 @@ export interface Options {
   baseUrl?: string;
   eventsUrl?: string;
   pollInterval?: number;
-  persistInterval?: number;
   eventsSyncInterval?: number;
   enableStream?: boolean;
   enableAnalytics?: boolean;
