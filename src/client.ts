@@ -1,5 +1,7 @@
 import * as events from 'events';
 import jwt_decode from 'jwt-decode';
+import axios from 'axios';
+import axiosRetry from 'axios-retry';
 import { Claims, Options, Target } from './types';
 import { Configuration, ClientApi, FeatureConfig, Variation } from './openapi';
 import { VERSION } from './version';
@@ -10,6 +12,8 @@ import { defaultOptions } from './constants';
 import { Repository, StorageRepository } from './repository';
 import { MetricsProcessor, MetricsProcessorInterface } from './metrics';
 
+axios.defaults.timeout = 30000;
+axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
 const log = defaultOptions.logger;
 
 export default class Client {
@@ -29,6 +33,10 @@ export default class Client {
 
   constructor(sdkKey: string, options: Options = {}) {
     this.sdkKey = sdkKey;
+    if (options.pollInterval < 1000) {
+      options.pollInterval = defaultOptions.pollInterval;
+      log.warn('Polling interval cannot be lower than 1000 ms');
+    }
     this.options = { ...defaultOptions, ...options };
 
     this.configuration = new Configuration({
@@ -45,27 +53,30 @@ export default class Client {
       this.options.store,
     );
     this.evaluator = new Evaluator(this.repository);
-
     this.api = new ClientApi(this.configuration);
     this.run();
   }
 
-  private async authenticate(): Promise<string> {
-    const response = await this.api.authenticate({
-      apiKey: this.sdkKey,
-    });
-    this.authToken = response.data.authToken;
-    this.configuration.accessToken = this.authToken;
+  private async authenticate(): Promise<void> {
+    try {
+      const response = await this.api.authenticate({
+        apiKey: this.sdkKey,
+      });
+      this.authToken = response.data.authToken;
+      this.configuration.accessToken = this.authToken;
 
-    const decoded: Claims = jwt_decode(this.authToken);
+      const decoded: Claims = jwt_decode(this.authToken);
 
-    this.environment = decoded.environment;
-    this.cluster = decoded.clusterIdentifier || '1';
-    return this.authToken;
+      this.environment = decoded.environment;
+      this.cluster = decoded.clusterIdentifier || '1';
+    } catch (error) {
+      console.error('Error while authenticating, err: ', error);
+    }
   }
 
   private async run(): Promise<void> {
     await this.authenticate();
+
     this.pollProcessor = new PollingProcessor(
       this.environment,
       this.cluster,
@@ -114,7 +125,9 @@ export default class Client {
       target,
       defaultValue,
       (fc: FeatureConfig, target: Target, variation: Variation) => {
-        this.metricsProcessor.enqueue(target, fc, variation);
+        if (this.metricsProcessor) {
+          this.metricsProcessor.enqueue(target, fc, variation);
+        }
       },
     );
   }
@@ -129,7 +142,9 @@ export default class Client {
       target,
       defaultValue,
       (fc: FeatureConfig, target: Target, variation: Variation) => {
-        this.metricsProcessor.enqueue(target, fc, variation);
+        if (this.metricsProcessor) {
+          this.metricsProcessor.enqueue(target, fc, variation);
+        }
       },
     );
   }
@@ -144,7 +159,9 @@ export default class Client {
       target,
       defaultValue,
       (fc: FeatureConfig, target: Target, variation: Variation) => {
-        this.metricsProcessor.enqueue(target, fc, variation);
+        if (this.metricsProcessor) {
+          this.metricsProcessor.enqueue(target, fc, variation);
+        }
       },
     );
   }
@@ -159,17 +176,19 @@ export default class Client {
       target,
       defaultValue,
       (fc: FeatureConfig, target: Target, variation: Variation) => {
-        this.metricsProcessor.enqueue(target, fc, variation);
+        if (this.metricsProcessor) {
+          this.metricsProcessor.enqueue(target, fc, variation);
+        }
       },
     );
   }
 
   close(): void {
     this.pollProcessor.close();
-    if (this.options.enableStream) {
+    if (this.streamProcessor) {
       this.streamProcessor.close();
     }
-    if (this.options.enableAnalytics) {
+    if (this.metricsProcessor) {
       this.metricsProcessor.close();
     }
   }

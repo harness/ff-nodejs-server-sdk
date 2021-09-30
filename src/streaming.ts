@@ -124,7 +124,7 @@ export class StreamProcessor {
     return this.eventSource.readyState == StreamProcessor.CONNECTED;
   }
 
-  private stop(): void {
+  stop(): void {
     log.info('Stopping StreamProcessor');
     this.eventSource.close();
     this.eventBus.emit(Event.DISCONNECTED);
