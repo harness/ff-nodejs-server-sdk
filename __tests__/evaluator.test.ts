@@ -20,6 +20,7 @@ const cache = new SimpleCache();
 const repository = new StorageRepository(cache);
 const evaluator = new Evaluator(repository);
 
+const results = [];
 let files = [];
 try {
   files = fs.readdirSync(directory);
@@ -28,8 +29,6 @@ try {
     throw new Error('Unable to scan directory: ' + err);
   }
 }
-
-const results = [];
 
 for (const file of files) {
   try {
@@ -56,7 +55,7 @@ for (const file of files) {
 describe('evaluation flag', () => {
   test.each(results)(
     `Usecase %p with target %p and expected value %p`,
-    (
+    async (
       _file: string,
       targetIdentifier: string,
       expected: unknown,
@@ -73,24 +72,32 @@ describe('evaluation flag', () => {
       let received: unknown;
       switch (usecase.flag.kind) {
         case FeatureConfigKindEnum.Boolean:
-          received = evaluator.boolVariation(
+          received = await evaluator.boolVariation(
             usecase.flag.feature,
             target,
             false,
           );
           break;
         case FeatureConfigKindEnum.String:
-          received = evaluator.stringVariation(
+          received = await evaluator.stringVariation(
             usecase.flag.feature,
             target,
             '',
           );
           break;
         case FeatureConfigKindEnum.Int:
-          received = evaluator.numberVariation(usecase.flag.feature, target, 0);
+          received = await evaluator.numberVariation(
+            usecase.flag.feature,
+            target,
+            0,
+          );
           break;
         case FeatureConfigKindEnum.Json:
-          received = evaluator.jsonVariation(usecase.flag.feature, target, {});
+          received = await evaluator.jsonVariation(
+            usecase.flag.feature,
+            target,
+            {},
+          );
           break;
       }
       expect(received).toBe(expected);

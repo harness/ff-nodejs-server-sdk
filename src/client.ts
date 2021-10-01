@@ -115,11 +115,11 @@ export default class Client {
     log.info('finished setting up processors');
   }
 
-  boolVariation(
+  async boolVariation(
     identifier: string,
     target: Target,
     defaultValue = false,
-  ): boolean {
+  ): Promise<boolean> {
     return this.evaluator.boolVariation(
       identifier,
       target,
@@ -132,11 +132,11 @@ export default class Client {
     );
   }
 
-  stringVariation(
+  async stringVariation(
     identifier: string,
     target: Target,
     defaultValue = '',
-  ): string {
+  ): Promise<string> {
     return this.evaluator.stringVariation(
       identifier,
       target,
@@ -149,11 +149,11 @@ export default class Client {
     );
   }
 
-  numberVariation(
+  async numberVariation(
     identifier: string,
     target: Target,
     defaultValue = 0,
-  ): number {
+  ): Promise<number> {
     return this.evaluator.numberVariation(
       identifier,
       target,
@@ -166,11 +166,11 @@ export default class Client {
     );
   }
 
-  jsonVariation(
+  async jsonVariation(
     identifier: string,
     target: Target,
     defaultValue = {},
-  ): Record<string, unknown> {
+  ): Promise<Record<string, unknown>> {
     return this.evaluator.jsonVariation(
       identifier,
       target,

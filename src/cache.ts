@@ -1,4 +1,4 @@
-import { KeyValueStore } from "./types";
+import { KeyValueStore } from './types';
 
 export class SimpleCache implements KeyValueStore {
   private cache = {};

@@ -10,7 +10,7 @@ export interface Options {
   enableStream?: boolean;
   enableAnalytics?: boolean;
   cache?: KeyValueStore;
-  store?: KeyValueStore;
+  store?: AsyncKeyValueStore;
   logger?: Logger;
 }
 
@@ -56,14 +56,20 @@ export interface Operator {
 }
 
 export interface Query {
-  getFlag(identifier: string): FeatureConfig;
-  getSegment(identifier: string): Segment;
+  getFlag(identifier: string): Promise<FeatureConfig>;
+  getSegment(identifier: string): Promise<Segment>;
 }
 
 export interface KeyValueStore {
   set(key: string, value: unknown): void;
   get(key: string): unknown;
   del(key: string): void;
+}
+
+export interface AsyncKeyValueStore {
+  set(key: string, value: unknown): Promise<true>;
+  get(key: string): Promise<unknown>;
+  del(key: string): Promise<boolean>;
 }
 
 export interface Target {
