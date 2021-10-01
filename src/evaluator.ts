@@ -1,4 +1,5 @@
 import {
+  defaultOptions,
   CONTAINS_OPERATOR,
   ENDS_WITH_OPERATOR,
   EQUAL_OPERATOR,
@@ -32,6 +33,8 @@ type Callback = (
   target: Target,
   variation: Variation,
 ) => void;
+
+const log = defaultOptions.logger;
 
 export class Evaluator {
   private query: Query;
@@ -139,9 +142,11 @@ export class Evaluator {
         if (
           this.convertApiTargetsToEvalTargets(segment.excluded).includes(target)
         ) {
-          // log.debug(
-          //   "Target %s excluded from segment %s via exclude list\n",
-          //   target.getName(), segment.getName());
+          log.debug(
+            'Target %s excluded from segment %s via exclude list\n',
+            target.name,
+            segment.name,
+          );
           return false;
         }
 
@@ -149,17 +154,21 @@ export class Evaluator {
         if (
           this.convertApiTargetsToEvalTargets(segment.included).includes(target)
         ) {
-          // log.debug(
-          //   "Target %s included in segment %s via include list\n",
-          //   target.getName(), segment.getName());
+          log.debug(
+            'Target %s included in segment %s via include list\n',
+            target.name,
+            segment.name,
+          );
           return true;
         }
 
         // Should Target be included via segment rules
         if (segment.rules && this.evaluateClauses(segment.rules, target)) {
-          // log.debug(
-          //   "Target %s included in segment %s via rules\n",
-          //   target.getName(), segment.getName());
+          log.debug(
+            'Target %s included in segment %s via rules\n',
+            target.name,
+            segment.name,
+          );
           return true;
         }
       }
@@ -289,15 +298,66 @@ export class Evaluator {
     return this.findVariation(fc.variations, variation);
   }
 
-  boolVariation(
+  private checkPreRequisite(parent: FeatureConfig, target: Target): boolean {
+    if (parent.prerequisites) {
+      log.info(
+        'Checking pre requisites %s of parent feature %s',
+        parent.prerequisites,
+        parent.feature,
+      );
+
+      for (const pqs of parent.prerequisites) {
+        const preReqFeatureConfig = this.query.getFlag(pqs.feature);
+        if (!preReqFeatureConfig) {
+          log.warn(
+            'Could not retrieve the pre requisite details of feature flag: %s',
+            parent.feature,
+          );
+          return true;
+        }
+
+        // Pre requisite variation value evaluated below
+        const variation = this.evaluateFlag(preReqFeatureConfig, target);
+        log.info(
+          'Pre requisite flag %s has variation %s for target %s',
+          preReqFeatureConfig.feature,
+          variation,
+          target,
+        );
+
+        // Compare if the pre requisite variation is a possible valid value of
+        // the pre requisite FF
+        log.info(
+          'Pre requisite flag %s should have the variations %s',
+          preReqFeatureConfig.feature,
+          pqs.variations,
+        );
+
+        if (!pqs.variations.includes(variation.identifier)) {
+          return false;
+        } else {
+          return this.checkPreRequisite(preReqFeatureConfig, target);
+        }
+      }
+    }
+    return true;
+  }
+
+  private evaluate(
     identifier: string,
     target: Target,
-    defaultValue = false,
+    expected: FeatureConfigKindEnum,
     callback: Callback = undefined,
-  ): boolean {
+  ): Variation | undefined {
     const fc = this.query.getFlag(identifier);
-    if (!fc || fc.kind !== FeatureConfigKindEnum.Boolean) {
-      return defaultValue;
+    if (!fc || fc.kind !== expected) {
+      return undefined;
+    }
+    if (fc.prerequisites) {
+      const prereq = this.checkPreRequisite(fc, target);
+      if (!prereq) {
+        return this.findVariation(fc.variations, fc.offVariation);
+      }
     }
 
     const variation = this.evaluateFlag(fc, target);
@@ -305,6 +365,25 @@ export class Evaluator {
       if (callback) {
         callback(fc, target, variation);
       }
+      return variation;
+    }
+
+    return undefined;
+  }
+
+  boolVariation(
+    identifier: string,
+    target: Target,
+    defaultValue = false,
+    callback: Callback = undefined,
+  ): boolean {
+    const variation = this.evaluate(
+      identifier,
+      target,
+      FeatureConfigKindEnum.Boolean,
+      callback,
+    );
+    if (variation) {
       return variation.value.toLowerCase() === 'true';
     }
 
@@ -317,16 +396,13 @@ export class Evaluator {
     defaultValue = '',
     callback: Callback = undefined,
   ): string {
-    const fc = this.query.getFlag(identifier);
-    if (!fc || fc.kind !== FeatureConfigKindEnum.String) {
-      return defaultValue;
-    }
-
-    const variation = this.evaluateFlag(fc, target);
+    const variation = this.evaluate(
+      identifier,
+      target,
+      FeatureConfigKindEnum.String,
+      callback,
+    );
     if (variation) {
-      if (callback) {
-        callback(fc, target, variation);
-      }
       return variation.value;
     }
 
@@ -339,16 +415,13 @@ export class Evaluator {
     defaultValue = 0,
     callback: Callback = undefined,
   ): number {
-    const fc = this.query.getFlag(identifier);
-    if (!fc || fc.kind !== FeatureConfigKindEnum.Int) {
-      return defaultValue;
-    }
-
-    const variation = this.evaluateFlag(fc, target);
+    const variation = this.evaluate(
+      identifier,
+      target,
+      FeatureConfigKindEnum.Int,
+      callback,
+    );
     if (variation) {
-      if (callback) {
-        callback(fc, target, variation);
-      }
       return parseFloat(variation.value);
     }
 
@@ -361,16 +434,13 @@ export class Evaluator {
     defaultValue = {},
     callback: Callback = undefined,
   ): Record<string, unknown> {
-    const fc = this.query.getFlag(identifier);
-    if (!fc || fc.kind !== FeatureConfigKindEnum.Json) {
-      return defaultValue;
-    }
-
-    const variation = this.evaluateFlag(fc, target);
+    const variation = this.evaluate(
+      identifier,
+      target,
+      FeatureConfigKindEnum.Json,
+      callback,
+    );
     if (variation) {
-      if (callback) {
-        callback(fc, target, variation);
-      }
       return JSON.parse(variation.value);
     }
 
