@@ -347,7 +347,7 @@ export class Evaluator {
     identifier: string,
     target: Target,
     expected: FeatureConfigKindEnum,
-    callback: Callback = undefined,
+    callback?: Callback,
   ): Variation | undefined {
     const fc = this.query.getFlag(identifier);
     if (!fc || fc.kind !== expected) {
@@ -375,7 +375,7 @@ export class Evaluator {
     identifier: string,
     target: Target,
     defaultValue = false,
-    callback: Callback = undefined,
+    callback?: Callback,
   ): boolean {
     const variation = this.evaluate(
       identifier,
@@ -394,7 +394,7 @@ export class Evaluator {
     identifier: string,
     target: Target,
     defaultValue = '',
-    callback: Callback = undefined,
+    callback?: Callback,
   ): string {
     const variation = this.evaluate(
       identifier,
@@ -413,7 +413,7 @@ export class Evaluator {
     identifier: string,
     target: Target,
     defaultValue = 0,
-    callback: Callback = undefined,
+    callback?: Callback,
   ): number {
     const variation = this.evaluate(
       identifier,
@@ -432,7 +432,7 @@ export class Evaluator {
     identifier: string,
     target: Target,
     defaultValue = {},
-    callback: Callback = undefined,
+    callback?: Callback,
   ): Record<string, unknown> {
     const variation = this.evaluate(
       identifier,
