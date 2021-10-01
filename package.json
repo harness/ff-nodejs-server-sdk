@@ -21,6 +21,7 @@
     "@types/eventsource": "^1.1.6",
     "@types/jest": "~26.0.23",
     "@types/keyv": "^3.1.3",
+    "@types/lru-cache": "^5.1.1",
     "@types/node": "^14.17.11",
     "@typescript-eslint/eslint-plugin": "~4.28.2",
     "@typescript-eslint/parser": "~4.28.2",
@@ -40,8 +41,8 @@
     "versioning": "node -p \"'export const VERSION = ' + JSON.stringify(require('./package.json').version) + ';'\" > src/version.ts",
     "prebuild": "npm run clean; npm run versioning; npm run lint",
     "dts": "tsc ./src/index.ts --declaration --emitDeclarationOnly --esModuleInterop --downlevelIteration --outfile ./dist/index.d.ts",
-    "build:esm": "esbuild ./src/index.ts --tsconfig=tsconfig.modules.json --minify --bundle --sourcemap --target=node12.22.5 --platform=node --format=esm --outfile=./dist/esm/index.js --external:eventsource --external:axios",
-    "build:cjs": "esbuild ./src/index.ts --tsconfig=tsconfig.release.json --minify --bundle --sourcemap --target=node12.22.5 --platform=node --format=cjs --outfile=./dist/cjs/index.js --external:eventsource --external:axios",
+    "build:esm": "esbuild ./src/index.ts --tsconfig=tsconfig.modules.json --minify --bundle --sourcemap --target=node12.22.5 --platform=node --format=esm --outfile=./dist/esm/index.js --external:keyv --external:keyv-file --external:eventsource --external:axios",
+    "build:cjs": "esbuild ./src/index.ts --tsconfig=tsconfig.release.json --minify --bundle --sourcemap --target=node12.22.5 --platform=node --format=cjs --outfile=./dist/cjs/index.js --external:keyv --external:keyv-file --external:eventsource --external:axios",
     "build": "npm run build:esm; npm run build:cjs; npm run dts",
     "build:watch": "tsc -w -p tsconfig.release.json",
     "lint": "eslint ./src --ext .ts,.tsx",
@@ -62,13 +63,15 @@
     "jwt-decode": "^3.1.2",
     "keyv": "^4.0.3",
     "keyv-file": "^0.2.0",
+    "lru-cache": "^6.0.0",
     "murmurhash": "^2.0.0",
-    "node-cache": "^5.1.2",
     "tslib": "~2.3.0"
   },
   "bundledDependencies": [
     "axios",
-    "eventsource"
+    "eventsource",
+    "keyv",
+    "keyv-file"
   ],
   "volta": {
     "node": "12.22.5"
