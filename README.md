@@ -66,10 +66,10 @@ client.close();
 
 ### Avaialable public methods
 ```
-function boolVariation(identifier: string, target: Target, defaultValue = true): boolean;
-function stringVariation(identifier, target: Target, defaultValue = ''): string;
-function numberVariation(identifier, target: Target, defaultValue = 1.0): number;
-function jsonVariation(identifier, target: Target, defaultValue = {}): Record<string, unknown>;
+function boolVariation(identifier: string, target: Target, defaultValue = true): Promise<boolean>;
+function stringVariation(identifier, target: Target, defaultValue = ''): Promise<string>;
+function numberVariation(identifier, target: Target, defaultValue = 1.0): Promise<number>;
+function jsonVariation(identifier, target: Target, defaultValue = {}): Promise<Record<string, unknown>>;
 function close();
 ```
 
