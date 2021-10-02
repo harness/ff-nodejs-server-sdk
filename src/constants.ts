@@ -41,7 +41,7 @@ export const defaultOptions: Options = {
   eventsSyncInterval: EVENTS_SYNC_INTERVAL,
   enableStream: true,
   enableAnalytics: true,
-  cache: new LRU({max: 100}),
+  cache: new LRU({ max: 100 }),
   store: new FileStore(),
   logger: new ConsoleLog(),
 };

@@ -29,13 +29,13 @@ export class StorageRepository implements Repository {
       return undefined;
     }
     if (this.store) {
-      this.store.set(flagKey, fc).then(_value => {
+      this.store.set(flagKey, fc).then((_value) => {
         this.cache.del(flagKey);
       });
     } else {
       this.cache.set(flagKey, fc);
     }
-    return undefined
+    return undefined;
   }
 
   async setSegment(identifier: string, segment: Segment): Promise<void> {
@@ -44,7 +44,7 @@ export class StorageRepository implements Repository {
       return undefined;
     }
     if (this.store) {
-      this.store.set(segmentKey, segment).then(_value => {
+      this.store.set(segmentKey, segment).then((_value) => {
         this.cache.del(segmentKey);
       });
     } else {
@@ -78,7 +78,7 @@ export class StorageRepository implements Repository {
       return flag;
     }
     if (this.store) {
-      flag = await this.store.get(flagKey) as FeatureConfig;
+      flag = (await this.store.get(flagKey)) as FeatureConfig;
       if (flag && cacheable) {
         this.cache.set(flagKey, flag);
       }
@@ -94,7 +94,7 @@ export class StorageRepository implements Repository {
       return segment;
     }
     if (this.store) {
-      segment = await this.store.get(segmentKey) as Segment;
+      segment = (await this.store.get(segmentKey)) as Segment;
       if (segment && cacheable) {
         this.cache.set(segmentKey, segment);
       }
@@ -103,12 +103,18 @@ export class StorageRepository implements Repository {
     return undefined;
   }
 
-  private async isFlagOutdated(key: string, flag: FeatureConfig): Promise<boolean> {
+  private async isFlagOutdated(
+    key: string,
+    flag: FeatureConfig,
+  ): Promise<boolean> {
     const oldFlag = await this.getFlag(key, false); // dont set cacheable, we are just checking the version
     return oldFlag?.version && oldFlag.version > flag?.version;
   }
 
-  private async isSegmentOutdated(key: string, segment: Segment): Promise<boolean> {
+  private async isSegmentOutdated(
+    key: string,
+    segment: Segment,
+  ): Promise<boolean> {
     const oldSegment = await this.getSegment(key, false); // dont set cacheable, we are just checking the version
     return oldSegment?.version && oldSegment.version > segment?.version;
   }

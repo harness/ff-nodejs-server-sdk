@@ -177,7 +177,10 @@ export class Evaluator {
     return false;
   }
 
-  private async evaluateClause(clause: Clause, target: Target): Promise<boolean> {
+  private async evaluateClause(
+    clause: Clause,
+    target: Target,
+  ): Promise<boolean> {
     if (!clause.op) {
       return false;
     }
@@ -204,9 +207,12 @@ export class Evaluator {
     return false;
   }
 
-  private async evaluateClauses(clauses: Clause[], target: Target): Promise<boolean> {
+  private async evaluateClauses(
+    clauses: Clause[],
+    target: Target,
+  ): Promise<boolean> {
     for (const clause of clauses) {
-      if (!await this.evaluateClause(clause, target)) {
+      if (!(await this.evaluateClause(clause, target))) {
         // some clause condition not met return false
         return false;
       }
@@ -234,7 +240,7 @@ export class Evaluator {
     let identifier: string;
     for (const rule of rules) {
       // if evaluation is false just continue to next rule
-      if (!await this.evaluateRule(rule, target)) {
+      if (!(await this.evaluateRule(rule, target))) {
         continue;
       }
 
@@ -292,14 +298,17 @@ export class Evaluator {
     if (fc.state === FeatureState.On) {
       variation =
         this.evaluateVariationMap(fc.variationToTargetMap, target) ||
-        await this.evaluateRules(fc.rules, target) ||
+        (await this.evaluateRules(fc.rules, target)) ||
         this.evaluateDistribution(fc.defaultServe.distribution, target) ||
         fc.defaultServe.variation;
     }
     return this.findVariation(fc.variations, variation);
   }
 
-  private async checkPreRequisite(parent: FeatureConfig, target: Target): Promise<boolean> {
+  private async checkPreRequisite(
+    parent: FeatureConfig,
+    target: Target,
+  ): Promise<boolean> {
     if (parent.prerequisites) {
       log.info(
         'Checking pre requisites %s of parent feature %s',

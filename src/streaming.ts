@@ -78,14 +78,14 @@ export class StreamProcessor {
           msg,
           this.api.getFeatureConfigByIdentifier.bind(this.api),
           this.repository.setFlag.bind(this.repository),
-          this.repository.deleteFlag.bind(this.repository)
+          this.repository.deleteFlag.bind(this.repository),
         );
       } else if (msg.domain === 'target-segment') {
         this.msgProcessor(
           msg,
           this.api.getSegmentByIdentifier.bind(this.api),
           this.repository.setSegment.bind(this.repository),
-          this.repository.deleteSegment.bind(this.repository)
+          this.repository.deleteSegment.bind(this.repository),
         );
       }
     });
@@ -99,7 +99,7 @@ export class StreamProcessor {
     setFn: (identifier: string, data: FeatureConfig | Segment) => void,
     delFn: (identifier: string) => void,
   ): Promise<void> {
-    log.info("Processing message", msg);
+    log.info('Processing message', msg);
     try {
       const response = await fn(msg.identifier, this.environment);
       const data: FeatureConfig | Segment = response.data;
@@ -116,7 +116,7 @@ export class StreamProcessor {
       );
       throw error;
     }
-    log.info("Processing message finished", msg);
+    log.info('Processing message finished', msg);
     return;
   }
 

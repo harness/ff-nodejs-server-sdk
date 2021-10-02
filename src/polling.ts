@@ -13,7 +13,7 @@ export class PollingProcessor {
   private api: ClientApi;
   private stopped = true;
   private options: Options;
-  private repository: Repository
+  private repository: Repository;
 
   constructor(
     environment: string,
@@ -21,7 +21,7 @@ export class PollingProcessor {
     api: ClientApi,
     options: Options,
     eventBus: EventEmitter,
-    repository: Repository
+    repository: Repository,
   ) {
     this.api = api;
     this.options = options;
@@ -71,7 +71,7 @@ export class PollingProcessor {
       });
       log.debug('Fetching flags finished');
       response.data.forEach((fc: FeatureConfig) =>
-        this.repository.setFlag(fc.feature, fc)
+        this.repository.setFlag(fc.feature, fc),
       );
     } catch (error) {
       log.error('Error loading flags', error);

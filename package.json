@@ -46,6 +46,7 @@
     "build": "npm run build:esm; npm run build:cjs; npm run dts",
     "build:watch": "tsc -w -p tsconfig.release.json",
     "lint": "eslint ./src --ext .ts,.tsx",
+    "format": "prettier --write \"src/**/*.ts\"",
     "test": "jest --coverage",
     "test:watch": "jest --watch",
     "generate": "openapi-generator-cli generate -i ./api.yaml -g typescript-axios -o src/openapi"

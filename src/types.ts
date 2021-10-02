@@ -38,21 +38,21 @@ export enum Event {
   CONNECTED = 'connected',
   DISCONNECTED = 'disconnected',
   CHANGED = 'changed',
-  ERROR = 'error'
+  ERROR = 'error',
 }
 
 export interface Operator {
-    startsWith(value: string[]): boolean;
-    endsWith(value: string[]): boolean;
-    match(value: string[]): boolean;
-    contains(value: string[]): boolean;
-    equalSensitive(value: string[]): boolean;
-    equal(value: string[]): boolean;
-    greaterThan(value: string[]): boolean;
-    greaterThanEqual(value: string[]): boolean;
-    lessThan(value: string[]): boolean;
-    lessThanEqual(value: string[]): boolean;
-    inList(value: string[]): boolean;
+  startsWith(value: string[]): boolean;
+  endsWith(value: string[]): boolean;
+  match(value: string[]): boolean;
+  contains(value: string[]): boolean;
+  equalSensitive(value: string[]): boolean;
+  equal(value: string[]): boolean;
+  greaterThan(value: string[]): boolean;
+  greaterThanEqual(value: string[]): boolean;
+  lessThan(value: string[]): boolean;
+  lessThanEqual(value: string[]): boolean;
+  inList(value: string[]): boolean;
 }
 
 export interface Query {

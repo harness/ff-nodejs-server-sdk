@@ -12,536 +12,552 @@
  * Do not edit the class manually.
  */
 
-
 import { Configuration } from './configuration';
 import globalAxios, { AxiosPromise, AxiosInstance } from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
-import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
+import {
+  DUMMY_BASE_URL,
+  assertParamExists,
+  setApiKeyToObject,
+  setBasicAuthToObject,
+  setBearerAuthToObject,
+  setOAuthToObject,
+  setSearchParams,
+  serializeDataIfNeeded,
+  toPathString,
+  createRequestFunction,
+} from './common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
+import {
+  BASE_PATH,
+  COLLECTION_FORMATS,
+  RequestArgs,
+  BaseAPI,
+  RequiredError,
+} from './base';
 
 /**
- * 
+ *
  * @export
  * @interface AuthenticationRequest
  */
 export interface AuthenticationRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof AuthenticationRequest
-     */
-    apiKey: string;
-    /**
-     * 
-     * @type {AuthenticationRequestTarget}
-     * @memberof AuthenticationRequest
-     */
-    target?: AuthenticationRequestTarget;
+  /**
+   *
+   * @type {string}
+   * @memberof AuthenticationRequest
+   */
+  apiKey: string;
+  /**
+   *
+   * @type {AuthenticationRequestTarget}
+   * @memberof AuthenticationRequest
+   */
+  target?: AuthenticationRequestTarget;
 }
 /**
- * 
+ *
  * @export
  * @interface AuthenticationRequestTarget
  */
 export interface AuthenticationRequestTarget {
-    /**
-     * 
-     * @type {string}
-     * @memberof AuthenticationRequestTarget
-     */
-    identifier: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof AuthenticationRequestTarget
-     */
-    name?: string;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof AuthenticationRequestTarget
-     */
-    anonymous?: boolean;
-    /**
-     * 
-     * @type {object}
-     * @memberof AuthenticationRequestTarget
-     */
-    attributes?: object;
+  /**
+   *
+   * @type {string}
+   * @memberof AuthenticationRequestTarget
+   */
+  identifier: string;
+  /**
+   *
+   * @type {string}
+   * @memberof AuthenticationRequestTarget
+   */
+  name?: string;
+  /**
+   *
+   * @type {boolean}
+   * @memberof AuthenticationRequestTarget
+   */
+  anonymous?: boolean;
+  /**
+   *
+   * @type {object}
+   * @memberof AuthenticationRequestTarget
+   */
+  attributes?: object;
 }
 /**
- * 
+ *
  * @export
  * @interface AuthenticationResponse
  */
 export interface AuthenticationResponse {
-    /**
-     * 
-     * @type {string}
-     * @memberof AuthenticationResponse
-     */
-    authToken: string;
+  /**
+   *
+   * @type {string}
+   * @memberof AuthenticationResponse
+   */
+  authToken: string;
 }
 /**
- * 
+ *
  * @export
  * @interface Clause
  */
 export interface Clause {
-    /**
-     * 
-     * @type {string}
-     * @memberof Clause
-     */
-    id: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Clause
-     */
-    attribute: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Clause
-     */
-    op: string;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof Clause
-     */
-    values: Array<string>;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof Clause
-     */
-    negate: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof Clause
+   */
+  id: string;
+  /**
+   *
+   * @type {string}
+   * @memberof Clause
+   */
+  attribute: string;
+  /**
+   *
+   * @type {string}
+   * @memberof Clause
+   */
+  op: string;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof Clause
+   */
+  values: Array<string>;
+  /**
+   *
+   * @type {boolean}
+   * @memberof Clause
+   */
+  negate: boolean;
 }
 /**
- * 
+ *
  * @export
  * @interface Distribution
  */
 export interface Distribution {
-    /**
-     * 
-     * @type {string}
-     * @memberof Distribution
-     */
-    bucketBy: string;
-    /**
-     * 
-     * @type {Array<WeightedVariation>}
-     * @memberof Distribution
-     */
-    variations: Array<WeightedVariation>;
+  /**
+   *
+   * @type {string}
+   * @memberof Distribution
+   */
+  bucketBy: string;
+  /**
+   *
+   * @type {Array<WeightedVariation>}
+   * @memberof Distribution
+   */
+  variations: Array<WeightedVariation>;
 }
 /**
- * 
+ *
  * @export
  * @interface Evaluation
  */
 export interface Evaluation {
-    /**
-     * 
-     * @type {string}
-     * @memberof Evaluation
-     */
-    flag: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Evaluation
-     */
-    value: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Evaluation
-     */
-    kind: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Evaluation
-     */
-    identifier?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof Evaluation
+   */
+  flag: string;
+  /**
+   *
+   * @type {string}
+   * @memberof Evaluation
+   */
+  value: string;
+  /**
+   *
+   * @type {string}
+   * @memberof Evaluation
+   */
+  kind: string;
+  /**
+   *
+   * @type {string}
+   * @memberof Evaluation
+   */
+  identifier?: string;
 }
 /**
- * 
+ *
  * @export
  * @interface FeatureConfig
  */
 export interface FeatureConfig {
-    /**
-     * 
-     * @type {string}
-     * @memberof FeatureConfig
-     */
-    project: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof FeatureConfig
-     */
-    environment: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof FeatureConfig
-     */
-    feature: string;
-    /**
-     * 
-     * @type {FeatureState}
-     * @memberof FeatureConfig
-     */
-    state: FeatureState;
-    /**
-     * 
-     * @type {string}
-     * @memberof FeatureConfig
-     */
-    kind: FeatureConfigKindEnum;
-    /**
-     * 
-     * @type {Array<Variation>}
-     * @memberof FeatureConfig
-     */
-    variations: Array<Variation>;
-    /**
-     * 
-     * @type {Array<ServingRule>}
-     * @memberof FeatureConfig
-     */
-    rules?: Array<ServingRule>;
-    /**
-     * 
-     * @type {Serve}
-     * @memberof FeatureConfig
-     */
-    defaultServe: Serve;
-    /**
-     * 
-     * @type {string}
-     * @memberof FeatureConfig
-     */
-    offVariation: string;
-    /**
-     * 
-     * @type {Array<Prerequisite>}
-     * @memberof FeatureConfig
-     */
-    prerequisites?: Array<Prerequisite>;
-    /**
-     * 
-     * @type {Array<VariationMap>}
-     * @memberof FeatureConfig
-     */
-    variationToTargetMap?: Array<VariationMap>;
-    /**
-     * 
-     * @type {number}
-     * @memberof FeatureConfig
-     */
-    version?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof FeatureConfig
+   */
+  project: string;
+  /**
+   *
+   * @type {string}
+   * @memberof FeatureConfig
+   */
+  environment: string;
+  /**
+   *
+   * @type {string}
+   * @memberof FeatureConfig
+   */
+  feature: string;
+  /**
+   *
+   * @type {FeatureState}
+   * @memberof FeatureConfig
+   */
+  state: FeatureState;
+  /**
+   *
+   * @type {string}
+   * @memberof FeatureConfig
+   */
+  kind: FeatureConfigKindEnum;
+  /**
+   *
+   * @type {Array<Variation>}
+   * @memberof FeatureConfig
+   */
+  variations: Array<Variation>;
+  /**
+   *
+   * @type {Array<ServingRule>}
+   * @memberof FeatureConfig
+   */
+  rules?: Array<ServingRule>;
+  /**
+   *
+   * @type {Serve}
+   * @memberof FeatureConfig
+   */
+  defaultServe: Serve;
+  /**
+   *
+   * @type {string}
+   * @memberof FeatureConfig
+   */
+  offVariation: string;
+  /**
+   *
+   * @type {Array<Prerequisite>}
+   * @memberof FeatureConfig
+   */
+  prerequisites?: Array<Prerequisite>;
+  /**
+   *
+   * @type {Array<VariationMap>}
+   * @memberof FeatureConfig
+   */
+  variationToTargetMap?: Array<VariationMap>;
+  /**
+   *
+   * @type {number}
+   * @memberof FeatureConfig
+   */
+  version?: number;
 }
 
 /**
-    * @export
-    * @enum {string}
-    */
+ * @export
+ * @enum {string}
+ */
 export enum FeatureConfigKindEnum {
-    Boolean = 'boolean',
-    Int = 'int',
-    String = 'string',
-    Json = 'json'
+  Boolean = 'boolean',
+  Int = 'int',
+  String = 'string',
+  Json = 'json',
 }
 
 /**
- * 
+ *
  * @export
  * @enum {string}
  */
 
 export enum FeatureState {
-    On = 'on',
-    Off = 'off'
+  On = 'on',
+  Off = 'off',
 }
 
 /**
- * 
+ *
  * @export
  * @interface KeyValue
  */
 export interface KeyValue {
-    /**
-     * 
-     * @type {string}
-     * @memberof KeyValue
-     */
-    key: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof KeyValue
-     */
-    value: string;
+  /**
+   *
+   * @type {string}
+   * @memberof KeyValue
+   */
+  key: string;
+  /**
+   *
+   * @type {string}
+   * @memberof KeyValue
+   */
+  value: string;
 }
 /**
- * 
+ *
  * @export
  * @interface Metrics
  */
 export interface Metrics {
-    /**
-     * 
-     * @type {Array<TargetData>}
-     * @memberof Metrics
-     */
-    targetData?: Array<TargetData>;
-    /**
-     * 
-     * @type {Array<MetricsData>}
-     * @memberof Metrics
-     */
-    metricsData?: Array<MetricsData>;
+  /**
+   *
+   * @type {Array<TargetData>}
+   * @memberof Metrics
+   */
+  targetData?: Array<TargetData>;
+  /**
+   *
+   * @type {Array<MetricsData>}
+   * @memberof Metrics
+   */
+  metricsData?: Array<MetricsData>;
 }
 /**
- * 
+ *
  * @export
  * @interface MetricsData
  */
 export interface MetricsData {
-    /**
-     * time at when this data was recorded
-     * @type {number}
-     * @memberof MetricsData
-     */
-    timestamp: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof MetricsData
-     */
-    count: number;
-    /**
-     * This can be of type FeatureMetrics
-     * @type {string}
-     * @memberof MetricsData
-     */
-    metricsType: MetricsDataMetricsTypeEnum;
-    /**
-     * 
-     * @type {Array<KeyValue>}
-     * @memberof MetricsData
-     */
-    attributes: Array<KeyValue>;
+  /**
+   * time at when this data was recorded
+   * @type {number}
+   * @memberof MetricsData
+   */
+  timestamp: number;
+  /**
+   *
+   * @type {number}
+   * @memberof MetricsData
+   */
+  count: number;
+  /**
+   * This can be of type FeatureMetrics
+   * @type {string}
+   * @memberof MetricsData
+   */
+  metricsType: MetricsDataMetricsTypeEnum;
+  /**
+   *
+   * @type {Array<KeyValue>}
+   * @memberof MetricsData
+   */
+  attributes: Array<KeyValue>;
 }
 
 /**
-    * @export
-    * @enum {string}
-    */
+ * @export
+ * @enum {string}
+ */
 export enum MetricsDataMetricsTypeEnum {
-    Ffmetrics = 'FFMETRICS'
+  Ffmetrics = 'FFMETRICS',
 }
 
 /**
- * 
+ *
  * @export
  * @interface ModelError
  */
 export interface ModelError {
-    /**
-     * 
-     * @type {string}
-     * @memberof ModelError
-     */
-    code: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ModelError
-     */
-    message: string;
+  /**
+   *
+   * @type {string}
+   * @memberof ModelError
+   */
+  code: string;
+  /**
+   *
+   * @type {string}
+   * @memberof ModelError
+   */
+  message: string;
 }
 /**
- * 
+ *
  * @export
  * @interface Pagination
  */
 export interface Pagination {
-    /**
-     * 
-     * @type {number}
-     * @memberof Pagination
-     */
-    version?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof Pagination
-     */
-    pageCount: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof Pagination
-     */
-    itemCount: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof Pagination
-     */
-    pageSize: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof Pagination
-     */
-    pageIndex: number;
+  /**
+   *
+   * @type {number}
+   * @memberof Pagination
+   */
+  version?: number;
+  /**
+   *
+   * @type {number}
+   * @memberof Pagination
+   */
+  pageCount: number;
+  /**
+   *
+   * @type {number}
+   * @memberof Pagination
+   */
+  itemCount: number;
+  /**
+   *
+   * @type {number}
+   * @memberof Pagination
+   */
+  pageSize: number;
+  /**
+   *
+   * @type {number}
+   * @memberof Pagination
+   */
+  pageIndex: number;
 }
 /**
- * 
+ *
  * @export
  * @interface Prerequisite
  */
 export interface Prerequisite {
-    /**
-     * 
-     * @type {string}
-     * @memberof Prerequisite
-     */
-    feature: string;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof Prerequisite
-     */
-    variations: Array<string>;
+  /**
+   *
+   * @type {string}
+   * @memberof Prerequisite
+   */
+  feature: string;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof Prerequisite
+   */
+  variations: Array<string>;
 }
 /**
- * 
+ *
  * @export
  * @interface Segment
  */
 export interface Segment {
-    /**
-     * Unique identifier for the segment.
-     * @type {string}
-     * @memberof Segment
-     */
-    identifier: string;
-    /**
-     * Name of the segment.
-     * @type {string}
-     * @memberof Segment
-     */
-    name: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Segment
-     */
-    environment?: string;
-    /**
-     * 
-     * @type {Array<Tag>}
-     * @memberof Segment
-     */
-    tags?: Array<Tag>;
-    /**
-     * 
-     * @type {Array<Target>}
-     * @memberof Segment
-     */
-    included?: Array<Target>;
-    /**
-     * 
-     * @type {Array<Target>}
-     * @memberof Segment
-     */
-    excluded?: Array<Target>;
-    /**
-     * An array of rules that can cause a user to be included in this segment.
-     * @type {Array<Clause>}
-     * @memberof Segment
-     */
-    rules?: Array<Clause>;
-    /**
-     * 
-     * @type {number}
-     * @memberof Segment
-     */
-    createdAt?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof Segment
-     */
-    modifiedAt?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof Segment
-     */
-    version?: number;
+  /**
+   * Unique identifier for the segment.
+   * @type {string}
+   * @memberof Segment
+   */
+  identifier: string;
+  /**
+   * Name of the segment.
+   * @type {string}
+   * @memberof Segment
+   */
+  name: string;
+  /**
+   *
+   * @type {string}
+   * @memberof Segment
+   */
+  environment?: string;
+  /**
+   *
+   * @type {Array<Tag>}
+   * @memberof Segment
+   */
+  tags?: Array<Tag>;
+  /**
+   *
+   * @type {Array<Target>}
+   * @memberof Segment
+   */
+  included?: Array<Target>;
+  /**
+   *
+   * @type {Array<Target>}
+   * @memberof Segment
+   */
+  excluded?: Array<Target>;
+  /**
+   * An array of rules that can cause a user to be included in this segment.
+   * @type {Array<Clause>}
+   * @memberof Segment
+   */
+  rules?: Array<Clause>;
+  /**
+   *
+   * @type {number}
+   * @memberof Segment
+   */
+  createdAt?: number;
+  /**
+   *
+   * @type {number}
+   * @memberof Segment
+   */
+  modifiedAt?: number;
+  /**
+   *
+   * @type {number}
+   * @memberof Segment
+   */
+  version?: number;
 }
 /**
- * 
+ *
  * @export
  * @interface Serve
  */
 export interface Serve {
-    /**
-     * 
-     * @type {Distribution}
-     * @memberof Serve
-     */
-    distribution?: Distribution;
-    /**
-     * 
-     * @type {string}
-     * @memberof Serve
-     */
-    variation?: string;
+  /**
+   *
+   * @type {Distribution}
+   * @memberof Serve
+   */
+  distribution?: Distribution;
+  /**
+   *
+   * @type {string}
+   * @memberof Serve
+   */
+  variation?: string;
 }
 /**
- * 
+ *
  * @export
  * @interface ServingRule
  */
 export interface ServingRule {
-    /**
-     * 
-     * @type {string}
-     * @memberof ServingRule
-     */
-    ruleId: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof ServingRule
-     */
-    priority: number;
-    /**
-     * 
-     * @type {Array<Clause>}
-     * @memberof ServingRule
-     */
-    clauses: Array<Clause>;
-    /**
-     * 
-     * @type {Serve}
-     * @memberof ServingRule
-     */
-    serve: Serve;
+  /**
+   *
+   * @type {string}
+   * @memberof ServingRule
+   */
+  ruleId: string;
+  /**
+   *
+   * @type {number}
+   * @memberof ServingRule
+   */
+  priority: number;
+  /**
+   *
+   * @type {Array<Clause>}
+   * @memberof ServingRule
+   */
+  clauses: Array<Clause>;
+  /**
+   *
+   * @type {Serve}
+   * @memberof ServingRule
+   */
+  serve: Serve;
 }
 /**
  * A name and value pair.
@@ -549,734 +565,1033 @@ export interface ServingRule {
  * @interface Tag
  */
 export interface Tag {
-    /**
-     * 
-     * @type {string}
-     * @memberof Tag
-     */
-    name: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Tag
-     */
-    value?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof Tag
+   */
+  name: string;
+  /**
+   *
+   * @type {string}
+   * @memberof Tag
+   */
+  value?: string;
 }
 /**
- * 
+ *
  * @export
  * @interface Target
  */
 export interface Target {
-    /**
-     * 
-     * @type {string}
-     * @memberof Target
-     */
-    identifier: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Target
-     */
-    account: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Target
-     */
-    org: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Target
-     */
-    environment: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Target
-     */
-    project: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Target
-     */
-    name: string;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof Target
-     */
-    anonymous?: boolean;
-    /**
-     * 
-     * @type {object}
-     * @memberof Target
-     */
-    attributes?: object;
-    /**
-     * 
-     * @type {number}
-     * @memberof Target
-     */
-    createdAt?: number;
-    /**
-     * 
-     * @type {Array<Segment>}
-     * @memberof Target
-     */
-    segments?: Array<Segment>;
+  /**
+   *
+   * @type {string}
+   * @memberof Target
+   */
+  identifier: string;
+  /**
+   *
+   * @type {string}
+   * @memberof Target
+   */
+  account: string;
+  /**
+   *
+   * @type {string}
+   * @memberof Target
+   */
+  org: string;
+  /**
+   *
+   * @type {string}
+   * @memberof Target
+   */
+  environment: string;
+  /**
+   *
+   * @type {string}
+   * @memberof Target
+   */
+  project: string;
+  /**
+   *
+   * @type {string}
+   * @memberof Target
+   */
+  name: string;
+  /**
+   *
+   * @type {boolean}
+   * @memberof Target
+   */
+  anonymous?: boolean;
+  /**
+   *
+   * @type {object}
+   * @memberof Target
+   */
+  attributes?: object;
+  /**
+   *
+   * @type {number}
+   * @memberof Target
+   */
+  createdAt?: number;
+  /**
+   *
+   * @type {Array<Segment>}
+   * @memberof Target
+   */
+  segments?: Array<Segment>;
 }
 /**
- * 
+ *
  * @export
  * @interface TargetData
  */
 export interface TargetData {
-    /**
-     * 
-     * @type {string}
-     * @memberof TargetData
-     */
-    identifier: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof TargetData
-     */
-    name: string;
-    /**
-     * 
-     * @type {Array<KeyValue>}
-     * @memberof TargetData
-     */
-    attributes: Array<KeyValue>;
+  /**
+   *
+   * @type {string}
+   * @memberof TargetData
+   */
+  identifier: string;
+  /**
+   *
+   * @type {string}
+   * @memberof TargetData
+   */
+  name: string;
+  /**
+   *
+   * @type {Array<KeyValue>}
+   * @memberof TargetData
+   */
+  attributes: Array<KeyValue>;
 }
 /**
- * 
+ *
  * @export
  * @interface TargetMap
  */
 export interface TargetMap {
-    /**
-     * 
-     * @type {string}
-     * @memberof TargetMap
-     */
-    identifier?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof TargetMap
-     */
-    name: string;
+  /**
+   *
+   * @type {string}
+   * @memberof TargetMap
+   */
+  identifier?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof TargetMap
+   */
+  name: string;
 }
 /**
- * 
+ *
  * @export
  * @interface Variation
  */
 export interface Variation {
-    /**
-     * 
-     * @type {string}
-     * @memberof Variation
-     */
-    identifier: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Variation
-     */
-    value: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Variation
-     */
-    name?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Variation
-     */
-    description?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof Variation
+   */
+  identifier: string;
+  /**
+   *
+   * @type {string}
+   * @memberof Variation
+   */
+  value: string;
+  /**
+   *
+   * @type {string}
+   * @memberof Variation
+   */
+  name?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof Variation
+   */
+  description?: string;
 }
 /**
- * 
+ *
  * @export
  * @interface VariationMap
  */
 export interface VariationMap {
-    /**
-     * 
-     * @type {string}
-     * @memberof VariationMap
-     */
-    variation: string;
-    /**
-     * 
-     * @type {Array<TargetMap>}
-     * @memberof VariationMap
-     */
-    targets?: Array<TargetMap>;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof VariationMap
-     */
-    targetSegments?: Array<string>;
+  /**
+   *
+   * @type {string}
+   * @memberof VariationMap
+   */
+  variation: string;
+  /**
+   *
+   * @type {Array<TargetMap>}
+   * @memberof VariationMap
+   */
+  targets?: Array<TargetMap>;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof VariationMap
+   */
+  targetSegments?: Array<string>;
 }
 /**
- * 
+ *
  * @export
  * @interface WeightedVariation
  */
 export interface WeightedVariation {
-    /**
-     * 
-     * @type {string}
-     * @memberof WeightedVariation
-     */
-    variation: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof WeightedVariation
-     */
-    weight: number;
+  /**
+   *
+   * @type {string}
+   * @memberof WeightedVariation
+   */
+  variation: string;
+  /**
+   *
+   * @type {number}
+   * @memberof WeightedVariation
+   */
+  weight: number;
 }
 
 /**
  * ClientApi - axios parameter creator
  * @export
  */
-export const ClientApiAxiosParamCreator = function (configuration?: Configuration) {
-    return {
-        /**
-         * Used to retrieve all target segments for certain account id.
-         * @summary Authenticate with the admin server.
-         * @param {AuthenticationRequest} [authenticationRequest] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        authenticate: async (authenticationRequest?: AuthenticationRequest, options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/client/auth`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
+export const ClientApiAxiosParamCreator = function (
+  configuration?: Configuration,
+) {
+  return {
+    /**
+     * Used to retrieve all target segments for certain account id.
+     * @summary Authenticate with the admin server.
+     * @param {AuthenticationRequest} [authenticationRequest]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    authenticate: async (
+      authenticationRequest?: AuthenticationRequest,
+      options: any = {},
+    ): Promise<RequestArgs> => {
+      const localVarPath = `/client/auth`;
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
 
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
+      const localVarRequestOptions = {
+        method: 'POST',
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
+      localVarHeaderParameter['Content-Type'] = 'application/json';
 
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
+      setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        authenticationRequest,
+        localVarRequestOptions,
+        configuration,
+      );
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(authenticationRequest, localVarRequestOptions, configuration)
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
+     * Used to retrieve all segments for certain account id.
+     * @summary Retrieve all segments.
+     * @param {string} environmentUUID Unique identifier for the environment object in the API.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getAllSegments: async (
+      environmentUUID: string,
+      options: any = {},
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'environmentUUID' is not null or undefined
+      assertParamExists('getAllSegments', 'environmentUUID', environmentUUID);
+      const localVarPath =
+        `/client/env/{environmentUUID}/target-segments`.replace(
+          `{${'environmentUUID'}}`,
+          encodeURIComponent(String(environmentUUID)),
+        );
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
 
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * Used to retrieve all segments for certain account id.
-         * @summary Retrieve all segments.
-         * @param {string} environmentUUID Unique identifier for the environment object in the API.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getAllSegments: async (environmentUUID: string, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'environmentUUID' is not null or undefined
-            assertParamExists('getAllSegments', 'environmentUUID', environmentUUID)
-            const localVarPath = `/client/env/{environmentUUID}/target-segments`
-                .replace(`{${"environmentUUID"}}`, encodeURIComponent(String(environmentUUID)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
+      const localVarRequestOptions = {
+        method: 'GET',
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
+      // authentication BearerAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-            // authentication BearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
+     *
+     * @summary Get feature evaluations for target
+     * @param {string} environmentUUID Unique identifier for the environment object in the API.
+     * @param {string} feature Unique identifier for the flag object in the API.
+     * @param {string} target Unique identifier for the target object in the API.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getEvaluationByIdentifier: async (
+      environmentUUID: string,
+      feature: string,
+      target: string,
+      options: any = {},
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'environmentUUID' is not null or undefined
+      assertParamExists(
+        'getEvaluationByIdentifier',
+        'environmentUUID',
+        environmentUUID,
+      );
+      // verify required parameter 'feature' is not null or undefined
+      assertParamExists('getEvaluationByIdentifier', 'feature', feature);
+      // verify required parameter 'target' is not null or undefined
+      assertParamExists('getEvaluationByIdentifier', 'target', target);
+      const localVarPath =
+        `/client/env/{environmentUUID}/target/{target}/evaluations/{feature}`
+          .replace(
+            `{${'environmentUUID'}}`,
+            encodeURIComponent(String(environmentUUID)),
+          )
+          .replace(`{${'feature'}}`, encodeURIComponent(String(feature)))
+          .replace(`{${'target'}}`, encodeURIComponent(String(target)));
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
 
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+      const localVarRequestOptions = {
+        method: 'GET',
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary Get feature evaluations for target
-         * @param {string} environmentUUID Unique identifier for the environment object in the API.
-         * @param {string} feature Unique identifier for the flag object in the API.
-         * @param {string} target Unique identifier for the target object in the API.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getEvaluationByIdentifier: async (environmentUUID: string, feature: string, target: string, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'environmentUUID' is not null or undefined
-            assertParamExists('getEvaluationByIdentifier', 'environmentUUID', environmentUUID)
-            // verify required parameter 'feature' is not null or undefined
-            assertParamExists('getEvaluationByIdentifier', 'feature', feature)
-            // verify required parameter 'target' is not null or undefined
-            assertParamExists('getEvaluationByIdentifier', 'target', target)
-            const localVarPath = `/client/env/{environmentUUID}/target/{target}/evaluations/{feature}`
-                .replace(`{${"environmentUUID"}}`, encodeURIComponent(String(environmentUUID)))
-                .replace(`{${"feature"}}`, encodeURIComponent(String(feature)))
-                .replace(`{${"target"}}`, encodeURIComponent(String(target)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
+      // authentication BearerAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
+      setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
-            // authentication BearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
+     *
+     * @summary Get feature evaluations for target
+     * @param {string} environmentUUID Unique identifier for the environment object in the API.
+     * @param {string} target Unique identifier for the target object in the API.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getEvaluations: async (
+      environmentUUID: string,
+      target: string,
+      options: any = {},
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'environmentUUID' is not null or undefined
+      assertParamExists('getEvaluations', 'environmentUUID', environmentUUID);
+      // verify required parameter 'target' is not null or undefined
+      assertParamExists('getEvaluations', 'target', target);
+      const localVarPath =
+        `/client/env/{environmentUUID}/target/{target}/evaluations`
+          .replace(
+            `{${'environmentUUID'}}`,
+            encodeURIComponent(String(environmentUUID)),
+          )
+          .replace(`{${'target'}}`, encodeURIComponent(String(target)));
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
 
+      const localVarRequestOptions = {
+        method: 'GET',
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+      // authentication BearerAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary Get feature evaluations for target
-         * @param {string} environmentUUID Unique identifier for the environment object in the API.
-         * @param {string} target Unique identifier for the target object in the API.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getEvaluations: async (environmentUUID: string, target: string, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'environmentUUID' is not null or undefined
-            assertParamExists('getEvaluations', 'environmentUUID', environmentUUID)
-            // verify required parameter 'target' is not null or undefined
-            assertParamExists('getEvaluations', 'target', target)
-            const localVarPath = `/client/env/{environmentUUID}/target/{target}/evaluations`
-                .replace(`{${"environmentUUID"}}`, encodeURIComponent(String(environmentUUID)))
-                .replace(`{${"target"}}`, encodeURIComponent(String(target)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
+      setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
+     * All feature flags with activations in project environment
+     * @summary Get all feature flags activations
+     * @param {string} environmentUUID Unique identifier for the environment object in the API.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getFeatureConfig: async (
+      environmentUUID: string,
+      options: any = {},
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'environmentUUID' is not null or undefined
+      assertParamExists('getFeatureConfig', 'environmentUUID', environmentUUID);
+      const localVarPath =
+        `/client/env/{environmentUUID}/feature-configs`.replace(
+          `{${'environmentUUID'}}`,
+          encodeURIComponent(String(environmentUUID)),
+        );
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
 
-            // authentication BearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      const localVarRequestOptions = {
+        method: 'GET',
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
+      // authentication BearerAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+      setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * All feature flags with activations in project environment
-         * @summary Get all feature flags activations
-         * @param {string} environmentUUID Unique identifier for the environment object in the API.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getFeatureConfig: async (environmentUUID: string, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'environmentUUID' is not null or undefined
-            assertParamExists('getFeatureConfig', 'environmentUUID', environmentUUID)
-            const localVarPath = `/client/env/{environmentUUID}/feature-configs`
-                .replace(`{${"environmentUUID"}}`, encodeURIComponent(String(environmentUUID)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
+     *
+     * @summary Get feature config
+     * @param {string} identifier Unique identifier for the flag object in the API.
+     * @param {string} environmentUUID Unique identifier for the environment object in the API.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getFeatureConfigByIdentifier: async (
+      identifier: string,
+      environmentUUID: string,
+      options: any = {},
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'identifier' is not null or undefined
+      assertParamExists(
+        'getFeatureConfigByIdentifier',
+        'identifier',
+        identifier,
+      );
+      // verify required parameter 'environmentUUID' is not null or undefined
+      assertParamExists(
+        'getFeatureConfigByIdentifier',
+        'environmentUUID',
+        environmentUUID,
+      );
+      const localVarPath =
+        `/client/env/{environmentUUID}/feature-configs/{identifier}`
+          .replace(`{${'identifier'}}`, encodeURIComponent(String(identifier)))
+          .replace(
+            `{${'environmentUUID'}}`,
+            encodeURIComponent(String(environmentUUID)),
+          );
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
+      const localVarRequestOptions = {
+        method: 'GET',
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
-            // authentication BearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      // authentication BearerAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
+      setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
+     * Used to retrieve a segment for a certain account id by identifier
+     * @summary Retrieve a segment by identifier
+     * @param {string} identifier Unique identifier for the segment object in the API
+     * @param {string} environmentUUID Unique identifier for the environment object in the API
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getSegmentByIdentifier: async (
+      identifier: string,
+      environmentUUID: string,
+      options: any = {},
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'identifier' is not null or undefined
+      assertParamExists('getSegmentByIdentifier', 'identifier', identifier);
+      // verify required parameter 'environmentUUID' is not null or undefined
+      assertParamExists(
+        'getSegmentByIdentifier',
+        'environmentUUID',
+        environmentUUID,
+      );
+      const localVarPath =
+        `/client/env/{environmentUUID}/target-segments/{identifier}`
+          .replace(`{${'identifier'}}`, encodeURIComponent(String(identifier)))
+          .replace(
+            `{${'environmentUUID'}}`,
+            encodeURIComponent(String(environmentUUID)),
+          );
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
 
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary Get feature config
-         * @param {string} identifier Unique identifier for the flag object in the API.
-         * @param {string} environmentUUID Unique identifier for the environment object in the API.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getFeatureConfigByIdentifier: async (identifier: string, environmentUUID: string, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'identifier' is not null or undefined
-            assertParamExists('getFeatureConfigByIdentifier', 'identifier', identifier)
-            // verify required parameter 'environmentUUID' is not null or undefined
-            assertParamExists('getFeatureConfigByIdentifier', 'environmentUUID', environmentUUID)
-            const localVarPath = `/client/env/{environmentUUID}/feature-configs/{identifier}`
-                .replace(`{${"identifier"}}`, encodeURIComponent(String(identifier)))
-                .replace(`{${"environmentUUID"}}`, encodeURIComponent(String(environmentUUID)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
+      const localVarRequestOptions = {
+        method: 'GET',
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
+      // authentication BearerAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-            // authentication BearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
+     *
+     * @summary Stream endpoint.
+     * @param {string} aPIKey
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    stream: async (aPIKey: string, options: any = {}): Promise<RequestArgs> => {
+      // verify required parameter 'aPIKey' is not null or undefined
+      assertParamExists('stream', 'aPIKey', aPIKey);
+      const localVarPath = `/stream`;
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
 
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+      const localVarRequestOptions = {
+        method: 'GET',
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * Used to retrieve a segment for a certain account id by identifier
-         * @summary Retrieve a segment by identifier
-         * @param {string} identifier Unique identifier for the segment object in the API
-         * @param {string} environmentUUID Unique identifier for the environment object in the API
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getSegmentByIdentifier: async (identifier: string, environmentUUID: string, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'identifier' is not null or undefined
-            assertParamExists('getSegmentByIdentifier', 'identifier', identifier)
-            // verify required parameter 'environmentUUID' is not null or undefined
-            assertParamExists('getSegmentByIdentifier', 'environmentUUID', environmentUUID)
-            const localVarPath = `/client/env/{environmentUUID}/target-segments/{identifier}`
-                .replace(`{${"identifier"}}`, encodeURIComponent(String(identifier)))
-                .replace(`{${"environmentUUID"}}`, encodeURIComponent(String(environmentUUID)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
+      // authentication BearerAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
+      if (aPIKey !== undefined && aPIKey !== null) {
+        localVarHeaderParameter['API-Key'] = String(aPIKey);
+      }
 
-            // authentication BearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary Stream endpoint.
-         * @param {string} aPIKey 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        stream: async (aPIKey: string, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'aPIKey' is not null or undefined
-            assertParamExists('stream', 'aPIKey', aPIKey)
-            const localVarPath = `/stream`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication BearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            if (aPIKey !== undefined && aPIKey !== null) {
-                localVarHeaderParameter['API-Key'] = String(aPIKey);
-            }
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-    }
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+  };
 };
 
 /**
  * ClientApi - functional programming interface
  * @export
  */
-export const ClientApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = ClientApiAxiosParamCreator(configuration)
-    return {
-        /**
-         * Used to retrieve all target segments for certain account id.
-         * @summary Authenticate with the admin server.
-         * @param {AuthenticationRequest} [authenticationRequest] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async authenticate(authenticationRequest?: AuthenticationRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AuthenticationResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.authenticate(authenticationRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * Used to retrieve all segments for certain account id.
-         * @summary Retrieve all segments.
-         * @param {string} environmentUUID Unique identifier for the environment object in the API.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getAllSegments(environmentUUID: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Segment>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getAllSegments(environmentUUID, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @summary Get feature evaluations for target
-         * @param {string} environmentUUID Unique identifier for the environment object in the API.
-         * @param {string} feature Unique identifier for the flag object in the API.
-         * @param {string} target Unique identifier for the target object in the API.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getEvaluationByIdentifier(environmentUUID: string, feature: string, target: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Evaluation>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getEvaluationByIdentifier(environmentUUID, feature, target, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @summary Get feature evaluations for target
-         * @param {string} environmentUUID Unique identifier for the environment object in the API.
-         * @param {string} target Unique identifier for the target object in the API.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getEvaluations(environmentUUID: string, target: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Pagination & object>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getEvaluations(environmentUUID, target, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * All feature flags with activations in project environment
-         * @summary Get all feature flags activations
-         * @param {string} environmentUUID Unique identifier for the environment object in the API.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getFeatureConfig(environmentUUID: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<FeatureConfig>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getFeatureConfig(environmentUUID, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @summary Get feature config
-         * @param {string} identifier Unique identifier for the flag object in the API.
-         * @param {string} environmentUUID Unique identifier for the environment object in the API.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getFeatureConfigByIdentifier(identifier: string, environmentUUID: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FeatureConfig>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getFeatureConfigByIdentifier(identifier, environmentUUID, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * Used to retrieve a segment for a certain account id by identifier
-         * @summary Retrieve a segment by identifier
-         * @param {string} identifier Unique identifier for the segment object in the API
-         * @param {string} environmentUUID Unique identifier for the environment object in the API
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getSegmentByIdentifier(identifier: string, environmentUUID: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Segment>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getSegmentByIdentifier(identifier, environmentUUID, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @summary Stream endpoint.
-         * @param {string} aPIKey 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async stream(aPIKey: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.stream(aPIKey, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-    }
+export const ClientApiFp = function (configuration?: Configuration) {
+  const localVarAxiosParamCreator = ClientApiAxiosParamCreator(configuration);
+  return {
+    /**
+     * Used to retrieve all target segments for certain account id.
+     * @summary Authenticate with the admin server.
+     * @param {AuthenticationRequest} [authenticationRequest]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async authenticate(
+      authenticationRequest?: AuthenticationRequest,
+      options?: any,
+    ): Promise<
+      (
+        axios?: AxiosInstance,
+        basePath?: string,
+      ) => AxiosPromise<AuthenticationResponse>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.authenticate(
+        authenticationRequest,
+        options,
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration,
+      );
+    },
+    /**
+     * Used to retrieve all segments for certain account id.
+     * @summary Retrieve all segments.
+     * @param {string} environmentUUID Unique identifier for the environment object in the API.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async getAllSegments(
+      environmentUUID: string,
+      options?: any,
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Segment>>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.getAllSegments(
+        environmentUUID,
+        options,
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration,
+      );
+    },
+    /**
+     *
+     * @summary Get feature evaluations for target
+     * @param {string} environmentUUID Unique identifier for the environment object in the API.
+     * @param {string} feature Unique identifier for the flag object in the API.
+     * @param {string} target Unique identifier for the target object in the API.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async getEvaluationByIdentifier(
+      environmentUUID: string,
+      feature: string,
+      target: string,
+      options?: any,
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Evaluation>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.getEvaluationByIdentifier(
+          environmentUUID,
+          feature,
+          target,
+          options,
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration,
+      );
+    },
+    /**
+     *
+     * @summary Get feature evaluations for target
+     * @param {string} environmentUUID Unique identifier for the environment object in the API.
+     * @param {string} target Unique identifier for the target object in the API.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async getEvaluations(
+      environmentUUID: string,
+      target: string,
+      options?: any,
+    ): Promise<
+      (
+        axios?: AxiosInstance,
+        basePath?: string,
+      ) => AxiosPromise<Pagination & object>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.getEvaluations(
+        environmentUUID,
+        target,
+        options,
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration,
+      );
+    },
+    /**
+     * All feature flags with activations in project environment
+     * @summary Get all feature flags activations
+     * @param {string} environmentUUID Unique identifier for the environment object in the API.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async getFeatureConfig(
+      environmentUUID: string,
+      options?: any,
+    ): Promise<
+      (
+        axios?: AxiosInstance,
+        basePath?: string,
+      ) => AxiosPromise<Array<FeatureConfig>>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.getFeatureConfig(
+          environmentUUID,
+          options,
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration,
+      );
+    },
+    /**
+     *
+     * @summary Get feature config
+     * @param {string} identifier Unique identifier for the flag object in the API.
+     * @param {string} environmentUUID Unique identifier for the environment object in the API.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async getFeatureConfigByIdentifier(
+      identifier: string,
+      environmentUUID: string,
+      options?: any,
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<FeatureConfig>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.getFeatureConfigByIdentifier(
+          identifier,
+          environmentUUID,
+          options,
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration,
+      );
+    },
+    /**
+     * Used to retrieve a segment for a certain account id by identifier
+     * @summary Retrieve a segment by identifier
+     * @param {string} identifier Unique identifier for the segment object in the API
+     * @param {string} environmentUUID Unique identifier for the environment object in the API
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async getSegmentByIdentifier(
+      identifier: string,
+      environmentUUID: string,
+      options?: any,
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Segment>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.getSegmentByIdentifier(
+          identifier,
+          environmentUUID,
+          options,
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration,
+      );
+    },
+    /**
+     *
+     * @summary Stream endpoint.
+     * @param {string} aPIKey
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async stream(
+      aPIKey: string,
+      options?: any,
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.stream(
+        aPIKey,
+        options,
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration,
+      );
+    },
+  };
 };
 
 /**
  * ClientApi - factory interface
  * @export
  */
-export const ClientApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = ClientApiFp(configuration)
-    return {
-        /**
-         * Used to retrieve all target segments for certain account id.
-         * @summary Authenticate with the admin server.
-         * @param {AuthenticationRequest} [authenticationRequest] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        authenticate(authenticationRequest?: AuthenticationRequest, options?: any): AxiosPromise<AuthenticationResponse> {
-            return localVarFp.authenticate(authenticationRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * Used to retrieve all segments for certain account id.
-         * @summary Retrieve all segments.
-         * @param {string} environmentUUID Unique identifier for the environment object in the API.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getAllSegments(environmentUUID: string, options?: any): AxiosPromise<Array<Segment>> {
-            return localVarFp.getAllSegments(environmentUUID, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Get feature evaluations for target
-         * @param {string} environmentUUID Unique identifier for the environment object in the API.
-         * @param {string} feature Unique identifier for the flag object in the API.
-         * @param {string} target Unique identifier for the target object in the API.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getEvaluationByIdentifier(environmentUUID: string, feature: string, target: string, options?: any): AxiosPromise<Evaluation> {
-            return localVarFp.getEvaluationByIdentifier(environmentUUID, feature, target, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Get feature evaluations for target
-         * @param {string} environmentUUID Unique identifier for the environment object in the API.
-         * @param {string} target Unique identifier for the target object in the API.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getEvaluations(environmentUUID: string, target: string, options?: any): AxiosPromise<Pagination & object> {
-            return localVarFp.getEvaluations(environmentUUID, target, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * All feature flags with activations in project environment
-         * @summary Get all feature flags activations
-         * @param {string} environmentUUID Unique identifier for the environment object in the API.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getFeatureConfig(environmentUUID: string, options?: any): AxiosPromise<Array<FeatureConfig>> {
-            return localVarFp.getFeatureConfig(environmentUUID, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Get feature config
-         * @param {string} identifier Unique identifier for the flag object in the API.
-         * @param {string} environmentUUID Unique identifier for the environment object in the API.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getFeatureConfigByIdentifier(identifier: string, environmentUUID: string, options?: any): AxiosPromise<FeatureConfig> {
-            return localVarFp.getFeatureConfigByIdentifier(identifier, environmentUUID, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * Used to retrieve a segment for a certain account id by identifier
-         * @summary Retrieve a segment by identifier
-         * @param {string} identifier Unique identifier for the segment object in the API
-         * @param {string} environmentUUID Unique identifier for the environment object in the API
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getSegmentByIdentifier(identifier: string, environmentUUID: string, options?: any): AxiosPromise<Segment> {
-            return localVarFp.getSegmentByIdentifier(identifier, environmentUUID, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Stream endpoint.
-         * @param {string} aPIKey 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        stream(aPIKey: string, options?: any): AxiosPromise<void> {
-            return localVarFp.stream(aPIKey, options).then((request) => request(axios, basePath));
-        },
-    };
+export const ClientApiFactory = function (
+  configuration?: Configuration,
+  basePath?: string,
+  axios?: AxiosInstance,
+) {
+  const localVarFp = ClientApiFp(configuration);
+  return {
+    /**
+     * Used to retrieve all target segments for certain account id.
+     * @summary Authenticate with the admin server.
+     * @param {AuthenticationRequest} [authenticationRequest]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    authenticate(
+      authenticationRequest?: AuthenticationRequest,
+      options?: any,
+    ): AxiosPromise<AuthenticationResponse> {
+      return localVarFp
+        .authenticate(authenticationRequest, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     * Used to retrieve all segments for certain account id.
+     * @summary Retrieve all segments.
+     * @param {string} environmentUUID Unique identifier for the environment object in the API.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getAllSegments(
+      environmentUUID: string,
+      options?: any,
+    ): AxiosPromise<Array<Segment>> {
+      return localVarFp
+        .getAllSegments(environmentUUID, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     *
+     * @summary Get feature evaluations for target
+     * @param {string} environmentUUID Unique identifier for the environment object in the API.
+     * @param {string} feature Unique identifier for the flag object in the API.
+     * @param {string} target Unique identifier for the target object in the API.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getEvaluationByIdentifier(
+      environmentUUID: string,
+      feature: string,
+      target: string,
+      options?: any,
+    ): AxiosPromise<Evaluation> {
+      return localVarFp
+        .getEvaluationByIdentifier(environmentUUID, feature, target, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     *
+     * @summary Get feature evaluations for target
+     * @param {string} environmentUUID Unique identifier for the environment object in the API.
+     * @param {string} target Unique identifier for the target object in the API.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getEvaluations(
+      environmentUUID: string,
+      target: string,
+      options?: any,
+    ): AxiosPromise<Pagination & object> {
+      return localVarFp
+        .getEvaluations(environmentUUID, target, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     * All feature flags with activations in project environment
+     * @summary Get all feature flags activations
+     * @param {string} environmentUUID Unique identifier for the environment object in the API.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getFeatureConfig(
+      environmentUUID: string,
+      options?: any,
+    ): AxiosPromise<Array<FeatureConfig>> {
+      return localVarFp
+        .getFeatureConfig(environmentUUID, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     *
+     * @summary Get feature config
+     * @param {string} identifier Unique identifier for the flag object in the API.
+     * @param {string} environmentUUID Unique identifier for the environment object in the API.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getFeatureConfigByIdentifier(
+      identifier: string,
+      environmentUUID: string,
+      options?: any,
+    ): AxiosPromise<FeatureConfig> {
+      return localVarFp
+        .getFeatureConfigByIdentifier(identifier, environmentUUID, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     * Used to retrieve a segment for a certain account id by identifier
+     * @summary Retrieve a segment by identifier
+     * @param {string} identifier Unique identifier for the segment object in the API
+     * @param {string} environmentUUID Unique identifier for the environment object in the API
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getSegmentByIdentifier(
+      identifier: string,
+      environmentUUID: string,
+      options?: any,
+    ): AxiosPromise<Segment> {
+      return localVarFp
+        .getSegmentByIdentifier(identifier, environmentUUID, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     *
+     * @summary Stream endpoint.
+     * @param {string} aPIKey
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    stream(aPIKey: string, options?: any): AxiosPromise<void> {
+      return localVarFp
+        .stream(aPIKey, options)
+        .then((request) => request(axios, basePath));
+    },
+  };
 };
 
 /**
@@ -1286,201 +1601,280 @@ export const ClientApiFactory = function (configuration?: Configuration, basePat
  * @extends {BaseAPI}
  */
 export class ClientApi extends BaseAPI {
-    /**
-     * Used to retrieve all target segments for certain account id.
-     * @summary Authenticate with the admin server.
-     * @param {AuthenticationRequest} [authenticationRequest] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof ClientApi
-     */
-    public authenticate(authenticationRequest?: AuthenticationRequest, options?: any) {
-        return ClientApiFp(this.configuration).authenticate(authenticationRequest, options).then((request) => request(this.axios, this.basePath));
-    }
+  /**
+   * Used to retrieve all target segments for certain account id.
+   * @summary Authenticate with the admin server.
+   * @param {AuthenticationRequest} [authenticationRequest]
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ClientApi
+   */
+  public authenticate(
+    authenticationRequest?: AuthenticationRequest,
+    options?: any,
+  ) {
+    return ClientApiFp(this.configuration)
+      .authenticate(authenticationRequest, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
 
-    /**
-     * Used to retrieve all segments for certain account id.
-     * @summary Retrieve all segments.
-     * @param {string} environmentUUID Unique identifier for the environment object in the API.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof ClientApi
-     */
-    public getAllSegments(environmentUUID: string, options?: any) {
-        return ClientApiFp(this.configuration).getAllSegments(environmentUUID, options).then((request) => request(this.axios, this.basePath));
-    }
+  /**
+   * Used to retrieve all segments for certain account id.
+   * @summary Retrieve all segments.
+   * @param {string} environmentUUID Unique identifier for the environment object in the API.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ClientApi
+   */
+  public getAllSegments(environmentUUID: string, options?: any) {
+    return ClientApiFp(this.configuration)
+      .getAllSegments(environmentUUID, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
 
-    /**
-     * 
-     * @summary Get feature evaluations for target
-     * @param {string} environmentUUID Unique identifier for the environment object in the API.
-     * @param {string} feature Unique identifier for the flag object in the API.
-     * @param {string} target Unique identifier for the target object in the API.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof ClientApi
-     */
-    public getEvaluationByIdentifier(environmentUUID: string, feature: string, target: string, options?: any) {
-        return ClientApiFp(this.configuration).getEvaluationByIdentifier(environmentUUID, feature, target, options).then((request) => request(this.axios, this.basePath));
-    }
+  /**
+   *
+   * @summary Get feature evaluations for target
+   * @param {string} environmentUUID Unique identifier for the environment object in the API.
+   * @param {string} feature Unique identifier for the flag object in the API.
+   * @param {string} target Unique identifier for the target object in the API.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ClientApi
+   */
+  public getEvaluationByIdentifier(
+    environmentUUID: string,
+    feature: string,
+    target: string,
+    options?: any,
+  ) {
+    return ClientApiFp(this.configuration)
+      .getEvaluationByIdentifier(environmentUUID, feature, target, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
 
-    /**
-     * 
-     * @summary Get feature evaluations for target
-     * @param {string} environmentUUID Unique identifier for the environment object in the API.
-     * @param {string} target Unique identifier for the target object in the API.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof ClientApi
-     */
-    public getEvaluations(environmentUUID: string, target: string, options?: any) {
-        return ClientApiFp(this.configuration).getEvaluations(environmentUUID, target, options).then((request) => request(this.axios, this.basePath));
-    }
+  /**
+   *
+   * @summary Get feature evaluations for target
+   * @param {string} environmentUUID Unique identifier for the environment object in the API.
+   * @param {string} target Unique identifier for the target object in the API.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ClientApi
+   */
+  public getEvaluations(
+    environmentUUID: string,
+    target: string,
+    options?: any,
+  ) {
+    return ClientApiFp(this.configuration)
+      .getEvaluations(environmentUUID, target, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
 
-    /**
-     * All feature flags with activations in project environment
-     * @summary Get all feature flags activations
-     * @param {string} environmentUUID Unique identifier for the environment object in the API.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof ClientApi
-     */
-    public getFeatureConfig(environmentUUID: string, options?: any) {
-        return ClientApiFp(this.configuration).getFeatureConfig(environmentUUID, options).then((request) => request(this.axios, this.basePath));
-    }
+  /**
+   * All feature flags with activations in project environment
+   * @summary Get all feature flags activations
+   * @param {string} environmentUUID Unique identifier for the environment object in the API.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ClientApi
+   */
+  public getFeatureConfig(environmentUUID: string, options?: any) {
+    return ClientApiFp(this.configuration)
+      .getFeatureConfig(environmentUUID, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
 
-    /**
-     * 
-     * @summary Get feature config
-     * @param {string} identifier Unique identifier for the flag object in the API.
-     * @param {string} environmentUUID Unique identifier for the environment object in the API.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof ClientApi
-     */
-    public getFeatureConfigByIdentifier(identifier: string, environmentUUID: string, options?: any) {
-        return ClientApiFp(this.configuration).getFeatureConfigByIdentifier(identifier, environmentUUID, options).then((request) => request(this.axios, this.basePath));
-    }
+  /**
+   *
+   * @summary Get feature config
+   * @param {string} identifier Unique identifier for the flag object in the API.
+   * @param {string} environmentUUID Unique identifier for the environment object in the API.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ClientApi
+   */
+  public getFeatureConfigByIdentifier(
+    identifier: string,
+    environmentUUID: string,
+    options?: any,
+  ) {
+    return ClientApiFp(this.configuration)
+      .getFeatureConfigByIdentifier(identifier, environmentUUID, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
 
-    /**
-     * Used to retrieve a segment for a certain account id by identifier
-     * @summary Retrieve a segment by identifier
-     * @param {string} identifier Unique identifier for the segment object in the API
-     * @param {string} environmentUUID Unique identifier for the environment object in the API
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof ClientApi
-     */
-    public getSegmentByIdentifier(identifier: string, environmentUUID: string, options?: any) {
-        return ClientApiFp(this.configuration).getSegmentByIdentifier(identifier, environmentUUID, options).then((request) => request(this.axios, this.basePath));
-    }
+  /**
+   * Used to retrieve a segment for a certain account id by identifier
+   * @summary Retrieve a segment by identifier
+   * @param {string} identifier Unique identifier for the segment object in the API
+   * @param {string} environmentUUID Unique identifier for the environment object in the API
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ClientApi
+   */
+  public getSegmentByIdentifier(
+    identifier: string,
+    environmentUUID: string,
+    options?: any,
+  ) {
+    return ClientApiFp(this.configuration)
+      .getSegmentByIdentifier(identifier, environmentUUID, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
 
-    /**
-     * 
-     * @summary Stream endpoint.
-     * @param {string} aPIKey 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof ClientApi
-     */
-    public stream(aPIKey: string, options?: any) {
-        return ClientApiFp(this.configuration).stream(aPIKey, options).then((request) => request(this.axios, this.basePath));
-    }
+  /**
+   *
+   * @summary Stream endpoint.
+   * @param {string} aPIKey
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ClientApi
+   */
+  public stream(aPIKey: string, options?: any) {
+    return ClientApiFp(this.configuration)
+      .stream(aPIKey, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
 }
-
 
 /**
  * MetricsApi - axios parameter creator
  * @export
  */
-export const MetricsApiAxiosParamCreator = function (configuration?: Configuration) {
-    return {
-        /**
-         * Send metrics to Analytics server
-         * @summary Send metrics to the Analytics server.
-         * @param {string} environment environment parameter in query.
-         * @param {Metrics} [metrics] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        postMetrics: async (environment: string, metrics?: Metrics, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'environment' is not null or undefined
-            assertParamExists('postMetrics', 'environment', environment)
-            const localVarPath = `/metrics/{environment}`
-                .replace(`{${"environment"}}`, encodeURIComponent(String(environment)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
+export const MetricsApiAxiosParamCreator = function (
+  configuration?: Configuration,
+) {
+  return {
+    /**
+     * Send metrics to Analytics server
+     * @summary Send metrics to the Analytics server.
+     * @param {string} environment environment parameter in query.
+     * @param {Metrics} [metrics]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    postMetrics: async (
+      environment: string,
+      metrics?: Metrics,
+      options: any = {},
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'environment' is not null or undefined
+      assertParamExists('postMetrics', 'environment', environment);
+      const localVarPath = `/metrics/{environment}`.replace(
+        `{${'environment'}}`,
+        encodeURIComponent(String(environment)),
+      );
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
 
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
+      const localVarRequestOptions = {
+        method: 'POST',
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
-            // authentication BearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      // authentication BearerAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
+      localVarHeaderParameter['Content-Type'] = 'application/json';
 
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
+      setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        metrics,
+        localVarRequestOptions,
+        configuration,
+      );
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(metrics, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-    }
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+  };
 };
 
 /**
  * MetricsApi - functional programming interface
  * @export
  */
-export const MetricsApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = MetricsApiAxiosParamCreator(configuration)
-    return {
-        /**
-         * Send metrics to Analytics server
-         * @summary Send metrics to the Analytics server.
-         * @param {string} environment environment parameter in query.
-         * @param {Metrics} [metrics] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async postMetrics(environment: string, metrics?: Metrics, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.postMetrics(environment, metrics, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-    }
+export const MetricsApiFp = function (configuration?: Configuration) {
+  const localVarAxiosParamCreator = MetricsApiAxiosParamCreator(configuration);
+  return {
+    /**
+     * Send metrics to Analytics server
+     * @summary Send metrics to the Analytics server.
+     * @param {string} environment environment parameter in query.
+     * @param {Metrics} [metrics]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async postMetrics(
+      environment: string,
+      metrics?: Metrics,
+      options?: any,
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.postMetrics(
+        environment,
+        metrics,
+        options,
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration,
+      );
+    },
+  };
 };
 
 /**
  * MetricsApi - factory interface
  * @export
  */
-export const MetricsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = MetricsApiFp(configuration)
-    return {
-        /**
-         * Send metrics to Analytics server
-         * @summary Send metrics to the Analytics server.
-         * @param {string} environment environment parameter in query.
-         * @param {Metrics} [metrics] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        postMetrics(environment: string, metrics?: Metrics, options?: any): AxiosPromise<void> {
-            return localVarFp.postMetrics(environment, metrics, options).then((request) => request(axios, basePath));
-        },
-    };
+export const MetricsApiFactory = function (
+  configuration?: Configuration,
+  basePath?: string,
+  axios?: AxiosInstance,
+) {
+  const localVarFp = MetricsApiFp(configuration);
+  return {
+    /**
+     * Send metrics to Analytics server
+     * @summary Send metrics to the Analytics server.
+     * @param {string} environment environment parameter in query.
+     * @param {Metrics} [metrics]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    postMetrics(
+      environment: string,
+      metrics?: Metrics,
+      options?: any,
+    ): AxiosPromise<void> {
+      return localVarFp
+        .postMetrics(environment, metrics, options)
+        .then((request) => request(axios, basePath));
+    },
+  };
 };
 
 /**
@@ -1490,18 +1884,18 @@ export const MetricsApiFactory = function (configuration?: Configuration, basePa
  * @extends {BaseAPI}
  */
 export class MetricsApi extends BaseAPI {
-    /**
-     * Send metrics to Analytics server
-     * @summary Send metrics to the Analytics server.
-     * @param {string} environment environment parameter in query.
-     * @param {Metrics} [metrics] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof MetricsApi
-     */
-    public postMetrics(environment: string, metrics?: Metrics, options?: any) {
-        return MetricsApiFp(this.configuration).postMetrics(environment, metrics, options).then((request) => request(this.axios, this.basePath));
-    }
+  /**
+   * Send metrics to Analytics server
+   * @summary Send metrics to the Analytics server.
+   * @param {string} environment environment parameter in query.
+   * @param {Metrics} [metrics]
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof MetricsApi
+   */
+  public postMetrics(environment: string, metrics?: Metrics, options?: any) {
+    return MetricsApiFp(this.configuration)
+      .postMetrics(environment, metrics, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
 }
-
-
