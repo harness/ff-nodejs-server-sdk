@@ -17,7 +17,7 @@ export class StorageRepository implements Repository {
 
   constructor(cache: KeyValueStore, store?: AsyncKeyValueStore) {
     if (!cache) {
-      throw new Error('Cache is required argument and connot be undefined');
+      throw new Error('Cache is required argument and cannot be undefined');
     }
     this.cache = cache;
     this.store = store;
@@ -26,49 +26,47 @@ export class StorageRepository implements Repository {
   async setFlag(identifier: string, fc: FeatureConfig): Promise<void> {
     const flagKey = this.formatFlagKey(identifier);
     if (await this.isFlagOutdated(flagKey, fc)) {
-      return undefined;
+      return;
     }
     if (this.store) {
-      this.store.set(flagKey, fc).then((_value) => {
-        this.cache.del(flagKey);
-      });
+      await this.store.set(flagKey, fc);
+      this.cache.del(flagKey);
     } else {
       this.cache.set(flagKey, fc);
     }
-    return undefined;
+    return;
   }
 
   async setSegment(identifier: string, segment: Segment): Promise<void> {
     const segmentKey = this.formatSegmentKey(identifier);
     if (await this.isSegmentOutdated(segmentKey, segment)) {
-      return undefined;
+      return;
     }
     if (this.store) {
-      this.store.set(segmentKey, segment).then((_value) => {
-        this.cache.del(segmentKey);
-      });
+      await this.store.set(segmentKey, segment);
+      this.cache.del(segmentKey);
     } else {
       this.cache.set(segmentKey, segment);
     }
-    return undefined;
+    return;
   }
 
-  deleteFlag(identifier: string): Promise<void> {
+  async deleteFlag(identifier: string): Promise<void> {
     const flagKey = this.formatFlagKey(identifier);
     if (this.store) {
       this.store.del(flagKey);
     }
     this.cache.del(flagKey);
-    return undefined;
+    return;
   }
 
-  deleteSegment(identifier: string): Promise<void> {
+  async deleteSegment(identifier: string): Promise<void> {
     const segmentKey = this.formatSegmentKey(identifier);
     if (this.store) {
       this.store.del(segmentKey);
     }
     this.cache.del(segmentKey);
-    return undefined;
+    return;
   }
 
   async getFlag(identifier: string, cacheable = true): Promise<FeatureConfig> {
@@ -78,7 +76,7 @@ export class StorageRepository implements Repository {
       return flag;
     }
     if (this.store) {
-      flag = (await this.store.get(flagKey)) as FeatureConfig;
+      flag = await this.store.get<FeatureConfig>(flagKey);
       if (flag && cacheable) {
         this.cache.set(flagKey, flag);
       }
@@ -94,7 +92,7 @@ export class StorageRepository implements Repository {
       return segment;
     }
     if (this.store) {
-      segment = (await this.store.get(segmentKey)) as Segment;
+      segment = await this.store.get<Segment>(segmentKey);
       if (segment && cacheable) {
         this.cache.set(segmentKey, segment);
       }

@@ -22,28 +22,28 @@ export default {
       this.instance = new Client(sdkKey, options);
     }
   },
-  boolVariation: async function (
+  boolVariation: function (
     identifier: string,
     target: Target,
     defaultValue = false,
   ): Promise<boolean> {
     return this.instance.boolVariation(identifier, target, defaultValue);
   },
-  stringVariation: async function (
+  stringVariation: function (
     identifier: string,
     target: Target,
     defaultValue = '',
   ): Promise<string> {
-    return this.stringVariation(identifier, target, defaultValue);
+    return this.instance.stringVariation(identifier, target, defaultValue);
   },
-  numberVariation: async function (
+  numberVariation: function (
     identifier: string,
     target: Target,
     defaultValue = 0,
   ): Promise<number> {
     return this.instance.numberVariation(identifier, target, defaultValue);
   },
-  jsonVariation: async function (
+  jsonVariation: function (
     identifier: string,
     target: Target,
     defaultValue = '',

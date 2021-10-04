@@ -11,10 +11,10 @@ export class FileStore implements AsyncKeyValueStore {
     });
   }
 
-  set(key: string, value: unknown): Promise<true> {
+  set<T>(key: string, value: T): Promise<true> {
     return this.keyv.set(key, value);
   }
-  get(key: string): Promise<unknown> {
+  get<T>(key: string): Promise<T> {
     return this.keyv.get(key);
   }
   del(key: string): Promise<boolean> {

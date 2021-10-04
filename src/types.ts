@@ -67,8 +67,8 @@ export interface KeyValueStore {
 }
 
 export interface AsyncKeyValueStore {
-  set(key: string, value: unknown): Promise<true>;
-  get(key: string): Promise<unknown>;
+  set<T>(key: string, value: T): Promise<true>;
+  get<T>(key: string): Promise<T>;
   del(key: string): Promise<boolean>;
 }
 

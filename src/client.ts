@@ -115,7 +115,7 @@ export default class Client {
     log.info('finished setting up processors');
   }
 
-  async boolVariation(
+  boolVariation(
     identifier: string,
     target: Target,
     defaultValue = false,
@@ -132,7 +132,7 @@ export default class Client {
     );
   }
 
-  async stringVariation(
+  stringVariation(
     identifier: string,
     target: Target,
     defaultValue = '',
@@ -149,7 +149,7 @@ export default class Client {
     );
   }
 
-  async numberVariation(
+  numberVariation(
     identifier: string,
     target: Target,
     defaultValue = 0,
@@ -166,7 +166,7 @@ export default class Client {
     );
   }
 
-  async jsonVariation(
+  jsonVariation(
     identifier: string,
     target: Target,
     defaultValue = {},

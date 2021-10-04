@@ -55,7 +55,7 @@ const target = {
 ```
 
 ### Evaluate the flag with default value set to false
-```
+```typescript
 const value = await client.boolVariation('test', target, false);
 ```
 
@@ -65,7 +65,7 @@ client.close();
 ```
 
 ### Avaialable public methods
-```
+```typescript
 function boolVariation(identifier: string, target: Target, defaultValue = true): Promise<boolean>;
 function stringVariation(identifier, target: Target, defaultValue = ''): Promise<string>;
 function numberVariation(identifier, target: Target, defaultValue = 1.0): Promise<number>;
@@ -76,15 +76,15 @@ function close();
 ### Avaialable options
 
 ```
-baseUrl: string;
-eventsUrl: string;
-pollInterval: number;
-eventsSyncInterval: number;
-enableStream: boolean;
-enableAnalytics: boolean;
-cache: KeyValueStore;
-store: AsyncKeyValueStore;
-logger: Logger;
+baseUrl: string;             // baseUrl is where the flag configurations are located
+eventsUrl: string;           // eventsUrl is where we send summarized target events
+pollInterval: number;        // pollInterval (default 60s)
+eventsSyncInterval: number;  // Metrics push event (default 60s)
+enableStream: boolean;       // enable server sent events
+enableAnalytics: boolean;    // enable analytics
+cache: KeyValueStore;        // set custom cache (default lru cache)
+store: AsyncKeyValueStore;   // set custom persistent store (default file store)
+logger: Logger;              // set logger (default console)
 ```
 
 ## Singleton example
