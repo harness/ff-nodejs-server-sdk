@@ -34,7 +34,6 @@ export class StorageRepository implements Repository {
     } else {
       this.cache.set(flagKey, fc);
     }
-    return;
   }
 
   async setSegment(identifier: string, segment: Segment): Promise<void> {
@@ -48,7 +47,6 @@ export class StorageRepository implements Repository {
     } else {
       this.cache.set(segmentKey, segment);
     }
-    return;
   }
 
   async deleteFlag(identifier: string): Promise<void> {
@@ -57,7 +55,6 @@ export class StorageRepository implements Repository {
       this.store.del(flagKey);
     }
     this.cache.del(flagKey);
-    return;
   }
 
   async deleteSegment(identifier: string): Promise<void> {
@@ -66,7 +63,6 @@ export class StorageRepository implements Repository {
       this.store.del(segmentKey);
     }
     this.cache.del(segmentKey);
-    return;
   }
 
   async getFlag(identifier: string, cacheable = true): Promise<FeatureConfig> {

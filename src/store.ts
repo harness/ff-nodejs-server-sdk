@@ -11,7 +11,7 @@ export class FileStore implements AsyncKeyValueStore {
     });
   }
 
-  set<T>(key: string, value: T): Promise<true> {
+  set(key: string, value: unknown): Promise<true> {
     return this.keyv.set(key, value);
   }
   get<T>(key: string): Promise<T> {
