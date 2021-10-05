@@ -107,7 +107,7 @@ export const MetricsProcessor = (
         let targetAttributes: KeyValue[] = [];
         if (event.target.attributes) {
           targetAttributes = Object.entries(event.target.attributes).map(
-            ([key, value]) => ({ key, value: value as string}),
+            ([key, value]) => ({ key, value: value as string }),
           );
         }
         let targetName = event.target.identifier;
@@ -134,24 +134,24 @@ export const MetricsProcessor = (
         },
         {
           key: VARIATION_IDENTIFIER_ATTRIBUTE,
-          value: event.variation.identifier
+          value: event.variation.identifier,
         },
         {
           key: SDK_TYPE_ATTRIBUTE,
-          value: SDK_TYPE
+          value: SDK_TYPE,
         },
         {
           key: SDK_LANGUAGE_ATTRIBUTE,
-          value: SDK_LANGUAGE
+          value: SDK_LANGUAGE,
         },
         {
           key: SDK_VERSION_ATTRIBUTE,
-          value: VERSION
+          value: VERSION,
         },
         {
           key: TARGET_ATTRIBUTE,
-          value: event.target.identifier
-        }
+          value: event.target.identifier,
+        },
       ];
 
       // private target attributes
@@ -207,6 +207,7 @@ export const MetricsProcessor = (
   const close = (): void => {
     log.info('Closing MetricsProcessor');
     clearInterval(syncInterval);
+    _send();
   };
 
   return {

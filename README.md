@@ -55,8 +55,8 @@ const target = {
 ```
 
 ### Evaluate the flag with default value set to false
-```
-const value = client.boolVariation('test', target, false);
+```typescript
+const value = await client.boolVariation('test', target, false);
 ```
 
 ### Shutting down SDK
@@ -65,25 +65,26 @@ client.close();
 ```
 
 ### Avaialable public methods
-```
-const value = client.boolVariation('test', target, false);
-const value = client.stringVariation('test', target, 'BLACK');
-const value = client.numberVariation('test', target, 1);
-const value = client.jsonVariation('test', target, {});
+```typescript
+function boolVariation(identifier: string, target: Target, defaultValue = true): Promise<boolean>;
+function stringVariation(identifier, target: Target, defaultValue = ''): Promise<string>;
+function numberVariation(identifier, target: Target, defaultValue = 1.0): Promise<number>;
+function jsonVariation(identifier, target: Target, defaultValue = {}): Promise<Record<string, unknown>>;
+function close();
 ```
 
 ### Avaialable options
 
 ```
-  baseUrl: string;
-  eventsUrl: string;
-  pollInterval: number;
-  eventsSyncInterval: number;
-  enableStream: boolean;
-  enableAnalytics: boolean;
-  cache: KeyValueStore;
-  store: KeyValueStore;
-  logger: Logger;
+baseUrl: string;             // baseUrl is where the flag configurations are located
+eventsUrl: string;           // eventsUrl is where we send summarized target events
+pollInterval: number;        // pollInterval (default 60s)
+eventsSyncInterval: number;  // Metrics push event (default 60s)
+enableStream: boolean;       // enable server sent events
+enableAnalytics: boolean;    // enable analytics
+cache: KeyValueStore;        // set custom cache (default lru cache)
+store: AsyncKeyValueStore;   // set custom persistent store (default file store)
+logger: Logger;              // set logger (default console)
 ```
 
 ## Singleton example
@@ -101,8 +102,8 @@ const target = {
 };
 const defaultValue = false;
 
-setInterval(() => {
-    const value = CfClient.boolVariation(FLAG_KEY, target, defaultValue);
+setInterval(async() => {
+    const value = await CfClient.boolVariation(FLAG_KEY, target, defaultValue);
     console.log("Evaluation for flag test and target none: ", value);
 }, 10000);
 ```

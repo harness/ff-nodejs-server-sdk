@@ -1,26 +1,23 @@
 import Keyv from 'keyv';
 import { KeyvFile } from 'keyv-file';
-import { KeyValueStore } from "./types";
+import { AsyncKeyValueStore } from './types';
 
+export class FileStore implements AsyncKeyValueStore {
+  private keyv: Keyv;
 
-export class FileStore implements KeyValueStore {
+  constructor(options = {}) {
+    this.keyv = new Keyv({
+      store: new KeyvFile(options),
+    });
+  }
 
-    private keyv: Keyv;
-
-    constructor() {
-        this.keyv = new Keyv({
-            store: new KeyvFile()
-        })
-    }
-
-    set(key: string, value: unknown): void {
-        this.keyv.set(key, value);
-    }
-    get(key: string): unknown {
-        return this.keyv.get(key);
-    }
-    del(key: string): void {
-        this.keyv.delete(key);
-    }
-
+  set(key: string, value: unknown): Promise<true> {
+    return this.keyv.set(key, value);
+  }
+  get<T>(key: string): Promise<T> {
+    return this.keyv.get(key);
+  }
+  del(key: string): Promise<boolean> {
+    return this.keyv.delete(key);
+  }
 }

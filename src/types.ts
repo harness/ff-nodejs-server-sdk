@@ -10,7 +10,7 @@ export interface Options {
   enableStream?: boolean;
   enableAnalytics?: boolean;
   cache?: KeyValueStore;
-  store?: KeyValueStore;
+  store?: AsyncKeyValueStore;
   logger?: Logger;
 }
 
@@ -38,32 +38,38 @@ export enum Event {
   CONNECTED = 'connected',
   DISCONNECTED = 'disconnected',
   CHANGED = 'changed',
-  ERROR = 'error'
+  ERROR = 'error',
 }
 
 export interface Operator {
-    startsWith(value: string[]): boolean;
-    endsWith(value: string[]): boolean;
-    match(value: string[]): boolean;
-    contains(value: string[]): boolean;
-    equalSensitive(value: string[]): boolean;
-    equal(value: string[]): boolean;
-    greaterThan(value: string[]): boolean;
-    greaterThanEqual(value: string[]): boolean;
-    lessThan(value: string[]): boolean;
-    lessThanEqual(value: string[]): boolean;
-    inList(value: string[]): boolean;
+  startsWith(value: string[]): boolean;
+  endsWith(value: string[]): boolean;
+  match(value: string[]): boolean;
+  contains(value: string[]): boolean;
+  equalSensitive(value: string[]): boolean;
+  equal(value: string[]): boolean;
+  greaterThan(value: string[]): boolean;
+  greaterThanEqual(value: string[]): boolean;
+  lessThan(value: string[]): boolean;
+  lessThanEqual(value: string[]): boolean;
+  inList(value: string[]): boolean;
 }
 
 export interface Query {
-  getFlag(identifier: string): FeatureConfig;
-  getSegment(identifier: string): Segment;
+  getFlag(identifier: string): Promise<FeatureConfig>;
+  getSegment(identifier: string): Promise<Segment>;
 }
 
 export interface KeyValueStore {
   set(key: string, value: unknown): void;
   get(key: string): unknown;
   del(key: string): void;
+}
+
+export interface AsyncKeyValueStore {
+  set(key: string, value: unknown): Promise<true>;
+  get<T>(key: string): Promise<T>;
+  del(key: string): Promise<boolean>;
 }
 
 export interface Target {

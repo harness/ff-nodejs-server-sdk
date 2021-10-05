@@ -1,9 +1,20 @@
 import Client from './client';
+import LRU from 'lru-cache';
 import { Options, Target } from './types';
 import { Logger } from './log';
-import { KeyValueStore } from './types';
+import { AsyncKeyValueStore, KeyValueStore } from './types';
+import { FileStore } from './store';
 
-export { Client, Options, Target, KeyValueStore, Logger };
+export {
+  Client,
+  Options,
+  Target,
+  AsyncKeyValueStore,
+  KeyValueStore,
+  Logger,
+  LRU,
+  FileStore,
+};
 export default {
   instance: undefined,
   init: function (sdkKey: string, options: Options): void {
@@ -15,28 +26,31 @@ export default {
     identifier: string,
     target: Target,
     defaultValue = false,
-  ): boolean {
+  ): Promise<boolean> {
     return this.instance.boolVariation(identifier, target, defaultValue);
   },
   stringVariation: function (
     identifier: string,
     target: Target,
     defaultValue = '',
-  ): string {
-    return this.stringVariation(identifier, target, defaultValue);
+  ): Promise<string> {
+    return this.instance.stringVariation(identifier, target, defaultValue);
   },
   numberVariation: function (
     identifier: string,
     target: Target,
     defaultValue = 0,
-  ): number {
+  ): Promise<number> {
     return this.instance.numberVariation(identifier, target, defaultValue);
   },
   jsonVariation: function (
     identifier: string,
     target: Target,
     defaultValue = '',
-  ): Record<string, unknown> {
+  ): Promise<Record<string, unknown>> {
     return this.instance.jsonVariation(identifier, target, defaultValue);
+  },
+  close: function (): void {
+    return this.instance.close();
   },
 };

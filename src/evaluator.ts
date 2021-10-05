@@ -90,10 +90,11 @@ export class Evaluator {
   private evaluateDistribution(
     distribution: Distribution,
     target: Target,
-  ): string | undefined {
+  ): string {
     if (!distribution) {
       return undefined;
     }
+
     let variation = '';
     for (const _var of distribution.variations) {
       variation = _var.variation;
@@ -130,12 +131,12 @@ export class Evaluator {
     );
   }
 
-  private isTargetIncludedOrExcludedInSegment(
+  private async isTargetIncludedOrExcludedInSegment(
     segments: string[],
     target: Target,
-  ): boolean {
+  ): Promise<boolean> {
     for (const segmentIdentifier of segments) {
-      const segment = this.query.getSegment(segmentIdentifier);
+      const segment = await this.query.getSegment(segmentIdentifier);
 
       if (segment) {
         // Should Target be excluded - if in excluded list we return false
@@ -176,7 +177,10 @@ export class Evaluator {
     return false;
   }
 
-  private evaluateClause(clause: Clause, target: Target): boolean {
+  private async evaluateClause(
+    clause: Clause,
+    target: Target,
+  ): Promise<boolean> {
     if (!clause.op) {
       return false;
     }
@@ -203,9 +207,12 @@ export class Evaluator {
     return false;
   }
 
-  private evaluateClauses(clauses: Clause[], target: Target): boolean {
+  private async evaluateClauses(
+    clauses: Clause[],
+    target: Target,
+  ): Promise<boolean> {
     for (const clause of clauses) {
-      if (!this.evaluateClause(clause, target)) {
+      if (!(await this.evaluateClause(clause, target))) {
         // some clause condition not met return false
         return false;
       }
@@ -214,14 +221,14 @@ export class Evaluator {
     return true;
   }
 
-  private evaluateRule(rule: ServingRule, target: Target): boolean {
+  private evaluateRule(rule: ServingRule, target: Target): Promise<boolean> {
     return this.evaluateClauses(rule.clauses, target);
   }
 
-  private evaluateRules(
+  private async evaluateRules(
     rules: ServingRule[],
     target: Target,
-  ): string | undefined {
+  ): Promise<string | undefined> {
     if (!target || !rules) {
       return undefined;
     }
@@ -233,7 +240,7 @@ export class Evaluator {
     let identifier: string;
     for (const rule of rules) {
       // if evaluation is false just continue to next rule
-      if (!this.evaluateRule(rule, target)) {
+      if (!(await this.evaluateRule(rule, target))) {
         continue;
       }
 
@@ -283,22 +290,25 @@ export class Evaluator {
     return undefined;
   }
 
-  private evaluateFlag(
+  private async evaluateFlag(
     fc: FeatureConfig,
     target: Target,
-  ): Variation | undefined {
+  ): Promise<Variation | undefined> {
     let variation = fc.offVariation;
     if (fc.state === FeatureState.On) {
       variation =
         this.evaluateVariationMap(fc.variationToTargetMap, target) ||
-        this.evaluateRules(fc.rules, target) ||
+        (await this.evaluateRules(fc.rules, target)) ||
         this.evaluateDistribution(fc.defaultServe.distribution, target) ||
         fc.defaultServe.variation;
     }
     return this.findVariation(fc.variations, variation);
   }
 
-  private checkPreRequisite(parent: FeatureConfig, target: Target): boolean {
+  private async checkPreRequisite(
+    parent: FeatureConfig,
+    target: Target,
+  ): Promise<boolean> {
     if (parent.prerequisites) {
       log.info(
         'Checking pre requisites %s of parent feature %s',
@@ -307,7 +317,7 @@ export class Evaluator {
       );
 
       for (const pqs of parent.prerequisites) {
-        const preReqFeatureConfig = this.query.getFlag(pqs.feature);
+        const preReqFeatureConfig = await this.query.getFlag(pqs.feature);
         if (!preReqFeatureConfig) {
           log.warn(
             'Could not retrieve the pre requisite details of feature flag: %s',
@@ -317,7 +327,7 @@ export class Evaluator {
         }
 
         // Pre requisite variation value evaluated below
-        const variation = this.evaluateFlag(preReqFeatureConfig, target);
+        const variation = await this.evaluateFlag(preReqFeatureConfig, target);
         log.info(
           'Pre requisite flag %s has variation %s for target %s',
           preReqFeatureConfig.feature,
@@ -336,31 +346,31 @@ export class Evaluator {
         if (!pqs.variations.includes(variation.identifier)) {
           return false;
         } else {
-          return this.checkPreRequisite(preReqFeatureConfig, target);
+          return await this.checkPreRequisite(preReqFeatureConfig, target);
         }
       }
     }
     return true;
   }
 
-  private evaluate(
+  private async evaluate(
     identifier: string,
     target: Target,
     expected: FeatureConfigKindEnum,
     callback?: Callback,
-  ): Variation | undefined {
-    const fc = this.query.getFlag(identifier);
+  ): Promise<Variation | undefined> {
+    const fc = await this.query.getFlag(identifier);
     if (!fc || fc.kind !== expected) {
       return undefined;
     }
     if (fc.prerequisites) {
-      const prereq = this.checkPreRequisite(fc, target);
+      const prereq = await this.checkPreRequisite(fc, target);
       if (!prereq) {
         return this.findVariation(fc.variations, fc.offVariation);
       }
     }
 
-    const variation = this.evaluateFlag(fc, target);
+    const variation = await this.evaluateFlag(fc, target);
     if (variation) {
       if (callback) {
         callback(fc, target, variation);
@@ -371,13 +381,13 @@ export class Evaluator {
     return undefined;
   }
 
-  boolVariation(
+  async boolVariation(
     identifier: string,
     target: Target,
     defaultValue = false,
     callback?: Callback,
-  ): boolean {
-    const variation = this.evaluate(
+  ): Promise<boolean> {
+    const variation = await this.evaluate(
       identifier,
       target,
       FeatureConfigKindEnum.Boolean,
@@ -390,13 +400,13 @@ export class Evaluator {
     return defaultValue;
   }
 
-  stringVariation(
+  async stringVariation(
     identifier: string,
     target: Target,
     defaultValue = '',
     callback?: Callback,
-  ): string {
-    const variation = this.evaluate(
+  ): Promise<string> {
+    const variation = await this.evaluate(
       identifier,
       target,
       FeatureConfigKindEnum.String,
@@ -409,13 +419,13 @@ export class Evaluator {
     return defaultValue;
   }
 
-  numberVariation(
+  async numberVariation(
     identifier: string,
     target: Target,
     defaultValue = 0,
     callback?: Callback,
-  ): number {
-    const variation = this.evaluate(
+  ): Promise<number> {
+    const variation = await this.evaluate(
       identifier,
       target,
       FeatureConfigKindEnum.Int,
@@ -428,13 +438,13 @@ export class Evaluator {
     return defaultValue;
   }
 
-  jsonVariation(
+  async jsonVariation(
     identifier: string,
     target: Target,
     defaultValue = {},
     callback?: Callback,
-  ): Record<string, unknown> {
-    const variation = this.evaluate(
+  ): Promise<Record<string, unknown>> {
+    const variation = await this.evaluate(
       identifier,
       target,
       FeatureConfigKindEnum.Json,

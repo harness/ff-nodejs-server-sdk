@@ -1,5 +1,6 @@
-import { SimpleCache } from './cache';
+import LRU from 'lru-cache';
 import { ConsoleLog } from './log';
+import { FileStore } from './store';
 import { Options } from './types';
 
 export const ONE_HUNDRED = 100;
@@ -40,6 +41,7 @@ export const defaultOptions: Options = {
   eventsSyncInterval: EVENTS_SYNC_INTERVAL,
   enableStream: true,
   enableAnalytics: true,
-  cache: new SimpleCache(),
+  cache: new LRU({ max: 100 }),
+  store: new FileStore(),
   logger: new ConsoleLog(),
 };

@@ -1,78 +1,78 @@
 import { FeatureConfig, Segment } from './openapi';
-import { KeyValueStore, Query } from './types';
+import { AsyncKeyValueStore, KeyValueStore, Query } from './types';
 
 export interface Repository extends Query {
   // put values
-  setFlag(identifier: string, fc: FeatureConfig): void;
-  setSegment(identifier: string, segment: Segment): void;
+  setFlag(identifier: string, fc: FeatureConfig): Promise<void>;
+  setSegment(identifier: string, segment: Segment): Promise<void>;
 
   // remove values
-  deleteFlag(identifier: string): void;
-  deleteSegment(identifier: string): void;
+  deleteFlag(identifier: string): Promise<void>;
+  deleteSegment(identifier: string): Promise<void>;
 }
 
 export class StorageRepository implements Repository {
   private cache: KeyValueStore;
-  private store: KeyValueStore;
+  private store: AsyncKeyValueStore;
 
-  constructor(cache: KeyValueStore, store?: KeyValueStore) {
+  constructor(cache: KeyValueStore, store?: AsyncKeyValueStore) {
     if (!cache) {
-      throw new Error('Cache is required argument and connot be undefined');
+      throw new Error('Cache is required argument and cannot be undefined');
     }
     this.cache = cache;
     this.store = store;
   }
 
-  setFlag(identifier: string, fc: FeatureConfig): void {
+  async setFlag(identifier: string, fc: FeatureConfig): Promise<void> {
     const flagKey = this.formatFlagKey(identifier);
-    if (this.isFlagOutdated(flagKey, fc)) {
+    if (await this.isFlagOutdated(flagKey, fc)) {
       return;
     }
     if (this.store) {
-      this.store.set(flagKey, fc);
+      await this.store.set(flagKey, fc);
       this.cache.del(flagKey);
     } else {
       this.cache.set(flagKey, fc);
     }
   }
 
-  setSegment(identifier: string, segment: Segment): void {
+  async setSegment(identifier: string, segment: Segment): Promise<void> {
     const segmentKey = this.formatSegmentKey(identifier);
-    if (this.isSegmentOutdated(segmentKey, segment)) {
+    if (await this.isSegmentOutdated(segmentKey, segment)) {
       return;
     }
     if (this.store) {
-      this.store.set(segmentKey, segment);
+      await this.store.set(segmentKey, segment);
       this.cache.del(segmentKey);
     } else {
       this.cache.set(segmentKey, segment);
     }
   }
 
-  deleteFlag(identifier: string): void {
+  async deleteFlag(identifier: string): Promise<void> {
     const flagKey = this.formatFlagKey(identifier);
     if (this.store) {
-      this.store.del(flagKey);
+      await this.store.del(flagKey);
     }
     this.cache.del(flagKey);
   }
 
-  deleteSegment(identifier: string): void {
+  async deleteSegment(identifier: string): Promise<void> {
     const segmentKey = this.formatSegmentKey(identifier);
     if (this.store) {
-      this.store.del(segmentKey);
+      await this.store.del(segmentKey);
     }
     this.cache.del(segmentKey);
   }
 
-  getFlag(identifier: string, cacheable = true): FeatureConfig {
+  async getFlag(identifier: string, cacheable = true): Promise<FeatureConfig> {
     const flagKey = this.formatFlagKey(identifier);
     let flag = this.cache.get(flagKey) as FeatureConfig;
     if (flag) {
       return flag;
     }
     if (this.store) {
-      flag = this.store.get(flagKey) as FeatureConfig;
+      flag = await this.store.get<FeatureConfig>(flagKey);
       if (flag && cacheable) {
         this.cache.set(flagKey, flag);
       }
@@ -81,14 +81,14 @@ export class StorageRepository implements Repository {
     return undefined;
   }
 
-  getSegment(identifier: string, cacheable = true): Segment {
+  async getSegment(identifier: string, cacheable = true): Promise<Segment> {
     const segmentKey = this.formatSegmentKey(identifier);
     let segment = this.cache.get(segmentKey) as Segment;
     if (segment) {
       return segment;
     }
     if (this.store) {
-      segment = this.store.get(segmentKey) as Segment;
+      segment = await this.store.get<Segment>(segmentKey);
       if (segment && cacheable) {
         this.cache.set(segmentKey, segment);
       }
@@ -97,13 +97,19 @@ export class StorageRepository implements Repository {
     return undefined;
   }
 
-  private isFlagOutdated(key: string, flag: FeatureConfig): boolean {
-    const oldFlag = this.getFlag(key, false); // dont set cacheable, we are just checking the version
+  private async isFlagOutdated(
+    key: string,
+    flag: FeatureConfig,
+  ): Promise<boolean> {
+    const oldFlag = await this.getFlag(key, false); // dont set cacheable, we are just checking the version
     return oldFlag?.version && oldFlag.version > flag?.version;
   }
 
-  private isSegmentOutdated(key: string, segment: Segment): boolean {
-    const oldSegment = this.getSegment(key, false); // dont set cacheable, we are just checking the version
+  private async isSegmentOutdated(
+    key: string,
+    segment: Segment,
+  ): Promise<boolean> {
+    const oldSegment = await this.getSegment(key, false); // dont set cacheable, we are just checking the version
     return oldSegment?.version && oldSegment.version > segment?.version;
   }
 
