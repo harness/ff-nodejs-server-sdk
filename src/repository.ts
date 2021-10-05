@@ -52,7 +52,7 @@ export class StorageRepository implements Repository {
   async deleteFlag(identifier: string): Promise<void> {
     const flagKey = this.formatFlagKey(identifier);
     if (this.store) {
-      this.store.del(flagKey);
+      await this.store.del(flagKey);
     }
     this.cache.del(flagKey);
   }
@@ -60,7 +60,7 @@ export class StorageRepository implements Repository {
   async deleteSegment(identifier: string): Promise<void> {
     const segmentKey = this.formatSegmentKey(identifier);
     if (this.store) {
-      this.store.del(segmentKey);
+      await this.store.del(segmentKey);
     }
     this.cache.del(segmentKey);
   }
