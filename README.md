@@ -5,6 +5,7 @@
 [![APLv2][license-badge]][license]
 
 # Before you Begin
+
 Harness Feature Flags (FF) is a feature management solution that enables users to change the software’s functionality, without deploying new code. FF uses feature flags to hide code or behaviours without having to ship new versions of the software. A feature flag is like a powerful if statement.
 
 For more information, see https://harness.io/products/feature-flags/
@@ -17,7 +18,7 @@ To sign up, https://app.harness.io/auth/#/signup/
 
 ### Setup
 
-```npm install @harness/ff-nodejs-server-sdk```
+`npm install @harnessio/ff-nodejs-server-sdk`
 
 ### Import the package (CommonJS)
 
@@ -34,11 +35,13 @@ import { Client } from 'ff-nodejs-server-sdk';
 ### Initialize
 
 This is the most simple way to initialize SDK using only a server type key
+
 ```
 const client = new Client('your server type SDK key');
 ```
 
 Advanced initialization can be done using options
+
 ```
 const client = new Client('your server type SDK key', {
   enableStream: false
@@ -46,6 +49,7 @@ const client = new Client('your server type SDK key', {
 ```
 
 ### Define a target
+
 ```
 const target = {
   identifier: 'harness',
@@ -55,21 +59,40 @@ const target = {
 ```
 
 ### Evaluate the flag with default value set to false
+
 ```typescript
 const value = await client.boolVariation('test', target, false);
 ```
 
 ### Shutting down SDK
+
 ```
 client.close();
 ```
 
 ### Avaialable public methods
+
 ```typescript
-function boolVariation(identifier: string, target: Target, defaultValue = true): Promise<boolean>;
-function stringVariation(identifier, target: Target, defaultValue = ''): Promise<string>;
-function numberVariation(identifier, target: Target, defaultValue = 1.0): Promise<number>;
-function jsonVariation(identifier, target: Target, defaultValue = {}): Promise<Record<string, unknown>>;
+function boolVariation(
+  identifier: string,
+  target: Target,
+  defaultValue = true,
+): Promise<boolean>;
+function stringVariation(
+  identifier,
+  target: Target,
+  defaultValue = '',
+): Promise<string>;
+function numberVariation(
+  identifier,
+  target: Target,
+  defaultValue = 1.0,
+): Promise<number>;
+function jsonVariation(
+  identifier,
+  target: Target,
+  defaultValue = {},
+): Promise<Record<string, unknown>>;
 function close();
 ```
 
@@ -107,6 +130,7 @@ setInterval(async() => {
     console.log("Evaluation for flag test and target none: ", value);
 }, 10000);
 ```
+
 ## License
 
 Licensed under the APLv2.
