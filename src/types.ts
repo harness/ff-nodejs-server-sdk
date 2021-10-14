@@ -33,12 +33,12 @@ export interface StreamMsg {
   version: number;
 }
 
-export enum Event {
-  READY = 'ready',
-  CONNECTED = 'connected',
-  DISCONNECTED = 'disconnected',
-  CHANGED = 'changed',
-  ERROR = 'error',
+export enum StreamEvent {
+  READY = 'stream_ready',
+  CONNECTED = 'stream_connected',
+  DISCONNECTED = 'stream_disconnected',
+  CHANGED = 'stream_changed',
+  ERROR = 'stream_error',
 }
 
 export interface Operator {

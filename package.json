@@ -1,6 +1,11 @@
 {
+<<<<<<< HEAD
   "name": "@harnessio/ff-nodejs-server-sdk",
   "version": "1.0.1",
+=======
+  "name": "ff-nodejs-server-sdk",
+  "version": "1.1.1",
+>>>>>>> 4bc76c0 (initial waitForInit implementation)
   "description": "Feature flags SDK for NodeJS environments",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",

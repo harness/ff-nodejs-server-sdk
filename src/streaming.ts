@@ -2,7 +2,7 @@ import EventSource from 'eventsource';
 import EventEmitter from 'events';
 import { AxiosPromise } from 'axios';
 import { ClientApi, FeatureConfig, Segment } from './openapi';
-import { Event, Options, StreamMsg } from './types';
+import { StreamEvent, Options, StreamMsg } from './types';
 import { Repository } from './repository';
 import { defaultOptions } from './constants';
 
@@ -60,12 +60,12 @@ export class StreamProcessor {
 
     eventSource.onopen = (event: MessageEvent) => {
       log.debug('Stream connected', event);
-      this.eventBus.emit(Event.CONNECTED);
+      this.eventBus.emit(StreamEvent.CONNECTED);
     };
 
     eventSource.onerror = (event: MessageEvent) => {
       log.debug('Stream has issue', event);
-      this.eventBus.emit(Event.ERROR, event);
+      this.eventBus.emit(StreamEvent.ERROR, event);
     };
 
     eventSource.addEventListener('*', (event: MessageEvent) => {
@@ -91,6 +91,7 @@ export class StreamProcessor {
     });
 
     this.eventSource = eventSource;
+    this.eventBus.emit(StreamEvent.READY);
   }
 
   private async msgProcessor(
@@ -127,7 +128,7 @@ export class StreamProcessor {
   stop(): void {
     log.info('Stopping StreamProcessor');
     this.eventSource.close();
-    this.eventBus.emit(Event.DISCONNECTED);
+    this.eventBus.emit(StreamEvent.DISCONNECTED);
   }
 
   close(): void {
