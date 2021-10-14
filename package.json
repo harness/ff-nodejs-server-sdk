@@ -1,5 +1,5 @@
 {
-  "name": "ff-nodejs-server-sdk",
+  "name": "@harnessio/ff-nodejs-server-sdk",
   "version": "1.0.1",
   "description": "Feature flags SDK for NodeJS environments",
   "main": "dist/cjs/index.js",
@@ -45,6 +45,7 @@
     "build:cjs": "esbuild ./src/index.ts --tsconfig=tsconfig.release.json --minify --bundle --sourcemap --target=node12.22.5 --platform=node --format=cjs --outfile=./dist/cjs/index.js --external:keyv --external:keyv-file --external:eventsource --external:axios",
     "build": "npm run build:esm; npm run build:cjs; npm run dts",
     "build:watch": "tsc -w -p tsconfig.release.json",
+    "prepare": "npm run build",
     "lint": "eslint ./src --ext .ts,.tsx",
     "format": "prettier --write \"src/**/*.ts\"",
     "test": "jest --coverage",
