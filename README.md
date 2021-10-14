@@ -25,13 +25,13 @@ npm install @harnessio/ff-nodejs-server-sdk
 ### Import the package (CommonJS)
 
 ```javascript
-const { Client } = require('ff-nodejs-server-sdk');
+const { Client } = require('@harnessio/ff-nodejs-server-sdk');
 ```
 
 ### Import the package (ES modules)
 
 ```typescript
-import { Client } from 'ff-nodejs-server-sdk';
+import { Client } from '@harnessio/ff-nodejs-server-sdk';
 ```
 
 ### Initialize
@@ -115,7 +115,7 @@ logger: Logger;              // set logger (default console)
 ## Singleton example
 
 ```
-import CfClient from 'ff-nodejs-server-sdk';
+import CfClient from '@harnessio/ff-nodejs-server-sdk';
 
 CfClient.init('your server type SDK key');
 
@@ -136,7 +136,7 @@ setInterval(async() => {
 ## Wait for initialization example
 
 ```
-const { Client } = require('ff-nodejs-server-sdk');
+const { Client } = require('@harnessio/ff-nodejs-server-sdk');
 
 console.log('Starting application');
 const client = new Client('1c100d25-4c3f-487b-b198-3b3d01df5794');
