@@ -1,5 +1,5 @@
 {
-  "name": "ff-nodejs-server-sdk",
+  "name": "@harnessio/ff-nodejs-server-sdk",
   "version": "1.1.0",
   "description": "Feature flags SDK for NodeJS environments",
   "main": "dist/cjs/index.js",
