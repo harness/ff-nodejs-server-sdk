@@ -1,4 +1,4 @@
-import Client from './client';
+import Client, { ClientEvent } from './client';
 import LRU from 'lru-cache';
 import { Options, Target } from './types';
 import { Logger } from './log';
@@ -7,6 +7,7 @@ import { FileStore } from './store';
 
 export {
   Client,
+  ClientEvent,
   Options,
   Target,
   AsyncKeyValueStore,
@@ -21,6 +22,9 @@ export default {
     if (!this.instance) {
       this.instance = new Client(sdkKey, options);
     }
+  },
+  waitForInitialization: function (): Promise<Client> {
+    return this.instance.waitForInitialization();
   },
   boolVariation: function (
     identifier: string,

@@ -2,20 +2,35 @@ import * as events from 'events';
 import jwt_decode from 'jwt-decode';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
-import { Claims, Options, Target } from './types';
+import { Claims, Options, StreamEvent, Target } from './types';
 import { Configuration, ClientApi, FeatureConfig, Variation } from './openapi';
 import { VERSION } from './version';
-import { PollingProcessor } from './polling';
+import { PollerEvent, PollingProcessor } from './polling';
 import { StreamProcessor } from './streaming';
 import { Evaluator } from './evaluator';
 import { defaultOptions } from './constants';
 import { Repository, StorageRepository } from './repository';
-import { MetricsProcessor, MetricsProcessorInterface } from './metrics';
+import {
+  MetricEvent,
+  MetricsProcessor,
+  MetricsProcessorInterface,
+} from './metrics';
 
 axios.defaults.timeout = 30000;
 axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
 const log = defaultOptions.logger;
 
+enum Processor {
+  POLL,
+  STREAM,
+  METRICS,
+}
+
+export enum ClientEvent {
+  READY = 'ready',
+  FAILED = 'failed',
+  CHANGED = 'changed',
+}
 export default class Client {
   private evaluator: Evaluator;
   private repository: Repository;
@@ -30,6 +45,12 @@ export default class Client {
   private pollProcessor: PollingProcessor;
   private streamProcessor: StreamProcessor;
   private metricsProcessor: MetricsProcessorInterface;
+  private initialized = false;
+  private failure = false;
+  private waitForInitialize: Promise<Client>;
+  private pollerReady = false;
+  private streamReady = false;
+  private metricReady = false;
 
   constructor(sdkKey: string, options: Options = {}) {
     this.sdkKey = sdkKey;
@@ -54,7 +75,45 @@ export default class Client {
     );
     this.evaluator = new Evaluator(this.repository);
     this.api = new ClientApi(this.configuration);
+    this.processEvents();
     this.run();
+  }
+
+  private processEvents(): void {
+    this.eventBus.on(PollerEvent.READY, () => {
+      this.initialize(Processor.POLL);
+    });
+
+    this.eventBus.on(PollerEvent.ERROR, () => {
+      this.failure = true;
+      this.eventBus.emit(ClientEvent.FAILED);
+    });
+
+    this.eventBus.on(StreamEvent.READY, () => {
+      this.initialize(Processor.STREAM);
+    });
+
+    this.eventBus.on(StreamEvent.ERROR, () => {
+      this.failure = true;
+      this.eventBus.emit(ClientEvent.FAILED);
+    });
+
+    this.eventBus.on(MetricEvent.READY, () => {
+      this.initialize(Processor.METRICS);
+    });
+
+    this.eventBus.on(MetricEvent.ERROR, () => {
+      this.failure = true;
+      this.eventBus.emit(ClientEvent.FAILED);
+    });
+
+    this.eventBus.on(StreamEvent.CONNECTED, () => {
+      this.pollProcessor.stop();
+    });
+
+    this.eventBus.on(StreamEvent.DISCONNECTED, () => {
+      this.pollProcessor.start();
+    });
   }
 
   private async authenticate(): Promise<void> {
@@ -70,8 +129,61 @@ export default class Client {
       this.environment = decoded.environment;
       this.cluster = decoded.clusterIdentifier || '1';
     } catch (error) {
+      this.failure = true;
       console.error('Error while authenticating, err: ', error);
     }
+  }
+
+  waitForInitialization(): Promise<Client> {
+    if (this.waitForInitialize) {
+      return this.waitForInitialize;
+    }
+
+    if (this.initialized) {
+      this.waitForInitialize = Promise.resolve(this);
+    } else if (this.failure) {
+      this.waitForInitialize = Promise.reject(this.failure);
+    } else {
+      this.waitForInitialize = new Promise((resolve, reject) => {
+        this.eventBus.once(ClientEvent.READY, () => {
+          resolve(this);
+        });
+        this.eventBus.once(ClientEvent.FAILED, reject);
+      });
+    }
+    return this.waitForInitialize;
+  }
+
+  private initialize(processor: Processor): void {
+    switch (processor) {
+      case Processor.POLL:
+        this.pollerReady = true;
+        log.debug('PollingProcessor ready');
+        break;
+      case Processor.STREAM:
+        this.streamReady = true;
+        log.debug('StreamingProcessor ready');
+        break;
+      case Processor.METRICS:
+        this.metricReady = true;
+        log.debug('MetricsProcessor ready');
+        break;
+    }
+
+    if (this.options.enableStream && !this.streamReady) {
+      return;
+    }
+
+    if (this.options.enableAnalytics && !this.metricReady) {
+      return;
+    }
+
+    if (!this.pollerReady) {
+      return;
+    }
+
+    this.initialized = true;
+    this.eventBus.emit(ClientEvent.READY);
   }
 
   private async run(): Promise<void> {
@@ -108,6 +220,7 @@ export default class Client {
         this.cluster,
         this.configuration,
         this.options,
+        this.eventBus,
       );
       this.metricsProcessor.start();
     }

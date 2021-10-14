@@ -1,3 +1,4 @@
+import * as events from 'events';
 import {
   defaultOptions,
   FEATURE_IDENTIFIER_ATTRIBUTE,
@@ -27,6 +28,11 @@ import { VERSION } from './version';
 
 const log = defaultOptions.logger;
 
+export enum MetricEvent {
+  READY = 'metrics_ready',
+  ERROR = 'metrics_error',
+}
+
 interface AnalyticsEvent {
   target: Target;
   featureConfig: FeatureConfig;
@@ -49,6 +55,7 @@ export const MetricsProcessor = (
   cluster = '1',
   conf: Configuration,
   options: Options,
+  eventBus: events.EventEmitter,
 ): MetricsProcessorInterface => {
   const data: Map<string, AnalyticsEvent> = new Map<string, AnalyticsEvent>();
   let syncInterval: NodeJS.Timeout;
@@ -202,6 +209,7 @@ export const MetricsProcessor = (
       options.eventsSyncInterval,
     );
     syncInterval = setInterval(_send, options.eventsSyncInterval);
+    eventBus.emit(MetricEvent.READY);
   };
 
   const close = (): void => {

@@ -1,11 +1,16 @@
 import { AxiosResponse } from 'axios';
 import { ClientApi, FeatureConfig, Segment } from './openapi';
-import { Event, Options } from './types';
+import { Options } from './types';
 import EventEmitter from 'events';
 import { Repository } from './repository';
 import { defaultOptions } from './constants';
 
 const log = defaultOptions.logger;
+
+export enum PollerEvent {
+  READY = 'poller_ready',
+  ERROR = 'poller_error',
+}
 
 export class PollingProcessor {
   private environment: string;
@@ -14,6 +19,8 @@ export class PollingProcessor {
   private stopped = true;
   private options: Options;
   private repository: Repository;
+  private initialized = false;
+  private eventBus: EventEmitter;
 
   constructor(
     environment: string,
@@ -28,15 +35,7 @@ export class PollingProcessor {
     this.environment = environment;
     this.cluster = cluster;
     this.repository = repository;
-
-    // register listener for stream events
-    eventBus.on(Event.CONNECTED, () => {
-      this.stop();
-    });
-
-    eventBus.on(Event.DISCONNECTED, () => {
-      this.start();
-    });
+    this.eventBus = eventBus;
   }
 
   private poll() {
@@ -53,8 +52,15 @@ export class PollingProcessor {
     };
 
     Promise.all([this.retrieveFlags(), this.retrieveSegments()])
+      .then(() => {
+        // when first fetch is successful then poller is ready
+        if (!this.initialized) {
+          this.initialized = true;
+          this.eventBus.emit(PollerEvent.READY);
+        }
+      })
       .catch((error) => {
-        log.error(error);
+        this.eventBus.emit(PollerEvent.ERROR, { error });
       })
       .finally(pollAgain);
   }
@@ -111,7 +117,7 @@ export class PollingProcessor {
     this.poll();
   }
 
-  private stop(): void {
+  stop(): void {
     log.info('Stopping PollingProcessor');
     this.stopped = true;
   }
