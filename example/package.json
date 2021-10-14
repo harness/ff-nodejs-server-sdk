@@ -11,6 +11,6 @@
   },
   "author": "enver.bisevac@harness.io",
   "dependencies": {
-    "ff-nodejs-server-sdk": "file:.."
+    "@harnessio/ff-nodejs-server-sdk": "file:.."
   }
 }
