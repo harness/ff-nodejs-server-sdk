@@ -1,11 +1,6 @@
 {
-<<<<<<< HEAD
-  "name": "@harnessio/ff-nodejs-server-sdk",
-  "version": "1.0.1",
-=======
   "name": "ff-nodejs-server-sdk",
-  "version": "1.1.1",
->>>>>>> 4bc76c0 (initial waitForInit implementation)
+  "version": "1.1.0",
   "description": "Feature flags SDK for NodeJS environments",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -22,7 +17,7 @@
     "url": "https://github.com/drone/ff-nodejs-server-sdk/issues"
   },
   "devDependencies": {
-    "@openapitools/openapi-generator-cli": "^2.3.10",
+    "@openapitools/openapi-generator-cli": "^2.4.12",
     "@types/eventsource": "^1.1.6",
     "@types/jest": "~26.0.23",
     "@types/keyv": "^3.1.3",
@@ -64,7 +59,7 @@
     "url": "https://github.com/drone/ff-nodejs-server-sdk"
   },
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^0.22.0",
     "axios-retry": "^3.2.0",
     "eventsource": "^1.1.0",
     "jwt-decode": "^3.1.2",

@@ -18,17 +18,19 @@ To sign up, https://app.harness.io/auth/#/signup/
 
 ### Setup
 
-`npm install @harnessio/ff-nodejs-server-sdk`
+```shell
+npm install @harnessio/ff-nodejs-server-sdk
+```
 
 ### Import the package (CommonJS)
 
-```
+```javascript
 const { Client } = require('ff-nodejs-server-sdk');
 ```
 
 ### Import the package (ES modules)
 
-```
+```typescript
 import { Client } from 'ff-nodejs-server-sdk';
 ```
 
@@ -42,9 +44,9 @@ const client = new Client('your server type SDK key');
 
 Advanced initialization can be done using options
 
-```
+```typescript
 const client = new Client('your server type SDK key', {
-  enableStream: false
+  enableStream: false,
 });
 ```
 
@@ -76,24 +78,24 @@ client.close();
 function boolVariation(
   identifier: string,
   target: Target,
-  defaultValue = true,
+  defaultValue: boolean = true,
 ): Promise<boolean>;
 function stringVariation(
-  identifier,
+  identifier: string,
   target: Target,
-  defaultValue = '',
+  defaultValue: boolean = '',
 ): Promise<string>;
 function numberVariation(
-  identifier,
+  identifier: string,
   target: Target,
-  defaultValue = 1.0,
+  defaultValue: boolean = 1.0,
 ): Promise<number>;
 function jsonVariation(
-  identifier,
+  identifier: string,
   target: Target,
-  defaultValue = {},
+  defaultValue: boolean = {},
 ): Promise<Record<string, unknown>>;
-function close();
+function close(): void;
 ```
 
 ### Avaialable options
