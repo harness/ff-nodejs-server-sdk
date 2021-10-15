@@ -1,4 +1,4 @@
-import Client, { ClientEvent } from './client';
+import Client, { Event } from './client';
 import LRU from 'lru-cache';
 import { Options, Target } from './types';
 import { Logger } from './log';
@@ -7,7 +7,7 @@ import { FileStore } from './store';
 
 export {
   Client,
-  ClientEvent,
+  Event,
   Options,
   Target,
   AsyncKeyValueStore,
@@ -53,6 +53,12 @@ export default {
     defaultValue = '',
   ): Promise<Record<string, unknown>> {
     return this.instance.jsonVariation(identifier, target, defaultValue);
+  },
+  on: function (event: Event, callback: (...args: unknown[]) => void): void {
+    this.instance.on(event, callback);
+  },
+  off: function (event: Event, callback: () => void): void {
+    this.instance.off(event, callback);
   },
   close: function (): void {
     return this.instance.close();

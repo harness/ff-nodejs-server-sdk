@@ -4,9 +4,12 @@
   "description": "NodeJS Server SDK sample",
   "main": "index.js",
   "scripts": {
-    "cf": "node index_cf.mjs",
-    "client": "node index.mjs",
-    "start": "node index.js",
+    "cf": "node --enable-source-maps index_cf.mjs",
+    "cf_reactive": "node --enable-source-maps cf_reactive.mjs",
+    "reactive": "node --enable-source-maps reactive.js",
+    "client": "node --enable-source-maps index.mjs",
+    "wait": "node --enable-source-maps wait.js",
+    "start": "node --enable-source-maps index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "enver.bisevac@harness.io",

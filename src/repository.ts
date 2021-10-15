@@ -1,3 +1,4 @@
+import EventEmitter from 'events';
 import { FeatureConfig, Segment } from './openapi';
 import { AsyncKeyValueStore, KeyValueStore, Query } from './types';
 
@@ -11,41 +12,60 @@ export interface Repository extends Query {
   deleteSegment(identifier: string): Promise<void>;
 }
 
+export enum RepositoryEvent {
+  FLAG_STORED = 'flag_stored',
+  FLAG_DELETED = 'flag_deleted',
+  SEGMENT_STORED = 'segment_stored',
+  SEGMENT_DELETED = 'segment_deleted',
+}
+
 export class StorageRepository implements Repository {
   private cache: KeyValueStore;
   private store: AsyncKeyValueStore;
+  private eventBus: EventEmitter;
 
-  constructor(cache: KeyValueStore, store?: AsyncKeyValueStore) {
+  constructor(
+    cache: KeyValueStore,
+    store?: AsyncKeyValueStore,
+    eventBus?: EventEmitter,
+  ) {
     if (!cache) {
       throw new Error('Cache is required argument and cannot be undefined');
     }
+    this.eventBus = eventBus;
     this.cache = cache;
     this.store = store;
   }
 
   async setFlag(identifier: string, fc: FeatureConfig): Promise<void> {
-    const flagKey = this.formatFlagKey(identifier);
-    if (await this.isFlagOutdated(flagKey, fc)) {
+    if (await this.isFlagOutdated(identifier, fc)) {
       return;
     }
+    const flagKey = this.formatFlagKey(identifier);
     if (this.store) {
       await this.store.set(flagKey, fc);
       this.cache.del(flagKey);
     } else {
       this.cache.set(flagKey, fc);
     }
+    if (this.eventBus) {
+      this.eventBus.emit(RepositoryEvent.FLAG_STORED, identifier);
+    }
   }
 
   async setSegment(identifier: string, segment: Segment): Promise<void> {
-    const segmentKey = this.formatSegmentKey(identifier);
-    if (await this.isSegmentOutdated(segmentKey, segment)) {
+    if (await this.isSegmentOutdated(identifier, segment)) {
       return;
     }
+    const segmentKey = this.formatSegmentKey(identifier);
     if (this.store) {
       await this.store.set(segmentKey, segment);
       this.cache.del(segmentKey);
     } else {
       this.cache.set(segmentKey, segment);
+    }
+    if (this.eventBus) {
+      this.eventBus.emit(RepositoryEvent.SEGMENT_STORED, identifier);
     }
   }
 
@@ -55,6 +75,9 @@ export class StorageRepository implements Repository {
       await this.store.del(flagKey);
     }
     this.cache.del(flagKey);
+    if (this.eventBus) {
+      this.eventBus.emit(RepositoryEvent.FLAG_DELETED, identifier);
+    }
   }
 
   async deleteSegment(identifier: string): Promise<void> {
@@ -63,6 +86,9 @@ export class StorageRepository implements Repository {
       await this.store.del(segmentKey);
     }
     this.cache.del(segmentKey);
+    if (this.eventBus) {
+      this.eventBus.emit(RepositoryEvent.SEGMENT_DELETED, identifier);
+    }
   }
 
   async getFlag(identifier: string, cacheable = true): Promise<FeatureConfig> {
@@ -102,7 +128,7 @@ export class StorageRepository implements Repository {
     flag: FeatureConfig,
   ): Promise<boolean> {
     const oldFlag = await this.getFlag(key, false); // dont set cacheable, we are just checking the version
-    return oldFlag?.version && oldFlag.version > flag?.version;
+    return oldFlag?.version && oldFlag.version >= flag?.version;
   }
 
   private async isSegmentOutdated(
@@ -110,7 +136,7 @@ export class StorageRepository implements Repository {
     segment: Segment,
   ): Promise<boolean> {
     const oldSegment = await this.getSegment(key, false); // dont set cacheable, we are just checking the version
-    return oldSegment?.version && oldSegment.version > segment?.version;
+    return oldSegment?.version && oldSegment.version >= segment?.version;
   }
 
   private formatFlagKey(key: string): string {
