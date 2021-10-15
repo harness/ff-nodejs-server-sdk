@@ -182,6 +182,22 @@ on(Event.CHANGED, (identifier) => {
 });
 ```
 
+and if you want to remove functionReference listener for Event.READY:
+
+```
+off(Event.READY, functionReference);
+```
+
+or if you want to remove all listeners on Event.READY:
+
+```
+off(Event.READY);
+```
+
+or if you call off() without params it will close the client.
+
+> All events are applicable to off() function.
+
 ## License
 
 Licensed under the APLv2.

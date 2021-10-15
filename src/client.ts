@@ -154,7 +154,7 @@ export default class Client {
     if (event) {
       this.eventBus.off(event, callback);
     } else {
-      close();
+      this.close();
     }
   }
 
