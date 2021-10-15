@@ -158,6 +158,30 @@ client
   });
 ```
 
+## Listening on events
+
+You can listen on these events:
+
+- Event.READY - SDK successfully initialized
+- Event.FAILED - SDK throws an error
+- Event.CHANGED - any new version of flag or segment triggers this event, if segment is changed then it will find all flags with segment match operator
+
+Methods:
+
+```
+on(Event.READY, () => {
+  console.log('READY');
+});
+
+on(Event.FAILED, () => {
+  console.log('FAILED');
+});
+
+on(Event.CHANGED, (identifier) => {
+  console.log('Changed', identifier);
+});
+```
+
 ## License
 
 Licensed under the APLv2.

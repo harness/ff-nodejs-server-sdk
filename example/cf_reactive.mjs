@@ -1,4 +1,4 @@
-import CfClient, { Event } from 'ff-nodejs-server-sdk';
+import CfClient, { Event } from '@harnessio/ff-nodejs-server-sdk';
 
 CfClient.init('1c100d25-4c3f-487b-b198-3b3d01df5794');
 

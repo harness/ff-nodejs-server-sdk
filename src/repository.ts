@@ -1,4 +1,5 @@
 import EventEmitter from 'events';
+import { SEGMENT_MATCH_OPERATOR } from './constants';
 import { FeatureConfig, Segment } from './openapi';
 import { AsyncKeyValueStore, KeyValueStore, Query } from './types';
 
@@ -121,6 +122,31 @@ export class StorageRepository implements Repository {
       return segment;
     }
     return undefined;
+  }
+
+  async findFlagsBySegment(segment: string): Promise<string[]> {
+    const result = [];
+    let keys = this.cache.keys();
+    if (this.store) {
+      keys = await this.store.keys();
+    }
+    for (const key of keys) {
+      const flag = await this.getFlag(key);
+      if (!flag) {
+        return [];
+      }
+      for (const rule of flag?.rules) {
+        for (const clause of rule?.clauses) {
+          if (
+            clause.op === SEGMENT_MATCH_OPERATOR &&
+            clause.values.includes(segment)
+          ) {
+            result.push(flag.feature);
+          }
+        }
+      }
+    }
+    return result;
   }
 
   private async isFlagOutdated(

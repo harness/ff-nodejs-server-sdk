@@ -118,7 +118,23 @@ export default class Client {
 
     for (const event of Object.values(RepositoryEvent)) {
       this.eventBus.on(event, (identifier) => {
-        this.eventBus.emit(Event.CHANGED, identifier);
+        switch (event) {
+          case RepositoryEvent.FLAG_STORED:
+          case RepositoryEvent.FLAG_DELETED:
+            this.eventBus.emit(Event.CHANGED, identifier);
+            break;
+          case RepositoryEvent.SEGMENT_STORED:
+          case RepositoryEvent.SEGMENT_DELETED:
+            // find all flags where segment match and emit the event
+            this.repository
+              .findFlagsBySegment(identifier)
+              .then((values: string[]) => {
+                values.forEach((value) =>
+                  this.eventBus.emit(Event.CHANGED, value),
+                );
+              });
+            break;
+        }
       });
     }
   }

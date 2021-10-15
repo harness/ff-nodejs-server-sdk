@@ -1,4 +1,4 @@
-const { Client, Event } = require('ff-nodejs-server-sdk');
+const { Client, Event } = require('@harnessio/ff-nodejs-server-sdk');
 
 const client = new Client('1c100d25-4c3f-487b-b198-3b3d01df5794', {
   enableStream: false,
@@ -13,7 +13,9 @@ client.on(Event.FAILED, () => {
 });
 
 client.on(Event.CHANGED, (identifier) => {
-  console.log('Changed', identifier);
+  if (identifier === 'test') {
+    console.log('test flag changed');
+  }
 });
 
 console.log('Starting application');
