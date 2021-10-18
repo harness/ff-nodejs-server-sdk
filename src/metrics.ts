@@ -157,7 +157,7 @@ export const MetricsProcessor = (
         },
         {
           key: TARGET_ATTRIBUTE,
-          value: event.target.identifier,
+          value: event?.target?.identifier ?? null,
         },
       ];
 
