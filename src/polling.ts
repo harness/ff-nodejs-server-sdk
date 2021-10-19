@@ -1,4 +1,3 @@
-import { AxiosResponse } from 'axios';
 import { ClientApi, FeatureConfig, Segment } from './openapi';
 import { Options } from './types';
 import EventEmitter from 'events';
@@ -65,9 +64,7 @@ export class PollingProcessor {
       .finally(pollAgain);
   }
 
-  private async retrieveFlags(): Promise<void | AxiosResponse<
-    FeatureConfig[]
-  >> {
+  private async retrieveFlags(): Promise<void> {
     try {
       log.debug('Fetching flags started');
       const response = await this.api.getFeatureConfig(this.environment, {
@@ -85,7 +82,7 @@ export class PollingProcessor {
     }
   }
 
-  private async retrieveSegments(): Promise<void | AxiosResponse<Segment[]>> {
+  private async retrieveSegments(): Promise<void> {
     try {
       log.debug('Fetching segments started');
       const response = await this.api.getAllSegments(this.environment, {
