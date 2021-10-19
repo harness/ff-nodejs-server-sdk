@@ -150,7 +150,7 @@ export default class Client {
     }
   }
 
-  off(event: string, callback: () => void): void {
+  off(event?: string, callback?: () => void): void {
     if (event) {
       this.eventBus.off(event, callback);
     } else {

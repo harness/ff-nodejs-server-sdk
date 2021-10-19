@@ -6,8 +6,8 @@ CfClient.on(Event.READY, () => {
   console.log('READY');
 });
 
-CfClient.on(Event.FAILED, () => {
-  console.log('FAILED');
+CfClient.on(Event.FAILED, (error) => {
+  console.log('FAILED with err:', error);
 });
 
 CfClient.on(Event.CHANGED, (identifier) => {

@@ -57,7 +57,7 @@ export default {
   on: function (event: Event, callback: (...args: unknown[]) => void): void {
     this.instance.on(event, callback);
   },
-  off: function (event: Event, callback: () => void): void {
+  off: function (event?: Event, callback?: () => void): void {
     this.instance.off(event, callback);
   },
   close: function (): void {
