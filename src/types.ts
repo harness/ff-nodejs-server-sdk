@@ -58,6 +58,7 @@ export interface Operator {
 export interface Query {
   getFlag(identifier: string, cacheable?: boolean): Promise<FeatureConfig>;
   getSegment(identifier: string, cacheable?: boolean): Promise<Segment>;
+  findFlagsBySegment(segment: string): Promise<string[]>;
 }
 
 export interface KeyValueStore {
