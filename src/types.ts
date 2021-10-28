@@ -58,18 +58,21 @@ export interface Operator {
 export interface Query {
   getFlag(identifier: string, cacheable?: boolean): Promise<FeatureConfig>;
   getSegment(identifier: string, cacheable?: boolean): Promise<Segment>;
+  findFlagsBySegment(segment: string): Promise<string[]>;
 }
 
 export interface KeyValueStore {
   set(key: string, value: unknown): void;
   get(key: string): unknown;
   del(key: string): void;
+  keys(): string[];
 }
 
 export interface AsyncKeyValueStore {
   set(key: string, value: unknown): Promise<true>;
   get<T>(key: string): Promise<T>;
   del(key: string): Promise<boolean>;
+  keys(): Promise<string[]>;
 }
 
 export interface Target {

@@ -158,6 +158,46 @@ client
   });
 ```
 
+## Listening on events
+
+You can listen on these events:
+
+- `Event.READY` - SDK successfully initialized
+- `Event.FAILED` - SDK throws an error
+- `Event.CHANGED` - any new version of flag or segment triggers this event, if segment is changed then it will find all flags with segment match operator
+
+Methods:
+
+```typescript
+on(Event.READY, () => {
+  console.log('READY');
+});
+
+on(Event.FAILED, () => {
+  console.log('FAILED');
+});
+
+on(Event.CHANGED, (identifier) => {
+  console.log('Changed', identifier);
+});
+```
+
+and if you want to remove the `functionReference` listener for `Event.READY`:
+
+```
+off(Event.READY, functionReference);
+```
+
+or if you want to remove all listeners on `Event.READY`:
+
+```
+off(Event.READY);
+```
+
+or if you call `off()` without params it will close the client.
+
+> All events are applicable to off() function.
+
 ## License
 
 Licensed under the APLv2.

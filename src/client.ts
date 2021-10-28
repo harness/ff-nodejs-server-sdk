@@ -1,4 +1,4 @@
-import * as events from 'events';
+import EventEmitter from 'events';
 import jwt_decode from 'jwt-decode';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
@@ -9,7 +9,7 @@ import { PollerEvent, PollingProcessor } from './polling';
 import { StreamProcessor } from './streaming';
 import { Evaluator } from './evaluator';
 import { defaultOptions } from './constants';
-import { Repository, StorageRepository } from './repository';
+import { Repository, RepositoryEvent, StorageRepository } from './repository';
 import {
   MetricEvent,
   MetricsProcessor,
@@ -26,7 +26,7 @@ enum Processor {
   METRICS,
 }
 
-export enum ClientEvent {
+export enum Event {
   READY = 'ready',
   FAILED = 'failed',
   CHANGED = 'changed',
@@ -41,7 +41,7 @@ export default class Client {
   private configuration: Configuration;
   private options: Options;
   private cluster = '1';
-  private eventBus = new events.EventEmitter();
+  private eventBus = new EventEmitter();
   private pollProcessor: PollingProcessor;
   private streamProcessor: StreamProcessor;
   private metricsProcessor: MetricsProcessorInterface;
@@ -72,6 +72,7 @@ export default class Client {
     this.repository = new StorageRepository(
       this.options.cache,
       this.options.store,
+      this.eventBus,
     );
     this.evaluator = new Evaluator(this.repository);
     this.api = new ClientApi(this.configuration);
@@ -86,7 +87,7 @@ export default class Client {
 
     this.eventBus.on(PollerEvent.ERROR, () => {
       this.failure = true;
-      this.eventBus.emit(ClientEvent.FAILED);
+      this.eventBus.emit(Event.FAILED);
     });
 
     this.eventBus.on(StreamEvent.READY, () => {
@@ -95,7 +96,7 @@ export default class Client {
 
     this.eventBus.on(StreamEvent.ERROR, () => {
       this.failure = true;
-      this.eventBus.emit(ClientEvent.FAILED);
+      this.eventBus.emit(Event.FAILED);
     });
 
     this.eventBus.on(MetricEvent.READY, () => {
@@ -104,7 +105,7 @@ export default class Client {
 
     this.eventBus.on(MetricEvent.ERROR, () => {
       this.failure = true;
-      this.eventBus.emit(ClientEvent.FAILED);
+      this.eventBus.emit(Event.FAILED);
     });
 
     this.eventBus.on(StreamEvent.CONNECTED, () => {
@@ -114,6 +115,47 @@ export default class Client {
     this.eventBus.on(StreamEvent.DISCONNECTED, () => {
       this.pollProcessor.start();
     });
+
+    for (const event of Object.values(RepositoryEvent)) {
+      this.eventBus.on(event, (identifier) => {
+        switch (event) {
+          case RepositoryEvent.FLAG_STORED:
+          case RepositoryEvent.FLAG_DELETED:
+            this.eventBus.emit(Event.CHANGED, identifier);
+            break;
+          case RepositoryEvent.SEGMENT_STORED:
+          case RepositoryEvent.SEGMENT_DELETED:
+            // find all flags where segment match and emit the event
+            this.repository
+              .findFlagsBySegment(identifier)
+              .then((values: string[]) => {
+                values.forEach((value) =>
+                  this.eventBus.emit(Event.CHANGED, value),
+                );
+              });
+            break;
+        }
+      });
+    }
+  }
+
+  on(event: Event, callback: (...args: unknown[]) => void): void {
+    const arrayObjects = [];
+
+    for (const value of Object.values(Event)) {
+      arrayObjects.push(value);
+    }
+    if (arrayObjects.includes(event)) {
+      this.eventBus.on(event, callback);
+    }
+  }
+
+  off(event?: string, callback?: () => void): void {
+    if (event) {
+      this.eventBus.off(event, callback);
+    } else {
+      this.close();
+    }
   }
 
   private async authenticate(): Promise<void> {
@@ -145,10 +187,10 @@ export default class Client {
       this.waitForInitialize = Promise.reject(this.failure);
     } else {
       this.waitForInitialize = new Promise((resolve, reject) => {
-        this.eventBus.once(ClientEvent.READY, () => {
+        this.eventBus.once(Event.READY, () => {
           resolve(this);
         });
-        this.eventBus.once(ClientEvent.FAILED, reject);
+        this.eventBus.once(Event.FAILED, reject);
       });
     }
     return this.waitForInitialize;
@@ -183,7 +225,7 @@ export default class Client {
     }
 
     this.initialized = true;
-    this.eventBus.emit(ClientEvent.READY);
+    this.eventBus.emit(Event.READY);
   }
 
   private async run(): Promise<void> {
@@ -304,5 +346,6 @@ export default class Client {
     if (this.metricsProcessor) {
       this.metricsProcessor.close();
     }
+    this.eventBus.removeAllListeners();
   }
 }
