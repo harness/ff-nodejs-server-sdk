@@ -4,7 +4,7 @@
 [![Node.js version][nodejs-badge]][nodejs]
 [![APLv2][license-badge]][license]
 
-# Before you Begin
+# Before you begin
 
 Harness Feature Flags (FF) is a feature management solution that enables users to change the software’s functionality, without deploying new code. FF uses feature flags to hide code or behaviours without having to ship new versions of the software. A feature flag is like a powerful if statement.
 
@@ -14,7 +14,7 @@ To read more, see https://ngdocs.harness.io/category/vjolt35atg-feature-flags
 
 To sign up, https://app.harness.io/auth/#/signup/
 
-## Getting Started
+## Getting started
 
 ### Setup
 
@@ -72,7 +72,7 @@ const value = await client.boolVariation('test', target, false);
 client.close();
 ```
 
-### Avaialable public methods
+### Available public methods
 
 ```typescript
 function boolVariation(
@@ -98,7 +98,7 @@ function jsonVariation(
 function close(): void;
 ```
 
-### Avaialable options
+### Available options
 
 ```
 baseUrl: string;             // baseUrl is where the flag configurations are located
