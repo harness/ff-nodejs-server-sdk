@@ -157,7 +157,7 @@ export class Evaluator {
     clause: Clause,
     target: Target,
   ): Promise<boolean> {
-    if (!clause?.op || !clause?.values || clause.values.length === 0) {
+    if (!clause?.op || !clause?.values?.length) {
       return false;
     }
 
