@@ -7,7 +7,7 @@ import { FeatureConfig, FeatureConfigKindEnum, Segment } from '../src/openapi';
 import { Evaluator } from '../src/evaluator';
 import { Target } from '../src/types';
 
-const directory = path.join(__dirname, 'usecases');
+const directory = path.join(__dirname, 'ff-test-cases/tests');
 
 interface Usecase {
   flag: FeatureConfig;

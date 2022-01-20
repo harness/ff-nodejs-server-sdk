@@ -10,11 +10,7 @@ import {
   SEGMENT_MATCH_OPERATOR,
   STARTS_WITH_OPERATOR,
 } from './constants';
-import { Operator, Query, Target, Type } from './types';
-import { Bool } from './boolean';
-import { Json } from './json';
-import { Num } from './number';
-import { Str } from './string';
+import { Query, Target, Type } from './types';
 import {
   Clause,
   Distribution,
@@ -96,39 +92,15 @@ export class Evaluator {
     }
 
     let variation = '';
-    for (const _var of distribution.variations) {
-      variation = _var.variation;
-      if (this.isEnabled(target, distribution.bucketBy, _var.weight)) {
-        return _var.variation;
+    let totalPercentage = 0;
+    for (const v of distribution.variations) {
+      variation = v.variation;
+      totalPercentage += v.weight;
+      if (this.isEnabled(target, distribution.bucketBy, totalPercentage)) {
+        return v.variation;
       }
     }
     return variation;
-  }
-
-  private getOperator(target: Target, attribute: string): Operator | undefined {
-    const value = this.getAttrValue(target, attribute);
-    switch (typeof value) {
-      case 'boolean':
-        return new Bool(value as boolean);
-      case 'string':
-        return new Str(value as string);
-      case 'number':
-        return new Num(value as number);
-      case 'object':
-        return new Json();
-    }
-  }
-
-  private convertApiTargetsToEvalTargets(targets: ApiTarget[]): Target[] {
-    return targets.map(
-      (elem) =>
-        ({
-          identifier: elem.identifier,
-          name: elem.name,
-          anonymous: elem.anonymous,
-          attributes: elem.attributes,
-        } as Target),
-    );
   }
 
   private async isTargetIncludedOrExcludedInSegment(
@@ -141,7 +113,9 @@ export class Evaluator {
       if (segment) {
         // Should Target be excluded - if in excluded list we return false
         if (
-          this.convertApiTargetsToEvalTargets(segment.excluded).includes(target)
+          segment.excluded.find(
+            (value: ApiTarget) => value.identifier === target.identifier,
+          )
         ) {
           log.debug(
             'Target %s excluded from segment %s via exclude list\n',
@@ -153,7 +127,9 @@ export class Evaluator {
 
         // Should Target be included - if in included list we return true
         if (
-          this.convertApiTargetsToEvalTargets(segment.included).includes(target)
+          segment.included.find(
+            (value: ApiTarget) => value.identifier === target.identifier,
+          )
         ) {
           log.debug(
             'Target %s included in segment %s via include list\n',
@@ -181,26 +157,38 @@ export class Evaluator {
     clause: Clause,
     target: Target,
   ): Promise<boolean> {
-    if (!clause.op) {
+    if (!clause?.op || !clause?.values?.length) {
       return false;
     }
 
-    const operator = this.getOperator(target, clause.attribute);
+    const attrValue = this.getAttrValue(target, clause.attribute);
+    const targetAttribute = attrValue?.toString();
+    if (clause.op !== SEGMENT_MATCH_OPERATOR && !targetAttribute) {
+      return false;
+    }
+
+    const value = clause.values[0];
+
     switch (clause.op) {
       case IN_OPERATOR:
-        return operator.inList(clause.values);
+        for (const val of clause.values) {
+          if (val == targetAttribute) {
+            return true;
+          }
+        }
+        return false;
       case EQUAL_OPERATOR:
-        return operator.equal(clause.values);
+        return targetAttribute.toLowerCase() == value.toLowerCase();
       case EQUAL_SENSITIVE_OPERATOR:
-        return operator.equalSensitive(clause.values);
+        return targetAttribute == value;
       case GT_OPERATOR:
-        return operator.greaterThan(clause.values);
+        return targetAttribute > value;
       case STARTS_WITH_OPERATOR:
-        return operator.startsWith(clause.values);
+        return targetAttribute.startsWith(value);
       case ENDS_WITH_OPERATOR:
-        return operator.endsWith(clause.values);
+        return targetAttribute.endsWith(value);
       case CONTAINS_OPERATOR:
-        return operator.contains(clause.values);
+        return targetAttribute.includes(value);
       case SEGMENT_MATCH_OPERATOR:
         return this.isTargetIncludedOrExcludedInSegment(clause.values, target);
     }
