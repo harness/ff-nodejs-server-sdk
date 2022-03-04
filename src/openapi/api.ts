@@ -793,10 +793,11 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
          * Used to retrieve all segments for certain account id.
          * @summary Retrieve all segments.
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
+         * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAllSegments: async (environmentUUID: string, options: any = {}): Promise<RequestArgs> => {
+        getAllSegments: async (environmentUUID: string, cluster?: string, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'environmentUUID' is not null or undefined
             assertParamExists('getAllSegments', 'environmentUUID', environmentUUID)
             const localVarPath = `/client/env/{environmentUUID}/target-segments`
@@ -816,6 +817,10 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            if (cluster !== undefined) {
+                localVarQueryParameter['cluster'] = cluster;
+            }
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
@@ -833,10 +838,11 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
          * @param {string} feature Unique identifier for the flag object in the API.
          * @param {string} target Unique identifier for the target object in the API.
+         * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getEvaluationByIdentifier: async (environmentUUID: string, feature: string, target: string, options: any = {}): Promise<RequestArgs> => {
+        getEvaluationByIdentifier: async (environmentUUID: string, feature: string, target: string, cluster?: string, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'environmentUUID' is not null or undefined
             assertParamExists('getEvaluationByIdentifier', 'environmentUUID', environmentUUID)
             // verify required parameter 'feature' is not null or undefined
@@ -862,6 +868,10 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            if (cluster !== undefined) {
+                localVarQueryParameter['cluster'] = cluster;
+            }
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
@@ -878,10 +888,11 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
          * @summary Get feature evaluations for target
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
          * @param {string} target Unique identifier for the target object in the API.
+         * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getEvaluations: async (environmentUUID: string, target: string, options: any = {}): Promise<RequestArgs> => {
+        getEvaluations: async (environmentUUID: string, target: string, cluster?: string, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'environmentUUID' is not null or undefined
             assertParamExists('getEvaluations', 'environmentUUID', environmentUUID)
             // verify required parameter 'target' is not null or undefined
@@ -904,6 +915,10 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            if (cluster !== undefined) {
+                localVarQueryParameter['cluster'] = cluster;
+            }
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
@@ -919,10 +934,11 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
          * All feature flags with activations in project environment
          * @summary Get all feature flags activations
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
+         * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getFeatureConfig: async (environmentUUID: string, options: any = {}): Promise<RequestArgs> => {
+        getFeatureConfig: async (environmentUUID: string, cluster?: string, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'environmentUUID' is not null or undefined
             assertParamExists('getFeatureConfig', 'environmentUUID', environmentUUID)
             const localVarPath = `/client/env/{environmentUUID}/feature-configs`
@@ -942,6 +958,10 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            if (cluster !== undefined) {
+                localVarQueryParameter['cluster'] = cluster;
+            }
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
@@ -958,10 +978,11 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
          * @summary Get feature config
          * @param {string} identifier Unique identifier for the flag object in the API.
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
+         * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getFeatureConfigByIdentifier: async (identifier: string, environmentUUID: string, options: any = {}): Promise<RequestArgs> => {
+        getFeatureConfigByIdentifier: async (identifier: string, environmentUUID: string, cluster?: string, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'identifier' is not null or undefined
             assertParamExists('getFeatureConfigByIdentifier', 'identifier', identifier)
             // verify required parameter 'environmentUUID' is not null or undefined
@@ -984,6 +1005,10 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            if (cluster !== undefined) {
+                localVarQueryParameter['cluster'] = cluster;
+            }
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
@@ -1000,10 +1025,11 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
          * @summary Retrieve a segment by identifier
          * @param {string} identifier Unique identifier for the segment object in the API
          * @param {string} environmentUUID Unique identifier for the environment object in the API
+         * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getSegmentByIdentifier: async (identifier: string, environmentUUID: string, options: any = {}): Promise<RequestArgs> => {
+        getSegmentByIdentifier: async (identifier: string, environmentUUID: string, cluster?: string, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'identifier' is not null or undefined
             assertParamExists('getSegmentByIdentifier', 'identifier', identifier)
             // verify required parameter 'environmentUUID' is not null or undefined
@@ -1026,6 +1052,10 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            if (cluster !== undefined) {
+                localVarQueryParameter['cluster'] = cluster;
+            }
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
@@ -1041,10 +1071,11 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
          * 
          * @summary Stream endpoint.
          * @param {string} aPIKey 
+         * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        stream: async (aPIKey: string, options: any = {}): Promise<RequestArgs> => {
+        stream: async (aPIKey: string, cluster?: string, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'aPIKey' is not null or undefined
             assertParamExists('stream', 'aPIKey', aPIKey)
             const localVarPath = `/stream`;
@@ -1062,6 +1093,10 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             // authentication BearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (cluster !== undefined) {
+                localVarQueryParameter['cluster'] = cluster;
+            }
 
             if (aPIKey !== undefined && aPIKey !== null) {
                 localVarHeaderParameter['API-Key'] = String(aPIKey);
@@ -1103,11 +1138,12 @@ export const ClientApiFp = function(configuration?: Configuration) {
          * Used to retrieve all segments for certain account id.
          * @summary Retrieve all segments.
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
+         * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAllSegments(environmentUUID: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Segment>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getAllSegments(environmentUUID, options);
+        async getAllSegments(environmentUUID: string, cluster?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Segment>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getAllSegments(environmentUUID, cluster, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -1116,11 +1152,12 @@ export const ClientApiFp = function(configuration?: Configuration) {
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
          * @param {string} feature Unique identifier for the flag object in the API.
          * @param {string} target Unique identifier for the target object in the API.
+         * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getEvaluationByIdentifier(environmentUUID: string, feature: string, target: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Evaluation>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getEvaluationByIdentifier(environmentUUID, feature, target, options);
+        async getEvaluationByIdentifier(environmentUUID: string, feature: string, target: string, cluster?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Evaluation>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getEvaluationByIdentifier(environmentUUID, feature, target, cluster, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -1128,22 +1165,24 @@ export const ClientApiFp = function(configuration?: Configuration) {
          * @summary Get feature evaluations for target
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
          * @param {string} target Unique identifier for the target object in the API.
+         * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getEvaluations(environmentUUID: string, target: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Pagination & object>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getEvaluations(environmentUUID, target, options);
+        async getEvaluations(environmentUUID: string, target: string, cluster?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Pagination & object>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getEvaluations(environmentUUID, target, cluster, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * All feature flags with activations in project environment
          * @summary Get all feature flags activations
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
+         * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getFeatureConfig(environmentUUID: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<FeatureConfig>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getFeatureConfig(environmentUUID, options);
+        async getFeatureConfig(environmentUUID: string, cluster?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<FeatureConfig>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getFeatureConfig(environmentUUID, cluster, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -1151,11 +1190,12 @@ export const ClientApiFp = function(configuration?: Configuration) {
          * @summary Get feature config
          * @param {string} identifier Unique identifier for the flag object in the API.
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
+         * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getFeatureConfigByIdentifier(identifier: string, environmentUUID: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FeatureConfig>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getFeatureConfigByIdentifier(identifier, environmentUUID, options);
+        async getFeatureConfigByIdentifier(identifier: string, environmentUUID: string, cluster?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FeatureConfig>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getFeatureConfigByIdentifier(identifier, environmentUUID, cluster, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -1163,22 +1203,24 @@ export const ClientApiFp = function(configuration?: Configuration) {
          * @summary Retrieve a segment by identifier
          * @param {string} identifier Unique identifier for the segment object in the API
          * @param {string} environmentUUID Unique identifier for the environment object in the API
+         * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getSegmentByIdentifier(identifier: string, environmentUUID: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Segment>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getSegmentByIdentifier(identifier, environmentUUID, options);
+        async getSegmentByIdentifier(identifier: string, environmentUUID: string, cluster?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Segment>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getSegmentByIdentifier(identifier, environmentUUID, cluster, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * 
          * @summary Stream endpoint.
          * @param {string} aPIKey 
+         * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async stream(aPIKey: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.stream(aPIKey, options);
+        async stream(aPIKey: string, cluster?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.stream(aPIKey, cluster, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -1205,11 +1247,12 @@ export const ClientApiFactory = function (configuration?: Configuration, basePat
          * Used to retrieve all segments for certain account id.
          * @summary Retrieve all segments.
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
+         * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAllSegments(environmentUUID: string, options?: any): AxiosPromise<Array<Segment>> {
-            return localVarFp.getAllSegments(environmentUUID, options).then((request) => request(axios, basePath));
+        getAllSegments(environmentUUID: string, cluster?: string, options?: any): AxiosPromise<Array<Segment>> {
+            return localVarFp.getAllSegments(environmentUUID, cluster, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1217,64 +1260,70 @@ export const ClientApiFactory = function (configuration?: Configuration, basePat
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
          * @param {string} feature Unique identifier for the flag object in the API.
          * @param {string} target Unique identifier for the target object in the API.
+         * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getEvaluationByIdentifier(environmentUUID: string, feature: string, target: string, options?: any): AxiosPromise<Evaluation> {
-            return localVarFp.getEvaluationByIdentifier(environmentUUID, feature, target, options).then((request) => request(axios, basePath));
+        getEvaluationByIdentifier(environmentUUID: string, feature: string, target: string, cluster?: string, options?: any): AxiosPromise<Evaluation> {
+            return localVarFp.getEvaluationByIdentifier(environmentUUID, feature, target, cluster, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary Get feature evaluations for target
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
          * @param {string} target Unique identifier for the target object in the API.
+         * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getEvaluations(environmentUUID: string, target: string, options?: any): AxiosPromise<Pagination & object> {
-            return localVarFp.getEvaluations(environmentUUID, target, options).then((request) => request(axios, basePath));
+        getEvaluations(environmentUUID: string, target: string, cluster?: string, options?: any): AxiosPromise<Pagination & object> {
+            return localVarFp.getEvaluations(environmentUUID, target, cluster, options).then((request) => request(axios, basePath));
         },
         /**
          * All feature flags with activations in project environment
          * @summary Get all feature flags activations
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
+         * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getFeatureConfig(environmentUUID: string, options?: any): AxiosPromise<Array<FeatureConfig>> {
-            return localVarFp.getFeatureConfig(environmentUUID, options).then((request) => request(axios, basePath));
+        getFeatureConfig(environmentUUID: string, cluster?: string, options?: any): AxiosPromise<Array<FeatureConfig>> {
+            return localVarFp.getFeatureConfig(environmentUUID, cluster, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary Get feature config
          * @param {string} identifier Unique identifier for the flag object in the API.
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
+         * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getFeatureConfigByIdentifier(identifier: string, environmentUUID: string, options?: any): AxiosPromise<FeatureConfig> {
-            return localVarFp.getFeatureConfigByIdentifier(identifier, environmentUUID, options).then((request) => request(axios, basePath));
+        getFeatureConfigByIdentifier(identifier: string, environmentUUID: string, cluster?: string, options?: any): AxiosPromise<FeatureConfig> {
+            return localVarFp.getFeatureConfigByIdentifier(identifier, environmentUUID, cluster, options).then((request) => request(axios, basePath));
         },
         /**
          * Used to retrieve a segment for a certain account id by identifier
          * @summary Retrieve a segment by identifier
          * @param {string} identifier Unique identifier for the segment object in the API
          * @param {string} environmentUUID Unique identifier for the environment object in the API
+         * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getSegmentByIdentifier(identifier: string, environmentUUID: string, options?: any): AxiosPromise<Segment> {
-            return localVarFp.getSegmentByIdentifier(identifier, environmentUUID, options).then((request) => request(axios, basePath));
+        getSegmentByIdentifier(identifier: string, environmentUUID: string, cluster?: string, options?: any): AxiosPromise<Segment> {
+            return localVarFp.getSegmentByIdentifier(identifier, environmentUUID, cluster, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary Stream endpoint.
          * @param {string} aPIKey 
+         * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        stream(aPIKey: string, options?: any): AxiosPromise<void> {
-            return localVarFp.stream(aPIKey, options).then((request) => request(axios, basePath));
+        stream(aPIKey: string, cluster?: string, options?: any): AxiosPromise<void> {
+            return localVarFp.stream(aPIKey, cluster, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -1302,12 +1351,13 @@ export class ClientApi extends BaseAPI {
      * Used to retrieve all segments for certain account id.
      * @summary Retrieve all segments.
      * @param {string} environmentUUID Unique identifier for the environment object in the API.
+     * @param {string} [cluster] Unique identifier for the cluster for the account
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ClientApi
      */
-    public getAllSegments(environmentUUID: string, options?: any) {
-        return ClientApiFp(this.configuration).getAllSegments(environmentUUID, options).then((request) => request(this.axios, this.basePath));
+    public getAllSegments(environmentUUID: string, cluster?: string, options?: any) {
+        return ClientApiFp(this.configuration).getAllSegments(environmentUUID, cluster, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1316,12 +1366,13 @@ export class ClientApi extends BaseAPI {
      * @param {string} environmentUUID Unique identifier for the environment object in the API.
      * @param {string} feature Unique identifier for the flag object in the API.
      * @param {string} target Unique identifier for the target object in the API.
+     * @param {string} [cluster] Unique identifier for the cluster for the account
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ClientApi
      */
-    public getEvaluationByIdentifier(environmentUUID: string, feature: string, target: string, options?: any) {
-        return ClientApiFp(this.configuration).getEvaluationByIdentifier(environmentUUID, feature, target, options).then((request) => request(this.axios, this.basePath));
+    public getEvaluationByIdentifier(environmentUUID: string, feature: string, target: string, cluster?: string, options?: any) {
+        return ClientApiFp(this.configuration).getEvaluationByIdentifier(environmentUUID, feature, target, cluster, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1329,24 +1380,26 @@ export class ClientApi extends BaseAPI {
      * @summary Get feature evaluations for target
      * @param {string} environmentUUID Unique identifier for the environment object in the API.
      * @param {string} target Unique identifier for the target object in the API.
+     * @param {string} [cluster] Unique identifier for the cluster for the account
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ClientApi
      */
-    public getEvaluations(environmentUUID: string, target: string, options?: any) {
-        return ClientApiFp(this.configuration).getEvaluations(environmentUUID, target, options).then((request) => request(this.axios, this.basePath));
+    public getEvaluations(environmentUUID: string, target: string, cluster?: string, options?: any) {
+        return ClientApiFp(this.configuration).getEvaluations(environmentUUID, target, cluster, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * All feature flags with activations in project environment
      * @summary Get all feature flags activations
      * @param {string} environmentUUID Unique identifier for the environment object in the API.
+     * @param {string} [cluster] Unique identifier for the cluster for the account
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ClientApi
      */
-    public getFeatureConfig(environmentUUID: string, options?: any) {
-        return ClientApiFp(this.configuration).getFeatureConfig(environmentUUID, options).then((request) => request(this.axios, this.basePath));
+    public getFeatureConfig(environmentUUID: string, cluster?: string, options?: any) {
+        return ClientApiFp(this.configuration).getFeatureConfig(environmentUUID, cluster, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1354,12 +1407,13 @@ export class ClientApi extends BaseAPI {
      * @summary Get feature config
      * @param {string} identifier Unique identifier for the flag object in the API.
      * @param {string} environmentUUID Unique identifier for the environment object in the API.
+     * @param {string} [cluster] Unique identifier for the cluster for the account
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ClientApi
      */
-    public getFeatureConfigByIdentifier(identifier: string, environmentUUID: string, options?: any) {
-        return ClientApiFp(this.configuration).getFeatureConfigByIdentifier(identifier, environmentUUID, options).then((request) => request(this.axios, this.basePath));
+    public getFeatureConfigByIdentifier(identifier: string, environmentUUID: string, cluster?: string, options?: any) {
+        return ClientApiFp(this.configuration).getFeatureConfigByIdentifier(identifier, environmentUUID, cluster, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1367,24 +1421,26 @@ export class ClientApi extends BaseAPI {
      * @summary Retrieve a segment by identifier
      * @param {string} identifier Unique identifier for the segment object in the API
      * @param {string} environmentUUID Unique identifier for the environment object in the API
+     * @param {string} [cluster] Unique identifier for the cluster for the account
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ClientApi
      */
-    public getSegmentByIdentifier(identifier: string, environmentUUID: string, options?: any) {
-        return ClientApiFp(this.configuration).getSegmentByIdentifier(identifier, environmentUUID, options).then((request) => request(this.axios, this.basePath));
+    public getSegmentByIdentifier(identifier: string, environmentUUID: string, cluster?: string, options?: any) {
+        return ClientApiFp(this.configuration).getSegmentByIdentifier(identifier, environmentUUID, cluster, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
      * @summary Stream endpoint.
      * @param {string} aPIKey 
+     * @param {string} [cluster] Unique identifier for the cluster for the account
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ClientApi
      */
-    public stream(aPIKey: string, options?: any) {
-        return ClientApiFp(this.configuration).stream(aPIKey, options).then((request) => request(this.axios, this.basePath));
+    public stream(aPIKey: string, cluster?: string, options?: any) {
+        return ClientApiFp(this.configuration).stream(aPIKey, cluster, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -1399,11 +1455,12 @@ export const MetricsApiAxiosParamCreator = function (configuration?: Configurati
          * Send metrics to Analytics server
          * @summary Send metrics to the Analytics server.
          * @param {string} environment environment parameter in query.
+         * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {Metrics} [metrics] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        postMetrics: async (environment: string, metrics?: Metrics, options: any = {}): Promise<RequestArgs> => {
+        postMetrics: async (environment: string, cluster?: string, metrics?: Metrics, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'environment' is not null or undefined
             assertParamExists('postMetrics', 'environment', environment)
             const localVarPath = `/metrics/{environment}`
@@ -1422,6 +1479,10 @@ export const MetricsApiAxiosParamCreator = function (configuration?: Configurati
             // authentication BearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (cluster !== undefined) {
+                localVarQueryParameter['cluster'] = cluster;
+            }
 
 
     
@@ -1451,12 +1512,13 @@ export const MetricsApiFp = function(configuration?: Configuration) {
          * Send metrics to Analytics server
          * @summary Send metrics to the Analytics server.
          * @param {string} environment environment parameter in query.
+         * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {Metrics} [metrics] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async postMetrics(environment: string, metrics?: Metrics, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.postMetrics(environment, metrics, options);
+        async postMetrics(environment: string, cluster?: string, metrics?: Metrics, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.postMetrics(environment, cluster, metrics, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -1473,12 +1535,13 @@ export const MetricsApiFactory = function (configuration?: Configuration, basePa
          * Send metrics to Analytics server
          * @summary Send metrics to the Analytics server.
          * @param {string} environment environment parameter in query.
+         * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {Metrics} [metrics] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        postMetrics(environment: string, metrics?: Metrics, options?: any): AxiosPromise<void> {
-            return localVarFp.postMetrics(environment, metrics, options).then((request) => request(axios, basePath));
+        postMetrics(environment: string, cluster?: string, metrics?: Metrics, options?: any): AxiosPromise<void> {
+            return localVarFp.postMetrics(environment, cluster, metrics, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -1494,13 +1557,14 @@ export class MetricsApi extends BaseAPI {
      * Send metrics to Analytics server
      * @summary Send metrics to the Analytics server.
      * @param {string} environment environment parameter in query.
+     * @param {string} [cluster] Unique identifier for the cluster for the account
      * @param {Metrics} [metrics] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MetricsApi
      */
-    public postMetrics(environment: string, metrics?: Metrics, options?: any) {
-        return MetricsApiFp(this.configuration).postMetrics(environment, metrics, options).then((request) => request(this.axios, this.basePath));
+    public postMetrics(environment: string, cluster?: string, metrics?: Metrics, options?: any) {
+        return MetricsApiFp(this.configuration).postMetrics(environment, cluster, metrics, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

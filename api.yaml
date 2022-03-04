@@ -29,6 +29,7 @@ paths:
           description: Unique identifier for the environment object in the API.
           schema:
             type: string
+        - $ref: '#/components/parameters/clusterQueryOptionalParam'
       security:
         - BearerAuth: []
       responses:
@@ -59,6 +60,7 @@ paths:
           description: Unique identifier for the environment object in the API.
           schema:
             type: string
+        - $ref: '#/components/parameters/clusterQueryOptionalParam'
       security:
         - BearerAuth: []
       responses:
@@ -82,6 +84,7 @@ paths:
           description: Unique identifier for the environment object in the API.
           schema:
             type: string
+        - $ref: '#/components/parameters/clusterQueryOptionalParam'
       security:
         - BearerAuth: []
       responses:
@@ -121,6 +124,7 @@ paths:
           description: Unique identifier for the environment object in the API
           schema:
             type: string
+        - $ref: '#/components/parameters/clusterQueryOptionalParam'
       security:
         - BearerAuth: []
       responses:
@@ -184,6 +188,7 @@ paths:
           description: Unique identifier for the target object in the API.
           schema:
             type: string
+        - $ref: '#/components/parameters/clusterQueryOptionalParam'
       security:
         - BearerAuth: []
       responses:
@@ -223,6 +228,7 @@ paths:
           description: Unique identifier for the target object in the API.
           schema:
             type: string
+        - $ref: '#/components/parameters/clusterQueryOptionalParam'
       security:
         - BearerAuth: []
       responses:
@@ -241,6 +247,7 @@ paths:
       operationId: postMetrics
       parameters:
         - $ref: '#/components/parameters/environmentPathParam'
+        - $ref: '#/components/parameters/clusterQueryOptionalParam'
       requestBody:
         content:
           application/json:
@@ -269,6 +276,7 @@ paths:
           schema:
             type: string
           required: true
+        - $ref: '#/components/parameters/clusterQueryOptionalParam'
       security:
         - BearerAuth: []
       responses:
@@ -616,7 +624,6 @@ components:
         - itemCount
         - pageSize
         - pageIndex
-        - pageIndex
     Evaluation:
       type: object
       properties:
@@ -701,6 +708,21 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+  parameters:
+    clusterQueryOptionalParam:
+      name: cluster
+      in: query
+      required: false
+      description: Unique identifier for the cluster for the account
+      schema:
+        type: string
+    environmentPathParam:
+      name: environment
+      in: path
+      required: true
+      description: environment parameter in query.
+      schema:
+        type: string
   responses:
     Unauthenticated:
       description: Unauthenticated
@@ -726,11 +748,3 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-  parameters:
-    environmentPathParam:
-      name: environment
-      in: path
-      required: true
-      description: environment parameter in query.
-      schema:
-        type: string

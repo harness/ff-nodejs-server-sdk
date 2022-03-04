@@ -183,11 +183,7 @@ export const MetricsProcessor = (
     if (metrics) {
       log.debug('Start sending metrics data');
       api
-        .postMetrics(environment, metrics, {
-          params: {
-            cluster: cluster,
-          },
-        })
+        .postMetrics(environment, cluster, metrics)
         .then((response) => {
           log.debug('Metrics server returns: ', response.status);
           if (response.status >= 400) {
