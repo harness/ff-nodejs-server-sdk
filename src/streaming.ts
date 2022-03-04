@@ -11,6 +11,7 @@ const log = defaultOptions.logger;
 type FetchFunction = (
   identifier: string,
   environment: string,
+  cluster: string,
 ) => AxiosPromise<FeatureConfig | Segment>;
 
 export class StreamProcessor {
@@ -102,7 +103,7 @@ export class StreamProcessor {
   ): Promise<void> {
     log.info('Processing message', msg);
     try {
-      const response = await fn(msg.identifier, this.environment);
+      const response = await fn(msg.identifier, this.environment, this.cluster);
       const data: FeatureConfig | Segment = response.data;
       if (msg.event === 'create' || msg.event === 'patch') {
         setFn(msg.identifier, data);

@@ -67,11 +67,10 @@ export class PollingProcessor {
   private async retrieveFlags(): Promise<void> {
     try {
       log.debug('Fetching flags started');
-      const response = await this.api.getFeatureConfig(this.environment, {
-        params: {
-          cluster: this.cluster,
-        },
-      });
+      const response = await this.api.getFeatureConfig(
+        this.environment,
+        this.cluster,
+      );
       log.debug('Fetching flags finished');
       response.data.forEach((fc: FeatureConfig) =>
         this.repository.setFlag(fc.feature, fc),
@@ -85,11 +84,10 @@ export class PollingProcessor {
   private async retrieveSegments(): Promise<void> {
     try {
       log.debug('Fetching segments started');
-      const response = await this.api.getAllSegments(this.environment, {
-        params: {
-          cluster: this.cluster,
-        },
-      });
+      const response = await this.api.getAllSegments(
+        this.environment,
+        this.cluster,
+      );
       log.debug('Fetching segments finished');
       // prepare cache for storing segments
       response.data.forEach((segment: Segment) =>
