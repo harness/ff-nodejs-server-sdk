@@ -30,6 +30,7 @@
     "eslint-config-prettier": "~8.3.0",
     "eslint-plugin-jest": "~24.3.6",
     "jest": "~27.0.6",
+    "jest-junit": "^13.0.0",
     "prettier": "~2.3.2",
     "rimraf": "~3.0.2",
     "ts-jest": "~27.0.3",
@@ -49,6 +50,7 @@
     "lint": "eslint ./src --ext .ts,.tsx",
     "format": "prettier --write \"src/**/*.ts\"",
     "test": "jest --coverage",
+    "test:junit": "jest --reporters=default --reporters=jest-junit",
     "test:watch": "jest --watch",
     "generate": "openapi-generator-cli generate -i ./api.yaml -g typescript-axios -o src/openapi"
   },
