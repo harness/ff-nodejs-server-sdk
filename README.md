@@ -14,7 +14,7 @@ To read more, see https://ngdocs.harness.io/category/vjolt35atg-feature-flags
 
 To sign up, https://app.harness.io/auth/#/signup/
 
-## Getting started
+## Getting started....
 
 ### Setup
 
