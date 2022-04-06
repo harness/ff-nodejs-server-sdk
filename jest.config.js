@@ -1,10 +1,10 @@
 module.exports = {
   testEnvironment: 'node',
   transform: {
-    '^.+\\.tsx?$': 'ts-jest',
+    '^.+\\.ts?$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
-  testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.(ts|js)x?$',
+  testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.(ts|js)?$',
   coverageDirectory: 'coverage',
   coveragePathIgnorePatterns: ['src/openapi/'],
   collectCoverageFrom: ['src/**/*.{ts,js}', '!src/**/*.d.ts'],

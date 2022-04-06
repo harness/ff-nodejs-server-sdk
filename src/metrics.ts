@@ -212,6 +212,7 @@ export const MetricsProcessor = (
     log.info('Closing MetricsProcessor');
     clearInterval(syncInterval);
     _send();
+    log.info('MetricsProcessor closed');
   };
 
   return {

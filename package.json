@@ -49,7 +49,8 @@
     "prepare": "npm run build",
     "lint": "eslint ./src --ext .ts,.tsx",
     "format": "prettier --write \"src/**/*.ts\"",
-    "test": "jest --coverage",
+    "test": "jest --detectOpenHandles",
+    "coverage": "jest --coverage",
     "test:junit": "jest --reporters=default --reporters=jest-junit",
     "test:watch": "jest --watch",
     "generate": "openapi-generator-cli generate -i ./api.yaml -g typescript-axios -o src/openapi"

@@ -1,6 +1,7 @@
+import 'dotenv/config';
 import CfClient, { Event } from '@harnessio/ff-nodejs-server-sdk';
 
-CfClient.init('1c100d25-4c3f-487b-b198-3b3d01df5794');
+CfClient.init(process.env.SDK_KEY);
 
 CfClient.on(Event.READY, () => {
   console.log('READY');
