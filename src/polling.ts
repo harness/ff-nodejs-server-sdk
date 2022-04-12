@@ -20,6 +20,7 @@ export class PollingProcessor {
   private repository: Repository;
   private initialized = false;
   private eventBus: EventEmitter;
+  private timeout: NodeJS.Timeout;
 
   constructor(
     environment: string,
@@ -39,6 +40,7 @@ export class PollingProcessor {
 
   private poll() {
     if (this.stopped) {
+      log.info('PollingProcessor stopped');
       return;
     }
 
@@ -47,7 +49,7 @@ export class PollingProcessor {
       const elapsed = new Date().getTime() - startTime;
       const sleepFor = Math.max(this.options.pollInterval - elapsed, 0);
 
-      setTimeout(() => this.poll(), sleepFor);
+      this.timeout = setTimeout(() => this.poll(), sleepFor);
     };
 
     Promise.all([this.retrieveFlags(), this.retrieveSegments()])
@@ -61,7 +63,14 @@ export class PollingProcessor {
       .catch((error) => {
         this.eventBus.emit(PollerEvent.ERROR, { error });
       })
-      .finally(pollAgain);
+      .finally(() => {
+        // we will check one more time if processor is stopped
+        if (this.stopped) {
+          log.info('PollingProcessor stopped');
+          return;
+        }
+        pollAgain();
+      });
   }
 
   private async retrieveFlags(): Promise<void> {
@@ -120,5 +129,7 @@ export class PollingProcessor {
   close(): void {
     log.info('Closing PollingProcessor');
     this.stop();
+    clearTimeout(this.timeout);
+    log.info('PollingProcessor closed');
   }
 }

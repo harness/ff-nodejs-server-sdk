@@ -133,6 +133,8 @@ export class StreamProcessor {
   }
 
   close(): void {
+    log.info('Closing StreamProcessor');
     this.stop();
+    log.info('StreamProcessor closed');
   }
 }

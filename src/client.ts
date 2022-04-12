@@ -51,6 +51,7 @@ export default class Client {
   private pollerReady = false;
   private streamReady = false;
   private metricReady = false;
+  private closing = false;
 
   constructor(sdkKey: string, options: Options = {}) {
     this.sdkKey = sdkKey;
@@ -113,7 +114,9 @@ export default class Client {
     });
 
     this.eventBus.on(StreamEvent.DISCONNECTED, () => {
-      this.pollProcessor.start();
+      if (!this.closing) {
+        this.pollProcessor.start();
+      }
     });
 
     for (const event of Object.values(RepositoryEvent)) {
@@ -339,6 +342,7 @@ export default class Client {
   }
 
   close(): void {
+    this.closing = true;
     this.pollProcessor.close();
     if (this.streamProcessor) {
       this.streamProcessor.close();
@@ -347,5 +351,6 @@ export default class Client {
       this.metricsProcessor.close();
     }
     this.eventBus.removeAllListeners();
+    this.closing = false;
   }
 }
