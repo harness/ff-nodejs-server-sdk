@@ -3,7 +3,7 @@ import { PollingProcessor } from '../polling';
 
 jest.mock('../openapi/api');
 
-it('check close client', async () => {
+it('should close the client when the close method is called', async () => {
   // given
   const start = jest.spyOn(PollingProcessor.prototype, 'start');
   const close = jest.spyOn(PollingProcessor.prototype, 'close');

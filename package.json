@@ -49,7 +49,7 @@
     "prepare": "npm run build",
     "lint": "eslint ./src --ext .ts,.tsx",
     "format": "prettier --write \"src/**/*.ts\"",
-    "test": "jest --detectOpenHandles",
+    "test": "jest",
     "coverage": "jest --coverage",
     "test:junit": "jest --reporters=default --reporters=jest-junit",
     "test:watch": "jest --watch",
