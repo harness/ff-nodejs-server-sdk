@@ -15,10 +15,10 @@ import {
   MetricsProcessor,
   MetricsProcessorInterface,
 } from './metrics';
+import { ConsoleLog } from './log';
 
 axios.defaults.timeout = 30000;
 axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
-const log = defaultOptions.logger;
 
 enum Processor {
   POLL,
@@ -36,6 +36,7 @@ export default class Client {
   private repository: Repository;
   private api: ClientApi;
   private sdkKey: string;
+  private log: ConsoleLog;
   private authToken: string;
   private environment: string;
   private configuration: Configuration;
@@ -55,11 +56,13 @@ export default class Client {
 
   constructor(sdkKey: string, options: Options = {}) {
     this.sdkKey = sdkKey;
-    if (options.pollInterval < 1000) {
-      options.pollInterval = defaultOptions.pollInterval;
-      log.warn('Polling interval cannot be lower than 1000 ms');
-    }
     this.options = { ...defaultOptions, ...options };
+    this.log = this.options.logger;
+
+    if (options.pollInterval < 1000) {
+      this.options.pollInterval = defaultOptions.pollInterval;
+      this.log.warn('Polling interval cannot be lower than 1000 ms');
+    }
 
     this.configuration = new Configuration({
       basePath: this.options.baseUrl,
@@ -75,7 +78,7 @@ export default class Client {
       this.options.store,
       this.eventBus,
     );
-    this.evaluator = new Evaluator(this.repository);
+    this.evaluator = new Evaluator(this.repository, this.log);
     this.api = new ClientApi(this.configuration);
     this.processEvents();
     this.run();
@@ -203,15 +206,15 @@ export default class Client {
     switch (processor) {
       case Processor.POLL:
         this.pollerReady = true;
-        log.debug('PollingProcessor ready');
+        this.log.debug('PollingProcessor ready');
         break;
       case Processor.STREAM:
         this.streamReady = true;
-        log.debug('StreamingProcessor ready');
+        this.log.debug('StreamingProcessor ready');
         break;
       case Processor.METRICS:
         this.metricReady = true;
-        log.debug('MetricsProcessor ready');
+        this.log.debug('MetricsProcessor ready');
         break;
     }
 
@@ -270,7 +273,7 @@ export default class Client {
       this.metricsProcessor.start();
     }
 
-    log.info('finished setting up processors');
+    this.log.info('finished setting up processors');
   }
 
   boolVariation(

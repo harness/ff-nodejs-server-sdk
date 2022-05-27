@@ -1,5 +1,4 @@
 import {
-  defaultOptions,
   CONTAINS_OPERATOR,
   ENDS_WITH_OPERATOR,
   EQUAL_OPERATOR,
@@ -23,6 +22,7 @@ import {
   VariationMap,
 } from './openapi';
 import murmurhash from 'murmurhash';
+import { ConsoleLog } from './log';
 
 type Callback = (
   fc: FeatureConfig,
@@ -30,13 +30,13 @@ type Callback = (
   variation: Variation,
 ) => void;
 
-const log = defaultOptions.logger;
-
 export class Evaluator {
   private query: Query;
+  private log: ConsoleLog;
 
-  constructor(query: Query) {
+  constructor(query: Query, logger: ConsoleLog) {
     this.query = query;
+    this.log = logger;
   }
 
   private getAttrValue(target: Target, attribute: string): Type | undefined {
@@ -117,7 +117,7 @@ export class Evaluator {
             (value: ApiTarget) => value.identifier === target.identifier,
           )
         ) {
-          log.debug(
+          this.log.debug(
             'Target %s excluded from segment %s via exclude list\n',
             target.name,
             segment.name,
@@ -131,7 +131,7 @@ export class Evaluator {
             (value: ApiTarget) => value.identifier === target.identifier,
           )
         ) {
-          log.debug(
+          this.log.debug(
             'Target %s included in segment %s via include list\n',
             target.name,
             segment.name,
@@ -141,7 +141,7 @@ export class Evaluator {
 
         // Should Target be included via segment rules
         if (segment.rules && this.evaluateClauses(segment.rules, target)) {
-          log.debug(
+          this.log.debug(
             'Target %s included in segment %s via rules\n',
             target.name,
             segment.name,
@@ -298,7 +298,7 @@ export class Evaluator {
     target: Target,
   ): Promise<boolean> {
     if (parent.prerequisites) {
-      log.info(
+      this.log.info(
         'Checking pre requisites %s of parent feature %s',
         parent.prerequisites,
         parent.feature,
@@ -307,7 +307,7 @@ export class Evaluator {
       for (const pqs of parent.prerequisites) {
         const preReqFeatureConfig = await this.query.getFlag(pqs.feature);
         if (!preReqFeatureConfig) {
-          log.warn(
+          this.log.warn(
             'Could not retrieve the pre requisite details of feature flag: %s',
             parent.feature,
           );
@@ -316,7 +316,7 @@ export class Evaluator {
 
         // Pre requisite variation value evaluated below
         const variation = await this.evaluateFlag(preReqFeatureConfig, target);
-        log.info(
+        this.log.info(
           'Pre requisite flag %s has variation %s for target %s',
           preReqFeatureConfig.feature,
           variation,
@@ -325,7 +325,7 @@ export class Evaluator {
 
         // Compare if the pre requisite variation is a possible valid value of
         // the pre requisite FF
-        log.info(
+        this.log.info(
           'Pre requisite flag %s should have the variations %s',
           preReqFeatureConfig.feature,
           pqs.variations,

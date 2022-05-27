@@ -2,9 +2,7 @@ import { ClientApi, FeatureConfig, Segment } from './openapi';
 import { Options } from './types';
 import EventEmitter from 'events';
 import { Repository } from './repository';
-import { defaultOptions } from './constants';
-
-const log = defaultOptions.logger;
+import { ConsoleLog } from './log';
 
 export enum PollerEvent {
   READY = 'poller_ready',
@@ -21,6 +19,7 @@ export class PollingProcessor {
   private initialized = false;
   private eventBus: EventEmitter;
   private timeout: NodeJS.Timeout;
+  private log: ConsoleLog;
 
   constructor(
     environment: string,
@@ -36,11 +35,12 @@ export class PollingProcessor {
     this.cluster = cluster;
     this.repository = repository;
     this.eventBus = eventBus;
+    this.log = options.logger;
   }
 
   private poll() {
     if (this.stopped) {
-      log.info('PollingProcessor stopped');
+      this.log.info('PollingProcessor stopped');
       return;
     }
 
@@ -66,7 +66,7 @@ export class PollingProcessor {
       .finally(() => {
         // we will check one more time if processor is stopped
         if (this.stopped) {
-          log.info('PollingProcessor stopped');
+          this.log.info('PollingProcessor stopped');
           return;
         }
         pollAgain();
@@ -75,45 +75,45 @@ export class PollingProcessor {
 
   private async retrieveFlags(): Promise<void> {
     try {
-      log.debug('Fetching flags started');
+      this.log.debug('Fetching flags started');
       const response = await this.api.getFeatureConfig(
         this.environment,
         this.cluster,
       );
-      log.debug('Fetching flags finished');
+      this.log.debug('Fetching flags finished');
       response.data.forEach((fc: FeatureConfig) =>
         this.repository.setFlag(fc.feature, fc),
       );
     } catch (error) {
-      log.error('Error loading flags', error);
+      this.log.error('Error loading flags', error);
       throw error;
     }
   }
 
   private async retrieveSegments(): Promise<void> {
     try {
-      log.debug('Fetching segments started');
+      this.log.debug('Fetching segments started');
       const response = await this.api.getAllSegments(
         this.environment,
         this.cluster,
       );
-      log.debug('Fetching segments finished');
+      this.log.debug('Fetching segments finished');
       // prepare cache for storing segments
       response.data.forEach((segment: Segment) =>
         this.repository.setSegment(segment.identifier, segment),
       );
     } catch (error) {
-      log.error('Error loading segments', error);
+      this.log.error('Error loading segments', error);
       throw error;
     }
   }
 
   start(): void {
     if (!this.stopped) {
-      log.info('PollingProcessor already started');
+      this.log.info('PollingProcessor already started');
       return;
     }
-    log.info(
+    this.log.info(
       'Starting PollingProcessor with request interval: ',
       this.options.pollInterval,
     );
@@ -122,14 +122,14 @@ export class PollingProcessor {
   }
 
   stop(): void {
-    log.info('Stopping PollingProcessor');
+    this.log.info('Stopping PollingProcessor');
     this.stopped = true;
   }
 
   close(): void {
-    log.info('Closing PollingProcessor');
+    this.log.info('Closing PollingProcessor');
     this.stop();
     clearTimeout(this.timeout);
-    log.info('PollingProcessor closed');
+    this.log.info('PollingProcessor closed');
   }
 }
