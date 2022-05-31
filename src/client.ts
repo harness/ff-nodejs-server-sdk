@@ -15,7 +15,7 @@ import {
   MetricsProcessor,
   MetricsProcessorInterface,
 } from './metrics';
-import { ConsoleLog } from './log';
+import { Logger } from './log';
 
 axios.defaults.timeout = 30000;
 axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
@@ -36,7 +36,7 @@ export default class Client {
   private repository: Repository;
   private api: ClientApi;
   private sdkKey: string;
-  private log: ConsoleLog;
+  private log: Logger;
   private authToken: string;
   private environment: string;
   private configuration: Configuration;
