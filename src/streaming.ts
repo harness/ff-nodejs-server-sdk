@@ -4,9 +4,7 @@ import { AxiosPromise } from 'axios';
 import { ClientApi, FeatureConfig, Segment } from './openapi';
 import { StreamEvent, Options, StreamMsg } from './types';
 import { Repository } from './repository';
-import { defaultOptions } from './constants';
-
-const log = defaultOptions.logger;
+import { ConsoleLog } from './log';
 
 type FetchFunction = (
   identifier: string,
@@ -26,6 +24,7 @@ export class StreamProcessor {
   private api: ClientApi;
   private eventSource: EventSource;
   private repository: Repository;
+  private log: ConsoleLog;
 
   constructor(
     api: ClientApi,
@@ -45,10 +44,11 @@ export class StreamProcessor {
     this.cluster = cluster;
     this.eventBus = eventBus;
     this.repository = repository;
+    this.log = this.options.logger;
   }
 
   start(): void {
-    log.info('Starting StreamProcessor');
+    this.log.info('Starting StreamProcessor');
     const eventSource = new EventSource(
       `${this.options.baseUrl}/stream?cluster=${this.cluster}`,
       {
@@ -60,19 +60,19 @@ export class StreamProcessor {
     );
 
     eventSource.onopen = (event: MessageEvent) => {
-      log.debug('Stream connected', event);
+      this.log.debug('Stream connected', event);
       this.eventBus.emit(StreamEvent.CONNECTED);
     };
 
     eventSource.onerror = (event: MessageEvent) => {
-      log.debug('Stream has issue', event);
+      this.log.debug('Stream has issue', event);
       this.eventBus.emit(StreamEvent.ERROR, event);
     };
 
     eventSource.addEventListener('*', (event: MessageEvent) => {
       const msg: StreamMsg = JSON.parse(event.data);
 
-      log.debug('Received event from stream: ', msg);
+      this.log.debug('Received event from stream: ', msg);
 
       if (msg.domain === 'flag') {
         this.msgProcessor(
@@ -101,7 +101,7 @@ export class StreamProcessor {
     setFn: (identifier: string, data: FeatureConfig | Segment) => void,
     delFn: (identifier: string) => void,
   ): Promise<void> {
-    log.info('Processing message', msg);
+    this.log.info('Processing message', msg);
     try {
       const response = await fn(msg.identifier, this.environment, this.cluster);
       const data: FeatureConfig | Segment = response.data;
@@ -111,14 +111,14 @@ export class StreamProcessor {
         delFn(msg.identifier);
       }
     } catch (error) {
-      log.error(
+      this.log.error(
         'Error while fetching data with identifier:',
         msg.identifier,
         error,
       );
       throw error;
     }
-    log.info('Processing message finished', msg);
+    this.log.info('Processing message finished', msg);
     return;
   }
 
@@ -127,14 +127,14 @@ export class StreamProcessor {
   }
 
   stop(): void {
-    log.info('Stopping StreamProcessor');
+    this.log.info('Stopping StreamProcessor');
     this.eventSource.close();
     this.eventBus.emit(StreamEvent.DISCONNECTED);
   }
 
   close(): void {
-    log.info('Closing StreamProcessor');
+    this.log.info('Closing StreamProcessor');
     this.stop();
-    log.info('StreamProcessor closed');
+    this.log.info('StreamProcessor closed');
   }
 }

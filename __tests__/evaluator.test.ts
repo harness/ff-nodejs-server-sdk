@@ -6,6 +6,7 @@ import { StorageRepository } from '../src/repository';
 import { FeatureConfig, FeatureConfigKindEnum, Segment } from '../src/openapi';
 import { Evaluator } from '../src/evaluator';
 import { Target } from '../src/types';
+import { defaultOptions } from '../src/constants';
 
 const directory = path.join(__dirname, 'ff-test-cases/tests');
 
@@ -18,7 +19,7 @@ interface Usecase {
 
 const cache = new SimpleCache();
 const repository = new StorageRepository(cache);
-const evaluator = new Evaluator(repository);
+const evaluator = new Evaluator(repository, defaultOptions.logger);
 
 const results = [];
 let files = [];

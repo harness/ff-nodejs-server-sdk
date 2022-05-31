@@ -1,6 +1,5 @@
 import * as events from 'events';
 import {
-  defaultOptions,
   FEATURE_IDENTIFIER_ATTRIBUTE,
   FEATURE_NAME_ATTRIBUTE,
   GLOBAL_TARGET,
@@ -25,8 +24,6 @@ import {
 } from './openapi';
 import { Options, Target } from './types';
 import { VERSION } from './version';
-
-const log = defaultOptions.logger;
 
 export enum MetricEvent {
   READY = 'metrics_ready',
@@ -65,6 +62,7 @@ export const MetricsProcessor = (
     basePath: options.eventsUrl,
   });
   const api = new MetricsApi(configuration);
+  const log = options.logger;
 
   const enqueue = (
     target: Target,
