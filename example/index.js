@@ -1,4 +1,4 @@
-import 'dotenv/config';
+require('dotenv').config();
 const { Client } = require('@harnessio/ff-nodejs-server-sdk');
 
 const client = new Client(process.env.SDK_KEY);
