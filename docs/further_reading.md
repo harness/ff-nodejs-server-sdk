@@ -16,7 +16,7 @@ const client = new Client(apiKey, options);
 | Name      | Description | default |
 | ----------- | ----------- |---------
 | baseUrl     | the URL used to fetch feature flag evaluations. You should change this when using the Feature Flag proxy to http://localhost:7000| https://config.ff.harness.io/api/1.0 |
-| eventsUrl   | the URL used to post metrics data to the feature flag service. YOu should change this when using the Feature Flag proxy to http://localhost:7000      | https://events.ff.harness.io/api/1.0 |
+| eventsUrl   | the URL used to post metrics data to the feature flag service. You should change this when using the Feature Flag proxy to http://localhost:7000      | https://events.ff.harness.io/api/1.0 |
 | pollInterval   | when running in stream mode, the interval in seconds that we poll for changes.        | 60 |
 | enableStream   | Enable streaming mode.        | true |
 | enableAnalytics   | Enable analytics.  Metrics data is posted every 60s        | true |
