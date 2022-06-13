@@ -1,206 +1,131 @@
-# Harness Feature Flags Server SDK for NodeJS
+Harness Feature Flags NodeJS SDK
+========================
 
 [![TypeScript version][ts-badge]][typescript-4-3]
 [![Node.js version][nodejs-badge]][nodejs]
 [![APLv2][license-badge]][license]
 
-# Before you begin
+
+## Table of Contents
+**[Intro](#Intro)**<br>
+**[Requirements](#Requirements)**<br>
+**[Quickstart](#Quickstart)**<br>
+**[Further Reading](docs/further_reading.md)**<br>
+**[Build Instructions](docs/build.md)**<br>
+
+## Intro
 
 Harness Feature Flags (FF) is a feature management solution that enables users to change the software’s functionality, without deploying new code. FF uses feature flags to hide code or behaviours without having to ship new versions of the software. A feature flag is like a powerful if statement.
+* For more information, see https://harness.io/products/feature-flags/
+* To read more, see https://ngdocs.harness.io/category/vjolt35atg-feature-flags
+* To sign up, https://app.harness.io/auth/#/signup/
 
-For more information, see https://harness.io/products/feature-flags/
+![FeatureFlags](https://github.com/harness/ff-python-server-sdk/raw/main/docs/images/ff-gui.png)
 
-To read more, see https://ngdocs.harness.io/category/vjolt35atg-feature-flags
+## Requirements
+[NodeJS](https://nodejs.org/en/download/) >= 12 <br>
 
-To sign up, https://app.harness.io/auth/#/signup/
+## Quickstart
+The Feature Flag SDK provides a client that connects to the feature flag service, and fetches the value
+of featue flags.   The following section provides an example of how to install the SDK and initalize it from
+an application.
+This quickstart assumes you have followed the instructions to [setup a Feature Flag project and have created a flag called `harnessappdemodarkmode` and created a server API Key](https://ngdocs.harness.io/article/1j7pdkqh7j-create-a-feature-flag#step_1_create_a_project).
 
-## Getting started
 
-### Setup
 
-```shell
+### Install the SDK
+```bash
 npm install @harnessio/ff-nodejs-server-sdk
 ```
 
-### Import the package (CommonJS)
+### A Simple Example
+Here is a complete example that will connect to the feature flag service and report the flag value every 10 seconds until the connection is closed.
+Any time a flag is toggled from the feature flag service you will receive the updated value.
 
 ```javascript
-const { Client } = require('@harnessio/ff-nodejs-server-sdk');
-```
+const { Client, Event } = require('@harnessio/ff-nodejs-server-sdk');
 
-### Import the package (ES modules)
+// set apiKey to the SDK API Key
+const apiKey = (process.env['FF_API_KEY']) ? process.env['FF_API_KEY'] : '';
 
-```typescript
-import { Client } from '@harnessio/ff-nodejs-server-sdk';
-```
+// set flagName to the flag identifier from the UI
+const flagName = (process.env['FF_FLAG_NAME']) ? process.env['FF_FLAG_NAME'] : 'harnessappdemodarkmode';
 
-### Initialize
+console.log('Harness SDK Getting Started');
 
-This is the most simple way to initialize SDK using only a server type key
+// Create Client
+const client = new Client(apiKey);
 
-```
-const client = new Client('your server type SDK key');
-```
-
-Advanced initialization can be done using options
-
-```typescript
-const client = new Client('your server type SDK key', {
-  enableStream: false,
-});
-```
-
-### Define a target
-
-```
+// Create a target (different targets can get different results based on rules.
+// This include a custom attribute 'location')
 const target = {
-  identifier: 'harness',
-  name: 'Harness',
-  attributes: {}
+  identifier: 'nodeserversdk',
+  name: 'NodeServerSDK',
+  attributes: {
+    "location": "emea"
+  }
 };
-```
 
-### Evaluate the flag with default value set to false
-
-```typescript
-const value = await client.boolVariation('test', target, false);
-```
-
-### Shutting down SDK
-
-```
-client.close();
-```
-
-### Available public methods
-
-```typescript
-function boolVariation(
-  identifier: string,
-  target: Target,
-  defaultValue: boolean = true,
-): Promise<boolean>;
-function stringVariation(
-  identifier: string,
-  target: Target,
-  defaultValue: boolean = '',
-): Promise<string>;
-function numberVariation(
-  identifier: string,
-  target: Target,
-  defaultValue: boolean = 1.0,
-): Promise<number>;
-function jsonVariation(
-  identifier: string,
-  target: Target,
-  defaultValue: boolean = {},
-): Promise<Record<string, unknown>>;
-function close(): void;
-```
-
-### Available options
-
-```
-baseUrl: string;             // baseUrl is where the flag configurations are located
-eventsUrl: string;           // eventsUrl is where we send summarized target events
-pollInterval: number;        // pollInterval (default 60s)
-eventsSyncInterval: number;  // Metrics push event (default 60s)
-enableStream: boolean;       // enable server sent events
-enableAnalytics: boolean;    // enable analytics
-cache: KeyValueStore;        // set custom cache (default lru cache)
-store: AsyncKeyValueStore;   // set custom persistent store (default file store)
-logger: Logger;              // set logger (default console)
-```
-
-## Singleton example
-
-```
-import CfClient from '@harnessio/ff-nodejs-server-sdk';
-
-CfClient.init('your server type SDK key');
-
-const FLAG_KEY = 'test_bool';
-const target = {
-  identifier: 'harness',
-  name: 'Harness',
-  attributes: {}
-};
-const defaultValue = false;
-
-setInterval(async() => {
-    const value = await CfClient.boolVariation(FLAG_KEY, target, defaultValue);
-    console.log("Evaluation for flag test and target none: ", value);
-}, 10000);
-```
-
-## Wait for initialization example
-
-```
-const { Client } = require('@harnessio/ff-nodejs-server-sdk');
-
-console.log('Starting application');
-const client = new Client('1c100d25-4c3f-487b-b198-3b3d01df5794');
 client
   .waitForInitialization()
   .then(() => {
+    // Loop forever reporting the state of the flag
     setInterval(async () => {
-      const target = {
-        identifier: 'harness',
-      };
-      const value = await client.boolVariation('test', target, false);
-      console.log('Evaluation for flag test and target: ', value, target);
+      const value = await client.boolVariation(flagName, target, false);
+      console.log('Flag variation: ', value);
     }, 10000);
 
-    console.log('Application started');
+
+    // We can also watch for event, when a flag changes.
+    client.on(Event.CHANGED, (flagIdentifier) => {
+      console.log('Flag changed',flagIdentifier);
+    });
+
   })
   .catch((error) => {
     console.log('Error', error);
   });
-```
 
-## Listening on events
-
-You can listen on these events:
-
-- `Event.READY` - SDK successfully initialized
-- `Event.FAILED` - SDK throws an error
-- `Event.CHANGED` - any new version of flag or segment triggers this event, if segment is changed then it will find all flags with segment match operator
-
-Methods:
-
-```typescript
-on(Event.READY, () => {
-  console.log('READY');
-});
-
-on(Event.FAILED, () => {
-  console.log('FAILED');
-});
-
-on(Event.CHANGED, (identifier) => {
-  console.log('Changed', identifier);
+process.on('SIGINT', function () {
+  console.log('Got SIGINT.  Press Control-D to exit.');
+  client.close()
 });
 ```
 
-and if you want to remove the `functionReference` listener for `Event.READY`:
+### Running the example
 
-```
-off(Event.READY, functionReference);
-```
+```bash
+export FF_API_KEY=<your key here>
+cd examples/getting_started
 
-or if you want to remove all listeners on `Event.READY`:
-
-```
-off(Event.READY);
+npm install 
+node examples/getting_started/index.js
 ```
 
-or if you call `off()` without params it will close the client.
+### Running with docker
+If you don't have the right version of python installed locally, or don't want to install the dependencies you can
+use docker to get started quickly.
 
-> All events are applicable to off() function.
+```bash
+# Install the package
+docker run -v $(pwd)/examples/getting_started:/app -w /app node:lts-alpine npm install
 
-## License
+# Run the script
+docker run -e FF_API_KEY=$FF_API_KEY -v $(pwd)/examples/getting_started:/app -w /app node:lts-alpine node index.js
+```
 
-Licensed under the APLv2.
+### Additional Reading
+
+Further examples and config options are in the further reading section:
+
+[Further Reading](docs/further_reading.md)
+
+
+-------------------------
+[Harness](https://www.harness.io/) is a feature management platform that helps teams to build better software and to
+test features quicker.
+
+-------------------------
 
 [ts-badge]: https://img.shields.io/badge/TypeScript-4.3-blue.svg
 [nodejs-badge]: https://img.shields.io/badge/Node.js->=%2012-blue.svg

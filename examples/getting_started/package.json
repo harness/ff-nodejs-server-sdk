@@ -1,0 +1,9 @@
+{
+  "name": "getting_started",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "@harnessio/ff-nodejs-server-sdk": "^1.2.2",
+    "dotenv": "^16.0.0"
+  }
+}
