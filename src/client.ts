@@ -59,9 +59,14 @@ export default class Client {
     this.options = { ...defaultOptions, ...options };
     this.log = this.options.logger;
 
-    if (options.pollInterval < 1000) {
+    if (options.pollInterval < defaultOptions.pollInterval) {
       this.options.pollInterval = defaultOptions.pollInterval;
-      this.log.warn('Polling interval cannot be lower than 1000 ms');
+      this.log.warn(`Polling interval cannot be lower than ${defaultOptions.pollInterval} ms`);
+    }
+
+    if (options.eventsSyncInterval < defaultOptions.eventsSyncInterval) {
+      this.options.eventsSyncInterval = defaultOptions.eventsSyncInterval;
+      this.log.warn(`Events sync interval cannot be lower than ${defaultOptions.eventsSyncInterval} ms`);
     }
 
     this.configuration = new Configuration({
