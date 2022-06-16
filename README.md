@@ -20,7 +20,7 @@ Harness Feature Flags (FF) is a feature management solution that enables users t
 * To read more, see https://ngdocs.harness.io/category/vjolt35atg-feature-flags
 * To sign up, https://app.harness.io/auth/#/signup/
 
-![FeatureFlags](https://github.com/harness/ff-python-server-sdk/raw/main/docs/images/ff-gui.png)
+![FeatureFlags](https://github.com/harness/ff-nodejs-server-sdk/raw/main/docs/images/ff-gui.png)
 
 ## Requirements
 [NodeJS](https://nodejs.org/en/download/) >= 12 <br>
@@ -103,7 +103,7 @@ node examples/getting_started/index.js
 ```
 
 ### Running with docker
-If you don't have the right version of python installed locally, or don't want to install the dependencies you can
+If you don't have the right version of nodejs installed locally, or don't want to install the dependencies you can
 use docker to get started quickly.
 
 ```bash
