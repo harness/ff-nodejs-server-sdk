@@ -19,7 +19,7 @@ To use this SDK, make sure you’ve:
 To follow along with our test code sample, make sure you’ve:
 
 - [Created a Feature Flag on the Harness Platform](https://ngdocs.harness.io/article/1j7pdkqh7j-create-a-feature-flag) called `harnessappdemodarkmode`
-- [Created a [server/client] SDK key](https://ngdocs.harness.io/article/1j7pdkqh7j-create-a-feature-flag#step_3_create_an_sdk_key) and made a copy of it
+- [Created a server SDK key](https://ngdocs.harness.io/article/1j7pdkqh7j-create-a-feature-flag#step_3_create_an_sdk_key) and made a copy of it
 
 ## Installing the SDK
 
