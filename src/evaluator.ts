@@ -140,7 +140,10 @@ export class Evaluator {
         }
 
         // Should Target be included via segment rules
-        if (segment.rules && this.evaluateClauses(segment.rules, target)) {
+        if (
+          segment.rules &&
+          (await this.evaluateClauses(segment.rules, target))
+        ) {
           this.log.debug(
             'Target %s included in segment %s via rules\n',
             target.name,
@@ -190,7 +193,10 @@ export class Evaluator {
       case CONTAINS_OPERATOR:
         return targetAttribute.includes(value);
       case SEGMENT_MATCH_OPERATOR:
-        return this.isTargetIncludedOrExcludedInSegment(clause.values, target);
+        return await this.isTargetIncludedOrExcludedInSegment(
+          clause.values,
+          target,
+        );
     }
     return false;
   }
