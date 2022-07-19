@@ -8,7 +8,7 @@ Use this README to get started with our Feature Flags (FF) SDK for Node.js. This
 started with the SDK and provides a full code sample for you to try out.
 
 This sample doesn't include configuration options, for in depth steps and configuring the SDK, for example, disabling
-streaming or using our Relay Proxy, see the [Node.js SDK Reference](https://ngdocs.harness.io/article/3v7fclfg59-node-js-sdk-reference).
+streaming or using our Relay Proxy, see the [Node.js SDK Reference](https://docs.harness.io/article/3v7fclfg59-node-js-sdk-reference).
 
 ## Requirements
 
@@ -18,8 +18,8 @@ To use this SDK, make sure you’ve:
 
 To follow along with our test code sample, make sure you’ve:
 
-- [Created a Feature Flag on the Harness Platform](https://ngdocs.harness.io/article/1j7pdkqh7j-create-a-feature-flag) called `harnessappdemodarkmode`
-- [Created a server SDK key](https://ngdocs.harness.io/article/1j7pdkqh7j-create-a-feature-flag#step_3_create_an_sdk_key) and made a copy of it
+- [Created a Feature Flag on the Harness Platform](https://docs.harness.io/article/1j7pdkqh7j-create-a-feature-flag) called `harnessappdemodarkmode`
+- [Created a server SDK key](https://docs.harness.io/article/1j7pdkqh7j-create-a-feature-flag#step_3_create_an_sdk_key) and made a copy of it
 
 ## Installing the SDK
 
@@ -101,8 +101,8 @@ When you're finished you can exit the example by stopping the process using <kbd
 
 ## Additional Reading
 
-For further examples and config options, see the [Node.js SDK Reference](https://ngdocs.harness.io/article/3v7fclfg59-node-js-sdk-reference) and the [test Node.js project](https://github.com/drone/ff-nodejs-server-sdk).
-For more information about Feature Flags, see our [Feature Flags documentation](https://ngdocs.harness.io/article/0a2u2ppp8s-getting-started-with-feature-flags).
+For further examples and config options, see the [Node.js SDK Reference](https://docs.harness.io/article/3v7fclfg59-node-js-sdk-reference) and the [test Node.js project](https://github.com/drone/ff-nodejs-server-sdk).
+For more information about Feature Flags, see our [Feature Flags documentation](https://docs.harness.io/article/0a2u2ppp8s-getting-started-with-feature-flags).
 
 [ts-badge]: https://img.shields.io/badge/TypeScript-4.3-blue.svg
 [nodejs-badge]: https://img.shields.io/badge/Node.js->=%2012-blue.svg

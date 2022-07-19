@@ -12,7 +12,7 @@
   "engines": {
     "node": ">= 12"
   },
-  "homepage": "https://ngdocs.harness.io/category/vjolt35atg-feature-flags",
+  "homepage": "https://docs.harness.io/category/vjolt35atg-feature-flags",
   "bugs": {
     "url": "https://github.com/drone/ff-nodejs-server-sdk/issues"
   },
