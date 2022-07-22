@@ -12,9 +12,9 @@
   "engines": {
     "node": ">= 12"
   },
-  "homepage": "https://ngdocs.harness.io/category/vjolt35atg-feature-flags",
+  "homepage": "https://docs.harness.io/category/vjolt35atg-feature-flags",
   "bugs": {
-    "url": "https://github.com/drone/ff-nodejs-server-sdk/issues"
+    "url": "https://github.com/harness/ff-nodejs-server-sdk/issues"
   },
   "devDependencies": {
     "@openapitools/openapi-generator-cli": "^2.4.12",
@@ -59,7 +59,7 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/drone/ff-nodejs-server-sdk"
+    "url": "https://github.com/harness/ff-nodejs-server-sdk"
   },
   "dependencies": {
     "axios": "^0.22.0",
