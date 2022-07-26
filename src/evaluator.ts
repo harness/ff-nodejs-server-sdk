@@ -254,10 +254,10 @@ export class Evaluator {
     return undefined;
   }
 
-  private evaluateVariationMap(
+  private async evaluateVariationMap(
     variationToTargetMap: VariationMap[],
     target: Target,
-  ): string | undefined {
+  ): Promise<string | undefined> {
     if (!target || !variationToTargetMap) {
       return undefined;
     }
@@ -275,7 +275,10 @@ export class Evaluator {
       const segmentIdentifiers = variationMap.targetSegments;
       if (
         segmentIdentifiers &&
-        this.isTargetIncludedOrExcludedInSegment(segmentIdentifiers, target)
+        (await this.isTargetIncludedOrExcludedInSegment(
+          segmentIdentifiers,
+          target,
+        ))
       ) {
         return variationMap.variation;
       }
@@ -291,7 +294,7 @@ export class Evaluator {
     let variation = fc.offVariation;
     if (fc.state === FeatureState.On) {
       variation =
-        this.evaluateVariationMap(fc.variationToTargetMap, target) ||
+        (await this.evaluateVariationMap(fc.variationToTargetMap, target)) ||
         (await this.evaluateRules(fc.rules, target)) ||
         this.evaluateDistribution(fc.defaultServe.distribution, target) ||
         fc.defaultServe.variation;
