@@ -2,6 +2,7 @@ import 'dotenv/config';
 import CfClient from '@harnessio/ff-nodejs-server-sdk';
 
 CfClient.init(process.env.SDK_KEY);
+CfClient.waitForInitialization();
 
 process
   .on('SIGTERM', shutdown('SIGTERM'))
@@ -9,8 +10,17 @@ process
   .on('uncaughtException', shutdown('uncaughtException'));
 
 setInterval(async () => {
-  const value = await CfClient.boolVariation('test', null, false);
-  console.log('Evaluation for flag test and target none: ', value);
+  const value = await CfClient.boolVariation(
+    'boolEnabled',
+    {
+      identifier: 'boolEnabledDefault',
+    },
+    false,
+  );
+  console.log(
+    'Evaluation for flag test and target boolEnabledDefault: ',
+    value,
+  );
 }, 10000);
 
 function shutdown(signal) {
