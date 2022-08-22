@@ -206,13 +206,13 @@ export class Evaluator {
     target: Target,
   ): Promise<boolean> {
     for (const clause of clauses) {
-      if (!(await this.evaluateClause(clause, target))) {
-        // some clause condition not met return false
-        return false;
+      if ((await this.evaluateClause(clause, target))) {
+        // If any clause returns true we return - rules being treated as OR rather than AND
+        return true;
       }
     }
-    // all clauses conditions passed so return true
-    return true;
+    // all clauses conditions failed so return false
+    return false;
   }
 
   private evaluateRule(rule: ServingRule, target: Target): Promise<boolean> {
