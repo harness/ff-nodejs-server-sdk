@@ -103,9 +103,12 @@ export class StreamProcessor {
   ): Promise<void> {
     this.log.info('Processing message', msg);
     try {
-      const response = await fn(msg.identifier, this.environment, this.cluster);
-      const data: FeatureConfig | Segment = response.data;
       if (msg.event === 'create' || msg.event === 'patch') {
+        const { data } = await fn(
+          msg.identifier,
+          this.environment,
+          this.cluster,
+        );
         setFn(msg.identifier, data);
       } else if (msg.event === 'delete') {
         delFn(msg.identifier);
