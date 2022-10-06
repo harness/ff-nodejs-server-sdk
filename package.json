@@ -64,7 +64,7 @@
   "dependencies": {
     "axios": "^0.22.0",
     "axios-retry": "^3.2.0",
-    "eventsource": "^1.1.0",
+    "eventsource": "^1.1.2",
     "jwt-decode": "^3.1.2",
     "keyv": "^4.0.3",
     "keyv-file": "^0.2.0",
