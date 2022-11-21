@@ -10,21 +10,43 @@ import { defaultOptions } from '../src/constants';
 
 const directory = path.join(__dirname, 'ff-test-cases/tests');
 
-interface Usecase {
-  flag: FeatureConfig;
+interface Fixture {
+  flags: FeatureConfig[];
   segments: Segment[];
   targets: Target[];
-  expected: Record<string, unknown>;
+  tests: Test[];
+}
+
+interface Test {
+  flag: string;
+  expected: string;
+  target: string;
 }
 
 const cache = new SimpleCache();
 const repository = new StorageRepository(cache);
 const evaluator = new Evaluator(repository, defaultOptions.logger);
 
-const results = [];
+const testCases = [];
 let files = [];
 try {
-  files = fs.readdirSync(directory);
+  const walk = function(dir) {
+    let results = [];
+    const list = fs.readdirSync(dir);
+    list.forEach(function(file) {
+      file = dir + '/' + file;
+      const stat = fs.statSync(file);
+      if (stat && stat.isDirectory()) {
+        /* Recurse into a subdirectory */
+        results = results.concat(walk(file));
+      } else {
+        /* Is a file */
+        results.push(file);
+      }
+    });
+    return results;
+  };
+  files = walk(directory)
 } catch (err) {
   if (err) {
     throw new Error('Unable to scan directory: ' + err);
@@ -33,19 +55,40 @@ try {
 
 for (const file of files) {
   try {
-    const data = fs.readFileSync(path.join(directory, file), 'utf8');
-    const usecase = JSON.parse(data) as Usecase;
-    usecase.flag.feature += file;
-    repository.setFlag(usecase.flag.feature, usecase.flag);
+    const data = fs.readFileSync(file, 'utf8');
+    const fixture = JSON.parse(data) as Fixture;
 
-    usecase.segments?.forEach((segment: Segment) =>
+    // Store all the flags for the test in the repo
+    fixture.flags?.forEach((flag: FeatureConfig) =>
+      repository.setFlag(flag.feature, flag),
+    );
+
+    // Store all segments for the test in the repo
+    fixture.segments?.forEach((segment: Segment) =>
       repository.setSegment(segment.identifier, segment),
     );
 
-    Object.entries(usecase.expected).forEach(([targetIdentifier, value]) => {
-      const result = [file, targetIdentifier, value, usecase];
-      results.push(result);
+
+    fixture.tests?.forEach((tc: Test) => {
+      // Get the flag for this test
+      const fc = fixture.flags?.find(
+        (item) => item.feature === tc.flag,
+      );
+
+      let target: Target;
+      if (tc.target === '_no_target') {
+        target = undefined;
+      } else {
+        target = fixture.targets.find(
+          (item) => item.identifier === tc.target,
+        );
+      }
+
+      const result = [file.replace(directory, ""), target, tc.expected, fc];
+      testCases.push(result);
     });
+
+
   } catch (err) {
     if (err) {
       throw err;
@@ -54,54 +97,49 @@ for (const file of files) {
 }
 
 describe('evaluation flag', () => {
-  test.each(results)(
+  test.each(testCases)(
     `Usecase %p with target %p and expected value %p`,
     async (
       _file: string,
-      targetIdentifier: string,
-      expected: unknown,
-      usecase: Usecase,
+      target: Target,
+      expected: string,
+      flag: FeatureConfig
     ) => {
-      let target: Target;
-      if (targetIdentifier === '_no_target') {
-        target = undefined;
-      } else {
-        target = usecase.targets.find(
-          (item) => item.identifier === targetIdentifier,
-        );
-      }
+
       let received: unknown;
-      switch (usecase.flag.kind) {
+      switch (flag?.kind) {
         case FeatureConfigKindEnum.Boolean:
           received = await evaluator.boolVariation(
-            usecase.flag.feature,
+            flag.feature,
             target,
             false,
           );
           break;
         case FeatureConfigKindEnum.String:
           received = await evaluator.stringVariation(
-            usecase.flag.feature,
+            flag.feature,
             target,
             '',
           );
           break;
         case FeatureConfigKindEnum.Int:
           received = await evaluator.numberVariation(
-            usecase.flag.feature,
+            flag.feature,
             target,
             0,
           );
           break;
         case FeatureConfigKindEnum.Json:
           received = await evaluator.jsonVariation(
-            usecase.flag.feature,
+            flag.feature,
             target,
             {},
           );
+          // parse the expected JSON string to JSON
+          expected = JSON.parse(expected)
           break;
       }
-      expect(received).toBe(expected);
+      expect(received).toStrictEqual(expected);
     },
   );
 });

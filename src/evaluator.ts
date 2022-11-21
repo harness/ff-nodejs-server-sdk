@@ -113,7 +113,7 @@ export class Evaluator {
       if (segment) {
         // Should Target be excluded - if in excluded list we return false
         if (
-          segment.excluded.find(
+          segment.excluded?.find(
             (value: ApiTarget) => value.identifier === target.identifier,
           )
         ) {
@@ -127,7 +127,7 @@ export class Evaluator {
 
         // Should Target be included - if in included list we return true
         if (
-          segment.included.find(
+          segment.included?.find(
             (value: ApiTarget) => value.identifier === target.identifier,
           )
         ) {
