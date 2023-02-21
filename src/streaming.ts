@@ -64,6 +64,11 @@ export class StreamProcessor {
       this.eventBus.emit(StreamEvent.CONNECTED);
     };
 
+    eventSource.onretrying = (event: MessageEvent) => {
+      this.log.debug('Stream is trying to reconnect', event);
+      this.eventBus.emit(StreamEvent.ERROR, event);
+    };
+
     eventSource.onerror = (event: MessageEvent) => {
       this.log.debug('Stream has issue', event);
       this.eventBus.emit(StreamEvent.ERROR, event);

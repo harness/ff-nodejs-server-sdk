@@ -127,6 +127,12 @@ export default class Client {
       }
     });
 
+    this.eventBus.on(StreamEvent.RETRYING, () => {
+      if (!this.closing) {
+        this.pollProcessor.start();
+      }
+    });
+
     for (const event of Object.values(RepositoryEvent)) {
       this.eventBus.on(event, (identifier) => {
         switch (event) {
