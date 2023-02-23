@@ -39,7 +39,6 @@ export enum StreamEvent {
   DISCONNECTED = 'stream_disconnected',
   CHANGED = 'stream_changed',
   ERROR = 'stream_error',
-  RETRYING = 'stream_retrying',
 }
 
 export interface Operator {

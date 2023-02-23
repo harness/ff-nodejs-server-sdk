@@ -105,6 +105,10 @@ export default class Client {
 
     this.eventBus.on(StreamEvent.ERROR, () => {
       this.failure = true;
+      this.log.debug('Issue with streaming: falling back to polling');
+      if (!this.closing) {
+        this.pollProcessor.start();
+      }
       this.eventBus.emit(Event.FAILED);
     });
 
@@ -122,12 +126,6 @@ export default class Client {
     });
 
     this.eventBus.on(StreamEvent.DISCONNECTED, () => {
-      if (!this.closing) {
-        this.pollProcessor.start();
-      }
-    });
-
-    this.eventBus.on(StreamEvent.RETRYING, () => {
       if (!this.closing) {
         this.pollProcessor.start();
       }

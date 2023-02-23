@@ -65,12 +65,13 @@ export class StreamProcessor {
     };
 
     eventSource.onretrying = (event: MessageEvent) => {
-      this.log.debug('Stream is trying to reconnect', event);
-      this.eventBus.emit(StreamEvent.ERROR, event);
+      // We just log the event. We don't need to emit it
+      // to the SDK as the onerror event handles the polling fallback.
+      this.log.error('Stream is trying to reconnect', event);
     };
 
     eventSource.onerror = (event: MessageEvent) => {
-      this.log.debug('Stream has issue', event);
+      this.log.error('Stream has issue', event);
       this.eventBus.emit(StreamEvent.ERROR, event);
     };
 
