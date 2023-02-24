@@ -1,4 +1,4 @@
-import EventSource from 'eventsource';
+import EventSource from '@harnessio/eventsource'
 import EventEmitter from 'events';
 import { AxiosPromise } from 'axios';
 import { ClientApi, FeatureConfig, Segment } from './openapi';
@@ -64,8 +64,14 @@ export class StreamProcessor {
       this.eventBus.emit(StreamEvent.CONNECTED);
     };
 
+    eventSource.onretrying = (event: MessageEvent) => {
+      // We just log the event. We don't need to emit it
+      // to the SDK as the onerror event handles the polling fallback.
+      this.log.error('Stream is trying to reconnect', event);
+    };
+
     eventSource.onerror = (event: MessageEvent) => {
-      this.log.debug('Stream has issue', event);
+      this.log.error('Stream has issue', event);
       this.eventBus.emit(StreamEvent.ERROR, event);
     };
 

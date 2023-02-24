@@ -3,7 +3,7 @@ const { Client, Event } = require('@harnessio/ff-nodejs-server-sdk');
 (async () => {
   // set apiKey to your SDK API Key
   const apiKey =
-    process.env['FF_API_KEY'] ?? 'cffc3f1d-6ea9-4017-9455-dda84964cfb5';
+    process.env['FF_API_KEY'] ?? 'YOUR_API_KEY';
 
   // set flagName to your flag identifier from the UI
   const flagName = process.env['FF_FLAG_NAME'] ?? 'harnessappdemodarkmode';
