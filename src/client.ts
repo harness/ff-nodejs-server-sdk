@@ -105,7 +105,7 @@ export default class Client {
 
     this.eventBus.on(StreamEvent.ERROR, () => {
       this.failure = true;
-      this.log.debug('Issue with streaming: falling back to polling');
+      this.log.error('Issue with streaming: falling back to polling');
       if (!this.closing) {
         this.pollProcessor.start();
       }
