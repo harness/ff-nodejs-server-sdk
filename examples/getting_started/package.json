@@ -3,6 +3,6 @@
   "version": "1.0.0",
   "main": "index.js",
   "dependencies": {
-    "@harnessio/ff-nodejs-server-sdk": "file:../.."
+    "@harnessio/ff-nodejs-server-sdk": "1.2.11"
   }
 }
