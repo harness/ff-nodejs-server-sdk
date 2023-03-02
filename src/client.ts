@@ -105,7 +105,7 @@ export default class Client {
 
     this.eventBus.on(StreamEvent.RETRYING, () => {
       this.failure = true;
-      this.log.error('Issue with streaming: falling back to polling');
+      this.log.error('Issue with streaming: falling back to polling while the SDK attempts to reconnect');
       if (!this.closing) {
         this.pollProcessor.start();
       }
