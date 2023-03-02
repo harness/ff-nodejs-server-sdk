@@ -36,6 +36,7 @@ export interface StreamMsg {
 export enum StreamEvent {
   READY = 'stream_ready',
   CONNECTED = 'stream_connected',
+  RETRYING = 'stream_retrying',
   DISCONNECTED = 'stream_disconnected',
   CHANGED = 'stream_changed',
   ERROR = 'stream_error',

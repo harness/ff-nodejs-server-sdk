@@ -25,6 +25,7 @@ export class StreamProcessor {
   private eventSource: EventSource;
   private repository: Repository;
   private log: ConsoleLog;
+  private isRetrying: boolean
 
   constructor(
     api: ClientApi,
@@ -62,16 +63,21 @@ export class StreamProcessor {
     eventSource.onopen = (event: MessageEvent) => {
       this.log.debug('Stream connected', event);
       this.eventBus.emit(StreamEvent.CONNECTED);
+      // In case we've had to retry, set it back to false.
+      this.isRetrying = false
     };
 
     eventSource.onretrying = (event: MessageEvent) => {
-      // We just log the event. We don't need to emit it
-      // to the SDK as the onerror event handles the polling fallback.
       this.log.error('Stream is trying to reconnect', event);
+      // Only inform the client once that we're retrying once per retrying
+      if (!this.isRetrying) {
+        this.isRetrying = true
+        this.eventBus.emit(StreamEvent.RETRYING);
+      }
     };
 
     eventSource.onerror = (event: MessageEvent) => {
-      this.log.error('Stream has issue', event);
+      this.log.error('Unrecoverable error with stream, not retrying to connect: ', event);
       this.eventBus.emit(StreamEvent.ERROR, event);
     };
 

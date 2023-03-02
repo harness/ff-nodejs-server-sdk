@@ -103,9 +103,17 @@ export default class Client {
       this.initialize(Processor.STREAM);
     });
 
-    this.eventBus.on(StreamEvent.ERROR, () => {
+    this.eventBus.on(StreamEvent.RETRYING, () => {
       this.failure = true;
       this.log.error('Issue with streaming: falling back to polling');
+      if (!this.closing) {
+        this.pollProcessor.start();
+      }
+    });
+
+    this.eventBus.on(StreamEvent.ERROR, () => {
+      this.failure = true;
+      this.log.error('Unrecoverable issue with streaming: falling back to polling');
       if (!this.closing) {
         this.pollProcessor.start();
       }
