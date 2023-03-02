@@ -63,13 +63,13 @@ export class StreamProcessor {
     eventSource.onopen = (event: MessageEvent) => {
       this.log.debug('Stream connected', event);
       this.eventBus.emit(StreamEvent.CONNECTED);
-      // In case we've had to retry, set it back to false.
+      // In case we've had to retry, set it back to false
       this.isRetrying = false
     };
 
     eventSource.onretrying = (event: MessageEvent) => {
       this.log.error('Stream is trying to reconnect', event);
-      // Only inform the client once that we're retrying once per retrying
+      // Only inform the client once that we're retrying
       if (!this.isRetrying) {
         this.isRetrying = true
         this.eventBus.emit(StreamEvent.RETRYING);
