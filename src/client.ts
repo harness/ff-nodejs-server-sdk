@@ -211,7 +211,7 @@ export default class Client {
     } else {
       this.waitForInitialize = new Promise((resolve, reject) => {
         this.eventBus.once(Event.READY, () => {
-          resolve(this);
+          setTimeout(() => resolve(this), 0);
         });
         this.eventBus.once(Event.FAILED, reject);
       });
