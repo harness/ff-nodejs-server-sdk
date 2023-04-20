@@ -30,6 +30,8 @@ export class StreamProcessor {
   private readyState: number;
   private repository: Repository;
   private log: ConsoleLog;
+  private retryDelayMs: number;
+  private retryAttempt: number;
 
   constructor(
     api: ClientApi,
@@ -50,6 +52,11 @@ export class StreamProcessor {
     this.eventBus = eventBus;
     this.repository = repository;
     this.log = this.options.logger;
+
+    const minDelay = 5000;
+    const maxDelay = 10000;
+    this.retryAttempt = 1;
+    this.retryDelayMs = Math.floor(Math.random() * (maxDelay - minDelay + 1) + minDelay)
   }
 
   start(): void {
@@ -68,24 +75,32 @@ export class StreamProcessor {
 
     const connected = () => {
       this.log.info(`SSE stream connected OK: ${url}`);
+      this.retryAttempt = 1;
       this.readyState = StreamProcessor.CONNECTED;
       this.eventBus.emit(StreamEvent.CONNECTED);
     }
 
     const failed = (msg) => {
-      this.log.warn("SSE disconnected: " + msg)
+      const delayMs = this.getRandomRetryDelayMs();
+      this.log.warn(`SSE disconnected: ${msg} will retry in ${delayMs}ms`)
       this.readyState = StreamProcessor.RETRYING;
       this.eventBus.emit(StreamEvent.RETRYING);
 
       setTimeout(() => {
         this.log.info("SSE retrying to connect");
         this.connect(url, options, connected, failed);
-        }, 30000);
+        }, delayMs);
     }
 
     this.connect(url, options, connected, failed);
 
     this.eventBus.emit(StreamEvent.READY);
+  }
+
+  private getRandomRetryDelayMs(): number {
+    const delayMs = (this.retryDelayMs * this.retryAttempt);
+    this.retryAttempt += 1;
+    return Math.min(delayMs, 60000);
   }
 
   private connect(url: string, options: RequestOptions, connected, failed): void {
