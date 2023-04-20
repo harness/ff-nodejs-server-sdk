@@ -53,11 +53,9 @@ export class StreamProcessor {
   start(): void {
     this.log.info('Starting new StreamProcessor');
 
-    const url = new URL(this.options.baseUrl);
+    const url = `${this.options.baseUrl}/stream?cluster=${this.cluster}`
+
     const options = {
-      host: url.hostname,
-      port: url.port,
-      path: `${url.pathname}/stream?cluster=${this.cluster}`,
       headers : {
         "Cache-Control": "no-cache",
         "Accept": "text/event-stream",
@@ -66,50 +64,63 @@ export class StreamProcessor {
       }
     }
 
-    this.connect(options)
-      .then(() => console.log("SSE connected"))
-      .catch((msg) => console.log("SSE disconnected: " + msg)) // TODO add retry logic here
+    const connected = () => {
+      console.log(`SSE stream connected OK`);
+      this.readyState = StreamProcessor.CONNECTED;
+      this.eventBus.emit(StreamEvent.CONNECTED);
+    }
 
-    this.readyState = StreamProcessor.CONNECTED;
+    const failed = (msg) => {
+      console.log("SSE disconnected: " + msg);
+      this.readyState = 0;
+      this.eventBus.emit(StreamEvent.RETRYING);
+
+      setTimeout(() => {
+        console.log("SSE retrying to connect");
+        this.connect(url, options, connected, failed);
+        }, 30000);
+    }
+    
+    console.log(`Attempt connect to stream endpoint`);
+    this.connect(url, options, connected, failed);
+
     this.eventBus.emit(StreamEvent.READY);
   }
 
-  private async connect(options: RequestOptions): Promise<boolean> {
+  private connect(url: string, options: RequestOptions, connected, failed): void {
     const timeout = 30000
-    const isSecure = options.path.startsWith("https:");
+    const isSecure = url.startsWith("https:");
     this.log.info('SSE HTTP request ', options.path);
 
-    return new Promise((resolve, reject) => {
+    (isSecure ? https : http).request(url, options, (res) => {
+      this.log.info('SSE HTTP response code ', res.statusCode);
 
-      (isSecure ? https : http).request(options, (res) => {
-        this.log.info('SSE HTTP response code ', res.statusCode);
+      if (res.statusCode >= 400 && res.statusCode <= 599) {
+        failed("HTTP code " + res.statusCode);
+        return;
+      }
 
-        if (res.statusCode >= 400 && res.statusCode <= 599) {
-          reject("HTTP code " + res.statusCode);
-          return;
-        }
+      connected();
 
-        //resolve(true);
-        this.eventBus.emit(StreamEvent.CONNECTED);
+      res.on('data', (data) => { this.processData(data); })
+        .on('close', () => { failed('SSE stream closed'); })
+        //.on('end', ()=> { failed('SSE stream ended'); })
 
-        res.on('data', (data) => { this.processData(data); })
-          .on('close', () => { reject('SSE stream closed'); })
-          .on('end', ()=> { reject('SSE stream ended'); })
-
-      }).on('error', (err) => { reject( "SSE request failed " + err.message) })
-        .on('timeout',  () => { reject( "SSE request timed out after " + timeout + "ms") })
-        .setTimeout(timeout)
-        .end();
-   });
-
+    }).on('error', (err) => { failed( "SSE request failed " + err.message) })
+      .on('timeout',  () => { failed( "SSE request timed out after " + timeout + "ms") })
+      .setTimeout(timeout)
+      .end();
   }
 
   private processData(data: any): void {
-    const str = data.toString();
-    const pos = str.indexOf("{"); // TODO only parse full lines
-    if (pos != -1) {
-      console.log('SSE GOT: ', str.substring(pos));
-      const msg = JSON.parse(str.substring(pos));
+    const lines = data.toString().split(/\r?\n/);
+    lines.forEach((line) => this.processLine(line));
+  }
+
+  private processLine(line: string): void {
+    if (line.startsWith("data:")) {
+      console.log('SSE GOT: ', line.substring(5));
+      const msg = JSON.parse(line.substring(5));
       if (msg.domain === 'flag') {
         console.log('SSE FLAG UPDATE ');
         this.msgProcessor(
