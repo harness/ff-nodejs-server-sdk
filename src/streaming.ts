@@ -17,6 +17,8 @@ type FetchFunction = (
 
 export class StreamProcessor {
   static readonly CONNECTED = 1;
+  static readonly RETRYING = 2;
+  static readonly SSE_TIMEOUT_MS = 30000
 
   private apiKey: string;
   private jwtToken: string;
@@ -65,37 +67,41 @@ export class StreamProcessor {
     }
 
     const connected = () => {
-      console.log(`SSE stream connected OK`);
+      this.log.info(`SSE stream connected OK: ${url}`);
       this.readyState = StreamProcessor.CONNECTED;
       this.eventBus.emit(StreamEvent.CONNECTED);
     }
 
     const failed = (msg) => {
-      console.log("SSE disconnected: " + msg);
-      this.readyState = 0;
+      this.log.warn("SSE disconnected: " + msg)
+      this.readyState = StreamProcessor.RETRYING;
       this.eventBus.emit(StreamEvent.RETRYING);
 
       setTimeout(() => {
-        console.log("SSE retrying to connect");
+        this.log.info("SSE retrying to connect");
         this.connect(url, options, connected, failed);
         }, 30000);
     }
-    
-    console.log(`Attempt connect to stream endpoint`);
+
     this.connect(url, options, connected, failed);
 
     this.eventBus.emit(StreamEvent.READY);
   }
 
   private connect(url: string, options: RequestOptions, connected, failed): void {
-    const timeout = 30000
+
+    if (this.readyState === StreamProcessor.CONNECTED) {
+      this.log.debug('SSE already connected, skip retry');
+      return;
+    }
+
     const isSecure = url.startsWith("https:");
-    this.log.info('SSE HTTP request ', options.path);
+    this.log.debug('SSE HTTP start request', url);
 
     (isSecure ? https : http).request(url, options, (res) => {
-      this.log.info('SSE HTTP response code ', res.statusCode);
+      this.log.debug('SSE got HTTP response code', res.statusCode);
 
-      if (res.statusCode >= 400 && res.statusCode <= 599) {
+      if (res.statusCode !== 200) {
         failed("HTTP code " + res.statusCode);
         return;
       }
@@ -107,8 +113,8 @@ export class StreamProcessor {
         //.on('end', ()=> { failed('SSE stream ended'); })
 
     }).on('error', (err) => { failed( "SSE request failed " + err.message) })
-      .on('timeout',  () => { failed( "SSE request timed out after " + timeout + "ms") })
-      .setTimeout(timeout)
+      .on('timeout',  () => { failed( "SSE request timed out after " + StreamProcessor.SSE_TIMEOUT_MS + "ms") })
+      .setTimeout(StreamProcessor.SSE_TIMEOUT_MS)
       .end();
   }
 
@@ -119,10 +125,9 @@ export class StreamProcessor {
 
   private processLine(line: string): void {
     if (line.startsWith("data:")) {
-      console.log('SSE GOT: ', line.substring(5));
+      this.log.debug('SSE GOT:', line.substring(5));
       const msg = JSON.parse(line.substring(5));
       if (msg.domain === 'flag') {
-        console.log('SSE FLAG UPDATE ');
         this.msgProcessor(
           msg,
           this.api.getFeatureConfigByIdentifier.bind(this.api),
@@ -130,7 +135,6 @@ export class StreamProcessor {
           this.repository.deleteFlag.bind(this.repository),
         );
       } else if (msg.domain === 'target-segment') {
-        console.log('SSE TARGET-SEGMENT UPDATE ');
         this.msgProcessor(
           msg,
           this.api.getSegmentByIdentifier.bind(this.api),
