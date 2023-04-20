@@ -7,7 +7,7 @@ import { ConsoleLog } from './log';
 
 import * as https from 'https';
 import * as http from 'http';
-import {RequestOptions} from "https";
+import { RequestOptions } from 'https';
 
 type FetchFunction = (
   identifier: string,
@@ -18,7 +18,7 @@ type FetchFunction = (
 export class StreamProcessor {
   static readonly CONNECTED = 1;
   static readonly RETRYING = 2;
-  static readonly SSE_TIMEOUT_MS = 30000
+  static readonly SSE_TIMEOUT_MS = 30000;
 
   private apiKey: string;
   private jwtToken: string;
@@ -56,41 +56,43 @@ export class StreamProcessor {
     const minDelay = 5000;
     const maxDelay = 10000;
     this.retryAttempt = 1;
-    this.retryDelayMs = Math.floor(Math.random() * (maxDelay - minDelay + 1) + minDelay)
+    this.retryDelayMs = Math.floor(
+      Math.random() * (maxDelay - minDelay + 1) + minDelay,
+    );
   }
 
   start(): void {
     this.log.info('Starting new StreamProcessor');
 
-    const url = `${this.options.baseUrl}/stream?cluster=${this.cluster}`
+    const url = `${this.options.baseUrl}/stream?cluster=${this.cluster}`;
 
     const options = {
-      headers : {
-        "Cache-Control": "no-cache",
-        "Accept": "text/event-stream",
-        "Authorization": `Bearer ${this.jwtToken}`,
-        "API-Key": this.apiKey,
-      }
-    }
+      headers: {
+        'Cache-Control': 'no-cache',
+        Accept: 'text/event-stream',
+        Authorization: `Bearer ${this.jwtToken}`,
+        'API-Key': this.apiKey,
+      },
+    };
 
     const connected = () => {
       this.log.info(`SSE stream connected OK: ${url}`);
       this.retryAttempt = 1;
       this.readyState = StreamProcessor.CONNECTED;
       this.eventBus.emit(StreamEvent.CONNECTED);
-    }
+    };
 
     const failed = (msg) => {
       const delayMs = this.getRandomRetryDelayMs();
-      this.log.warn(`SSE disconnected: ${msg} will retry in ${delayMs}ms`)
+      this.log.warn(`SSE disconnected: ${msg} will retry in ${delayMs}ms`);
       this.readyState = StreamProcessor.RETRYING;
       this.eventBus.emit(StreamEvent.RETRYING);
 
       setTimeout(() => {
-        this.log.info("SSE retrying to connect");
+        this.log.info('SSE retrying to connect');
         this.connect(url, options, connected, failed);
-        }, delayMs);
-    }
+      }, delayMs);
+    };
 
     this.connect(url, options, connected, failed);
 
@@ -98,37 +100,55 @@ export class StreamProcessor {
   }
 
   private getRandomRetryDelayMs(): number {
-    const delayMs = (this.retryDelayMs * this.retryAttempt);
+    const delayMs = this.retryDelayMs * this.retryAttempt;
     this.retryAttempt += 1;
     return Math.min(delayMs, 60000);
   }
 
-  private connect(url: string, options: RequestOptions, connected, failed): void {
-
+  private connect(
+    url: string,
+    options: RequestOptions,
+    connected,
+    failed,
+  ): void {
     if (this.readyState === StreamProcessor.CONNECTED) {
       this.log.debug('SSE already connected, skip retry');
       return;
     }
 
-    const isSecure = url.startsWith("https:");
+    const isSecure = url.startsWith('https:');
     this.log.debug('SSE HTTP start request', url);
 
-    (isSecure ? https : http).request(url, options, (res) => {
-      this.log.debug('SSE got HTTP response code', res.statusCode);
+    (isSecure ? https : http)
+      .request(url, options, (res) => {
+        this.log.debug('SSE got HTTP response code', res.statusCode);
 
-      if (res.statusCode !== 200) {
-        failed("HTTP code " + res.statusCode);
-        return;
-      }
+        if (res.statusCode !== 200) {
+          failed('HTTP code ' + res.statusCode);
+          return;
+        }
 
-      connected();
+        connected();
 
-      res.on('data', (data) => { this.processData(data); })
-        .on('close', () => { failed('SSE stream closed'); })
+        res
+          .on('data', (data) => {
+            this.processData(data);
+          })
+          .on('close', () => {
+            failed('SSE stream closed');
+          });
         //.on('end', ()=> { failed('SSE stream ended'); })
-
-    }).on('error', (err) => { failed( "SSE request failed " + err.message) })
-      .on('timeout',  () => { failed( "SSE request timed out after " + StreamProcessor.SSE_TIMEOUT_MS + "ms") })
+      })
+      .on('error', (err) => {
+        failed('SSE request failed ' + err.message);
+      })
+      .on('timeout', () => {
+        failed(
+          'SSE request timed out after ' +
+            StreamProcessor.SSE_TIMEOUT_MS +
+            'ms',
+        );
+      })
       .setTimeout(StreamProcessor.SSE_TIMEOUT_MS)
       .end();
   }
@@ -139,7 +159,7 @@ export class StreamProcessor {
   }
 
   private processLine(line: string): void {
-    if (line.startsWith("data:")) {
+    if (line.startsWith('data:')) {
       this.log.debug('SSE GOT:', line.substring(5));
       const msg = JSON.parse(line.substring(5));
       if (msg.domain === 'flag') {
