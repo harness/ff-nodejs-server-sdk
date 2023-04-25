@@ -124,7 +124,7 @@ export class StreamProcessor {
         this.log.debug('SSE got HTTP response code', res.statusCode);
 
         if (res.statusCode !== 200) {
-          onFailed('HTTP code ${res.statusCode}');
+          onFailed(`HTTP code ${res.statusCode}`);
           return;
         }
 
@@ -209,7 +209,7 @@ export class StreamProcessor {
   }
 
   connected(): boolean {
-    return this.readyState == StreamProcessor.CONNECTED;
+    return this.readyState === StreamProcessor.CONNECTED;
   }
 
   stop(): void {

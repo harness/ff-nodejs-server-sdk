@@ -54,7 +54,7 @@ export class PollingProcessor {
     };
 
     if (this.lastPollTime > (Date.now() - this.options.pollInterval)) {
-      this.log.info(`Last poll was ${(Date.now()-this.lastPollTime)/1000} seconds ago, skipping flag refresh`);
+      this.log.info(`Last poll was ${Math.round((Date.now()-this.lastPollTime)/1000)} seconds ago, skipping flag refresh`);
       pollAgain();
       return;
     }
