@@ -161,6 +161,7 @@ export class StreamProcessor {
     if (line.startsWith('data:')) {
       this.log.debug('SSE GOT:', line.substring(5));
       const msg = JSON.parse(line.substring(5));
+
       if (msg.domain === 'flag') {
         this.msgProcessor(
           msg,
