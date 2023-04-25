@@ -84,7 +84,7 @@ export class StreamProcessor {
     const onFailed = (msg: string) => {
       this.retryAttempt += 1;
 
-      const delayMs = this.getRandomRetryDelayMs() * this.retryAttempt;
+      const delayMs = this.getRandomRetryDelayMs();
       this.log.warn(`SSE disconnected: ${msg} will retry in ${delayMs}ms`);
       this.readyState = StreamProcessor.RETRYING;
       this.eventBus.emit(StreamEvent.RETRYING);

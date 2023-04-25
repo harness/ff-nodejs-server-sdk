@@ -20,6 +20,7 @@ export class PollingProcessor {
   private eventBus: EventEmitter;
   private timeout: NodeJS.Timeout;
   private log: ConsoleLog;
+  private lastPollTime  = 0;
 
   constructor(
     environment: string,
@@ -52,6 +53,13 @@ export class PollingProcessor {
       this.timeout = setTimeout(() => this.poll(), sleepFor);
     };
 
+    if (this.lastPollTime > (Date.now() - this.options.pollInterval)) {
+      this.log.info(`Last poll was ${(Date.now()-this.lastPollTime)/1000} seconds ago, skipping flag refresh`);
+      pollAgain();
+      return;
+    }
+
+    this.lastPollTime = Date.now();
     Promise.all([this.retrieveFlags(), this.retrieveSegments()])
       .then(() => {
         // when first fetch is successful then poller is ready
