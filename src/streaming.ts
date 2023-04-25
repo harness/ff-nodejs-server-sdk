@@ -5,9 +5,8 @@ import { StreamEvent, Options, StreamMsg } from './types';
 import { Repository } from './repository';
 import { ConsoleLog } from './log';
 
-import * as https from 'https';
-import * as http from 'http';
-import { RequestOptions } from 'https';
+import https, { RequestOptions } from 'https';
+import http from 'http';
 
 type FetchFunction = (
   identifier: string,
