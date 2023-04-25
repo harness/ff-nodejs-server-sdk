@@ -206,7 +206,7 @@ export class Evaluator {
     target: Target,
   ): Promise<boolean> {
     for (const clause of clauses) {
-      if ((await this.evaluateClause(clause, target))) {
+      if (await this.evaluateClause(clause, target)) {
         // If any clause returns true we return - rules being treated as OR rather than AND
         return true;
       }

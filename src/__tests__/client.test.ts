@@ -6,8 +6,8 @@ jest.mock('../openapi/api');
 
 describe('Client', () => {
   beforeEach(() => {
-    jest.resetAllMocks()
-  })
+    jest.resetAllMocks();
+  });
 
   it('should close the client when the close method is called', async () => {
     // given
@@ -28,7 +28,7 @@ describe('Client', () => {
   });
 
   it('should warn if poll interval is set below the default', async () => {
-    jest.spyOn(PollingProcessor.prototype, 'start').mockReturnValue(undefined)
+    jest.spyOn(PollingProcessor.prototype, 'start').mockReturnValue(undefined);
     const warnSpy = jest.spyOn(console, 'warn').mockReturnValue(undefined);
 
     new Client('some key', {
@@ -55,7 +55,7 @@ describe('Client', () => {
   });
 
   it('should warn if events sync interval is set below the default', async () => {
-    jest.spyOn(PollingProcessor.prototype, 'start').mockReturnValue(undefined)
+    jest.spyOn(PollingProcessor.prototype, 'start').mockReturnValue(undefined);
     const warnSpy = jest.spyOn(console, 'warn');
 
     new Client('some key', {
