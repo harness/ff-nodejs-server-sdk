@@ -130,9 +130,7 @@ export class StreamProcessor {
         connected();
 
         res
-          .on('data', (data) => {
-            this.processData(data);
-          })
+          .on('data', this.processData)
           .on('close', () => {
             failed('SSE stream closed');
           });
