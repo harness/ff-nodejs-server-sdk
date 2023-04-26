@@ -123,7 +123,7 @@ export class StreamProcessor {
       .request(url, options, (res) => {
         this.log.debug('SSE got HTTP response code', res.statusCode);
 
-        if (res.statusCode !== 200) {
+        if (res.statusCode >= 400 && res.statusCode <= 599) {
           onFailed(`HTTP code ${res.statusCode}`);
           return;
         }
