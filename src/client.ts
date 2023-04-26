@@ -61,12 +61,16 @@ export default class Client {
 
     if (options.pollInterval < defaultOptions.pollInterval) {
       this.options.pollInterval = defaultOptions.pollInterval;
-      this.log.warn(`Polling interval cannot be lower than ${defaultOptions.pollInterval} ms`);
+      this.log.warn(
+        `Polling interval cannot be lower than ${defaultOptions.pollInterval} ms`,
+      );
     }
 
     if (options.eventsSyncInterval < defaultOptions.eventsSyncInterval) {
       this.options.eventsSyncInterval = defaultOptions.eventsSyncInterval;
-      this.log.warn(`Events sync interval cannot be lower than ${defaultOptions.eventsSyncInterval} ms`);
+      this.log.warn(
+        `Events sync interval cannot be lower than ${defaultOptions.eventsSyncInterval} ms`,
+      );
     }
 
     this.configuration = new Configuration({
@@ -105,7 +109,9 @@ export default class Client {
 
     this.eventBus.on(StreamEvent.RETRYING, () => {
       this.failure = true;
-      this.log.error('Issue with streaming: falling back to polling while the SDK attempts to reconnect');
+      this.log.error(
+        'Issue with streaming: falling back to polling while the SDK attempts to reconnect',
+      );
       if (!this.closing) {
         this.pollProcessor.start();
       }
@@ -113,7 +119,9 @@ export default class Client {
 
     this.eventBus.on(StreamEvent.ERROR, () => {
       this.failure = true;
-      this.log.error('Unrecoverable issue with streaming: falling back to polling');
+      this.log.error(
+        'Unrecoverable issue with streaming: falling back to polling',
+      );
       if (!this.closing) {
         this.pollProcessor.start();
       }

@@ -1,10 +1,12 @@
-import EventSource from '@harnessio/eventsource'
 import EventEmitter from 'events';
 import { AxiosPromise } from 'axios';
 import { ClientApi, FeatureConfig, Segment } from './openapi';
 import { StreamEvent, Options, StreamMsg } from './types';
 import { Repository } from './repository';
 import { ConsoleLog } from './log';
+
+import https, { RequestOptions } from 'https';
+import http from 'http';
 
 type FetchFunction = (
   identifier: string,
@@ -14,18 +16,22 @@ type FetchFunction = (
 
 export class StreamProcessor {
   static readonly CONNECTED = 1;
+  static readonly RETRYING = 2;
+  static readonly SSE_TIMEOUT_MS = 30000;
 
-  private apiKey: string;
-  private jwtToken: string;
-  private environment: string;
+  private readonly apiKey: string;
+  private readonly jwtToken: string;
+  private readonly environment: string;
+  private readonly cluster: string;
+  private readonly api: ClientApi;
+  private readonly repository: Repository;
+  private readonly retryDelayMs: number;
+
   private options: Options;
-  private cluster: string;
   private eventBus: EventEmitter;
-  private api: ClientApi;
-  private eventSource: EventSource;
-  private repository: Repository;
+  private readyState: number;
   private log: ConsoleLog;
-  private isRetrying: boolean
+  private retryAttempt = 0;
 
   constructor(
     api: ClientApi,
@@ -46,45 +52,113 @@ export class StreamProcessor {
     this.eventBus = eventBus;
     this.repository = repository;
     this.log = this.options.logger;
+
+    const minDelay = 5000;
+    const maxDelay = 10000;
+    this.retryDelayMs = Math.floor(
+      Math.random() * (maxDelay - minDelay) + minDelay,
+    );
   }
 
   start(): void {
-    this.log.info('Starting StreamProcessor');
-    const eventSource = new EventSource(
-      `${this.options.baseUrl}/stream?cluster=${this.cluster}`,
-      {
-        headers: {
-          Authorization: `Bearer ${this.jwtToken}`,
-          'API-Key': this.apiKey,
-        },
+    this.log.info('Starting new StreamProcessor');
+
+    const url = `${this.options.baseUrl}/stream?cluster=${this.cluster}`;
+
+    const options = {
+      headers: {
+        'Cache-Control': 'no-cache',
+        Accept: 'text/event-stream',
+        Authorization: `Bearer ${this.jwtToken}`,
+        'API-Key': this.apiKey,
       },
-    );
+    };
 
-    eventSource.onopen = (event: MessageEvent) => {
-      this.log.debug('Stream connected', event);
+    const onConnected = () => {
+      this.log.info(`SSE stream connected OK: ${url}`);
+      this.retryAttempt = 0;
+      this.readyState = StreamProcessor.CONNECTED;
       this.eventBus.emit(StreamEvent.CONNECTED);
-      // In case we've had to retry, set it back to false
-      this.isRetrying = false
     };
 
-    eventSource.onretrying = (event: MessageEvent) => {
-      this.log.error('Stream is trying to reconnect', event);
-      // Only inform the client once that we're retrying
-      if (!this.isRetrying) {
-        this.isRetrying = true
-        this.eventBus.emit(StreamEvent.RETRYING);
-      }
+    const onFailed = (msg: string) => {
+      this.retryAttempt += 1;
+
+      const delayMs = this.getRandomRetryDelayMs();
+      this.log.warn(`SSE disconnected: ${msg} will retry in ${delayMs}ms`);
+      this.readyState = StreamProcessor.RETRYING;
+      this.eventBus.emit(StreamEvent.RETRYING);
+
+      setTimeout(() => {
+        this.log.info('SSE retrying to connect');
+        this.connect(url, options, onConnected, onFailed);
+      }, delayMs);
     };
 
-    eventSource.onerror = (event: MessageEvent) => {
-      this.log.error('Unrecoverable error with stream, not retrying to connect: ', event);
-      this.eventBus.emit(StreamEvent.ERROR, event);
-    };
+    this.connect(url, options, onConnected, onFailed);
 
-    eventSource.addEventListener('*', (event: MessageEvent) => {
-      const msg: StreamMsg = JSON.parse(event.data);
+    this.eventBus.emit(StreamEvent.READY);
+  }
 
-      this.log.debug('Received event from stream: ', msg);
+  private getRandomRetryDelayMs(): number {
+    const delayMs = this.retryDelayMs * this.retryAttempt;
+    return Math.min(delayMs, 60000);
+  }
+
+  private connect(
+    url: string,
+    options: RequestOptions,
+    onConnected: () => void,
+    onFailed: (msg: string) => void,
+  ): void {
+    if (this.readyState === StreamProcessor.CONNECTED) {
+      this.log.debug('SSE already connected, skip retry');
+      return;
+    }
+
+    const isSecure = url.startsWith('https:');
+    this.log.debug('SSE HTTP start request', url);
+
+    (isSecure ? https : http)
+      .request(url, options, (res) => {
+        this.log.debug('SSE got HTTP response code', res.statusCode);
+
+        if (res.statusCode >= 400 && res.statusCode <= 599) {
+          onFailed(`HTTP code ${res.statusCode}`);
+          return;
+        }
+
+        onConnected();
+
+        res
+          .on('data', (data) => this.processData(data))
+          .on('close', () => {
+            onFailed('SSE stream closed');
+          });
+      })
+      .on('error', (err) => {
+        onFailed('SSE request failed ' + err.message);
+      })
+      .on('timeout', () => {
+        onFailed(
+          'SSE request timed out after ' +
+            StreamProcessor.SSE_TIMEOUT_MS +
+            'ms',
+        );
+      })
+      .setTimeout(StreamProcessor.SSE_TIMEOUT_MS)
+      .end();
+  }
+
+  private processData(data: any): void {
+    const lines = data.toString().split(/\r?\n/);
+    lines.forEach((line) => this.processLine(line));
+  }
+
+  private processLine(line: string): void {
+    if (line.startsWith('data:')) {
+      this.log.debug('SSE GOT:', line.substring(5));
+      const msg = JSON.parse(line.substring(5));
 
       if (msg.domain === 'flag') {
         this.msgProcessor(
@@ -101,10 +175,7 @@ export class StreamProcessor {
           this.repository.deleteSegment.bind(this.repository),
         );
       }
-    });
-
-    this.eventSource = eventSource;
-    this.eventBus.emit(StreamEvent.READY);
+    }
   }
 
   private async msgProcessor(
@@ -138,12 +209,11 @@ export class StreamProcessor {
   }
 
   connected(): boolean {
-    return this.eventSource.readyState == StreamProcessor.CONNECTED;
+    return this.readyState === StreamProcessor.CONNECTED;
   }
 
   stop(): void {
     this.log.info('Stopping StreamProcessor');
-    this.eventSource.close();
     this.eventBus.emit(StreamEvent.DISCONNECTED);
   }
 
