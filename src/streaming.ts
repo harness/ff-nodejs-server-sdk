@@ -18,6 +18,7 @@ type FetchFunction = (
 export class StreamProcessor {
   static readonly CONNECTED = 1;
   static readonly RETRYING = 2;
+  static readonly CLOSED = 3;
   static readonly SSE_TIMEOUT_MS = 30000;
 
   private readonly apiKey: string;
@@ -86,17 +87,19 @@ export class StreamProcessor {
     };
 
     const onFailed = (msg: string) => {
-      this.retryAttempt += 1;
+      if (this.readyState !== StreamProcessor.CLOSED) {
+        this.retryAttempt += 1;
 
-      const delayMs = this.getRandomRetryDelayMs();
-      this.log.warn(`SSE disconnected: ${msg} will retry in ${delayMs}ms`);
-      this.readyState = StreamProcessor.RETRYING;
-      this.eventBus.emit(StreamEvent.RETRYING);
+        const delayMs = this.getRandomRetryDelayMs();
+        this.log.warn(`SSE disconnected: ${msg} will retry in ${delayMs}ms`);
+        this.readyState = StreamProcessor.RETRYING;
+        this.eventBus.emit(StreamEvent.RETRYING);
 
-      setTimeout(() => {
-        this.log.info('SSE retrying to connect');
-        this.connect(url, options, onConnected, onFailed);
-      }, delayMs);
+        setTimeout(() => {
+          this.log.info('SSE retrying to connect');
+          this.connect(url, options, onConnected, onFailed);
+        }, delayMs);
+      }
     };
 
     this.connect(url, options, onConnected, onFailed);
@@ -123,16 +126,16 @@ export class StreamProcessor {
     if (this.abortController) {
       this.abortController.abort();
     }
-    const abortController = new AbortController();
-    const {signal} = abortController;
+    this.abortController = new AbortController();
+    const {signal} = this.abortController;
 
     const isSecure = url.startsWith('https:');
     this.log.debug('SSE HTTP start request', url);
 
-    const newObject = {...options, signal};
+    const appendedOptions = {...options, signal};
 
     (isSecure ? https : http)
-      .request(url, newObject, (res) => {
+      .request(url, appendedOptions, (res) => {
         this.log.debug('SSE got HTTP response code', res.statusCode);
 
         if (res.statusCode >= 400 && res.statusCode <= 599) {
@@ -229,6 +232,7 @@ export class StreamProcessor {
 
   close(): void {
     if (this.readyState == StreamProcessor.CONNECTED || this.readyState == StreamProcessor.RETRYING) {
+      this.readyState = StreamProcessor.CLOSED;
       this.log.info('Closing StreamProcessor');
       this.abortController.abort()
       this.eventBus.emit(StreamEvent.DISCONNECTED);
