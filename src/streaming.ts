@@ -7,7 +7,6 @@ import { ConsoleLog } from './log';
 
 import https, { RequestOptions } from 'https';
 import http from 'http';
-import { AbortController } from 'abort-controller';
 
 
 type FetchFunction = (
@@ -30,6 +29,7 @@ export class StreamProcessor {
   private readonly retryDelayMs: number;
 
   private options: Options;
+  private abortController: AbortController;
   private eventBus: EventEmitter;
   private readyState: number;
   private log: ConsoleLog;
@@ -67,6 +67,9 @@ export class StreamProcessor {
 
     const url = `${this.options.baseUrl}/stream?cluster=${this.cluster}`;
 
+
+
+
     const options = {
       headers: {
         'Cache-Control': 'no-cache',
@@ -74,6 +77,7 @@ export class StreamProcessor {
         Authorization: `Bearer ${this.jwtToken}`,
         'API-Key': this.apiKey,
       },
+      // signal: { signal }
     };
 
     const onConnected = () => {
@@ -117,12 +121,20 @@ export class StreamProcessor {
       this.log.debug('SSE already connected, skip retry');
       return;
     }
+    // Cleanup the previous AbortController instance if it exists
+    if (this.abortController) {
+      this.abortController.abort();
+    }
+    const abortController = new AbortController();
+    const { signal } = abortController;
 
     const isSecure = url.startsWith('https:');
     this.log.debug('SSE HTTP start request', url);
 
+    const newObject = { ...options, signal };
+
     (isSecure ? https : http)
-      .request(url, options, (res) => {
+      .request(url, newObject, (res) => {
         this.log.debug('SSE got HTTP response code', res.statusCode);
 
         if (res.statusCode >= 400 && res.statusCode <= 599) {
@@ -150,6 +162,8 @@ export class StreamProcessor {
       })
       .setTimeout(StreamProcessor.SSE_TIMEOUT_MS)
       .end();
+
+
   }
 
   private processData(data: any): void {
@@ -214,14 +228,19 @@ export class StreamProcessor {
     return this.readyState === StreamProcessor.CONNECTED;
   }
 
-  stop(): void {
-    this.log.info('Stopping StreamProcessor');
-    this.eventBus.emit(StreamEvent.DISCONNECTED);
-  }
 
   close(): void {
-    this.log.info('Closing StreamProcessor');
-    this.stop();
-    this.log.info('StreamProcessor closed');
+    if (this.readyState == StreamProcessor.CONNECTED || this.readyState == StreamProcessor.RETRYING) {
+      this.log.info('Closing StreamProcessor');
+      this.abortController.abort()
+      this.eventBus.emit(StreamEvent.DISCONNECTED);
+      this.log.info('StreamProcessor closed');
+    }
+    else {
+      this.log.info('SteamProcessor already closed');
+    }
+
+
+
   }
 }
