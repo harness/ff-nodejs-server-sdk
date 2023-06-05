@@ -7,6 +7,8 @@ import { ConsoleLog } from './log';
 
 import https, { RequestOptions } from 'https';
 import http from 'http';
+import { AbortController } from 'abort-controller';
+
 
 type FetchFunction = (
   identifier: string,
