@@ -76,7 +76,6 @@ export class StreamProcessor {
         Authorization: `Bearer ${this.jwtToken}`,
         'API-Key': this.apiKey,
       },
-      // signal: { signal }
     };
 
     const onConnected = () => {
