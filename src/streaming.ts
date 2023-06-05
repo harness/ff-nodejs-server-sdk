@@ -1,13 +1,12 @@
 import EventEmitter from 'events';
-import {AxiosPromise} from 'axios';
-import {ClientApi, FeatureConfig, Segment} from './openapi';
-import {StreamEvent, Options, StreamMsg} from './types';
-import {Repository} from './repository';
-import {ConsoleLog} from './log';
+import { AxiosPromise } from 'axios';
+import { ClientApi, FeatureConfig, Segment } from './openapi';
+import { StreamEvent, Options, StreamMsg } from './types';
+import { Repository } from './repository';
+import { ConsoleLog } from './log';
 
-import https, {RequestOptions} from 'https';
+import https, { RequestOptions } from 'https';
 import http from 'http';
-
 
 type FetchFunction = (
   identifier: string,
@@ -68,7 +67,6 @@ export class StreamProcessor {
 
     const url = `${this.options.baseUrl}/stream?cluster=${this.cluster}`;
 
-
     const options = {
       headers: {
         'Cache-Control': 'no-cache',
@@ -126,12 +124,12 @@ export class StreamProcessor {
       this.abortController.abort();
     }
     this.abortController = new AbortController();
-    const {signal} = this.abortController;
+    const { signal } = this.abortController;
 
     const isSecure = url.startsWith('https:');
     this.log.debug('SSE HTTP start request', url);
 
-    const appendedOptions = {...options, signal};
+    const appendedOptions = { ...options, signal };
 
     (isSecure ? https : http)
       .request(url, appendedOptions, (res) => {
@@ -156,14 +154,12 @@ export class StreamProcessor {
       .on('timeout', () => {
         onFailed(
           'SSE request timed out after ' +
-          StreamProcessor.SSE_TIMEOUT_MS +
-          'ms',
+            StreamProcessor.SSE_TIMEOUT_MS +
+            'ms',
         );
       })
       .setTimeout(StreamProcessor.SSE_TIMEOUT_MS)
       .end();
-
-
   }
 
   private processData(data: any): void {
@@ -203,7 +199,7 @@ export class StreamProcessor {
     this.log.info('Processing message', msg);
     try {
       if (msg.event === 'create' || msg.event === 'patch') {
-        const {data} = await fn(
+        const { data } = await fn(
           msg.identifier,
           this.environment,
           this.cluster,
@@ -228,18 +224,18 @@ export class StreamProcessor {
     return this.readyState === StreamProcessor.CONNECTED;
   }
 
-
   close(): void {
-    if (this.readyState == StreamProcessor.CONNECTED || this.readyState == StreamProcessor.RETRYING) {
+    if (
+      this.readyState == StreamProcessor.CONNECTED ||
+      this.readyState == StreamProcessor.RETRYING
+    ) {
       this.readyState = StreamProcessor.CLOSED;
       this.log.info('Closing StreamProcessor');
-      this.abortController.abort()
+      this.abortController.abort();
       this.eventBus.emit(StreamEvent.DISCONNECTED);
       this.log.info('StreamProcessor closed');
     } else {
       this.log.info('SteamProcessor already closed');
     }
-
-
   }
 }
