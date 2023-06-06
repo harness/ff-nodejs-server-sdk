@@ -6,7 +6,7 @@ import { Repository } from './repository';
 import { ConsoleLog } from './log';
 
 import https, { RequestOptions } from 'https';
-import http from 'http';
+import http, { ClientRequest } from "http";
 
 type FetchFunction = (
   identifier: string,
@@ -29,7 +29,10 @@ export class StreamProcessor {
   private readonly retryDelayMs: number;
 
   private options: Options;
+  // Abort requests from users running Node.js version 15 and above
   private abortController: AbortController;
+  // Abort requests from users running Node.js version 12 to 14
+  private request: ClientRequest;
   private eventBus: EventEmitter;
   private readyState: number;
   private log: ConsoleLog;
@@ -224,18 +227,26 @@ export class StreamProcessor {
     return this.readyState === StreamProcessor.CONNECTED;
   }
 
+
   close(): void {
-    if (
-      this.readyState == StreamProcessor.CONNECTED ||
-      this.readyState == StreamProcessor.RETRYING
-    ) {
-      this.readyState = StreamProcessor.CLOSED;
-      this.log.info('Closing StreamProcessor');
-      this.abortController.abort();
-      this.eventBus.emit(StreamEvent.DISCONNECTED);
-      this.log.info('StreamProcessor closed');
-    } else {
+    if (this.readyState === StreamProcessor.CLOSED) {
       this.log.info('SteamProcessor already closed');
+      return;
     }
+
+    this.readyState = StreamProcessor.CLOSED;
+    this.log.info('Closing StreamProcessor');
+
+    if (typeof AbortController === 'object') {
+      this.abortController.abort();
+    }
+    else {
+      this.request.destroy();
+      this.request = undefined;
+    }
+
+    this.eventBus.emit(StreamEvent.DISCONNECTED);
+    this.log.info('StreamProcessor closed');
+    
   }
 }
