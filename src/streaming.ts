@@ -29,9 +29,6 @@ export class StreamProcessor {
   private readonly retryDelayMs: number;
 
   private options: Options;
-  // Abort requests from users running Node.js version 15 and above
-  private abortController: AbortController;
-  // Store the request so we can abort it later from users running Node.js version 12 to 14
   private request: ClientRequest;
   private eventBus: EventEmitter;
   private readyState: number;
@@ -123,23 +120,11 @@ export class StreamProcessor {
       return;
     }
 
-    // If the user is running Node 15 and greater, we can use AbortController to close the connection
-    let appendedOptions = undefined;
-    if (typeof AbortController === 'function') {
-      // Cleanup the previous AbortController instance if it exists
-      if (this.abortController) {
-        this.abortController.abort();
-      }
-      this.abortController = new AbortController();
-      const { signal } = this.abortController;
-      appendedOptions = { ...options, signal };
-    }
-
     const isSecure = url.startsWith('https:');
     this.log.debug('SSE HTTP start request', url);
 
     this.request = (isSecure ? https : http)
-      .request(url, appendedOptions ? appendedOptions : options, (res) => {
+      .request(url, options, (res) => {
         this.log.debug('SSE got HTTP response code', res.statusCode);
 
         if (res.statusCode >= 400 && res.statusCode <= 599) {
@@ -240,12 +225,8 @@ export class StreamProcessor {
     this.readyState = StreamProcessor.CLOSED;
     this.log.info('Closing StreamProcessor');
 
-    if (typeof AbortController === 'function') {
-      this.abortController.abort();
-    } else {
-      this.request.destroy();
-      this.request = undefined;
-    }
+    this.request.destroy();
+    this.request = undefined;
 
     this.eventBus.emit(StreamEvent.DISCONNECTED);
     this.log.info('StreamProcessor closed');
