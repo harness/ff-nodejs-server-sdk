@@ -31,7 +31,7 @@ export class StreamProcessor {
   private options: Options;
   // Abort requests from users running Node.js version 15 and above
   private abortController: AbortController;
-  // Abort requests from users running Node.js version 12 to 14
+  // Store the request so we can abort it later from users running Node.js version 12 to 14
   private request: ClientRequest;
   private eventBus: EventEmitter;
   private readyState: number;
