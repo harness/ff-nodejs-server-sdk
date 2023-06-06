@@ -165,8 +165,8 @@ export class StreamProcessor {
             'ms',
         );
       })
-      .setTimeout(StreamProcessor.SSE_TIMEOUT_MS)
-      this.request.end()
+      .setTimeout(StreamProcessor.SSE_TIMEOUT_MS);
+    this.request.end();
   }
 
   private processData(data: any): void {
