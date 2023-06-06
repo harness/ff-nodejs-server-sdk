@@ -6,7 +6,7 @@ import { Repository } from './repository';
 import { ConsoleLog } from './log';
 
 import https, { RequestOptions } from 'https';
-import http, { ClientRequest } from "http";
+import http, { ClientRequest } from 'http';
 
 type FetchFunction = (
   identifier: string,
@@ -122,20 +122,23 @@ export class StreamProcessor {
       this.log.debug('SSE already connected, skip retry');
       return;
     }
-    // Cleanup the previous AbortController instance if it exists
-    if (this.abortController) {
-      this.abortController.abort();
+
+    let appendedOptions = undefined;
+    if (typeof AbortController === 'function') {
+      // Cleanup the previous AbortController instance if it exists
+      if (this.abortController) {
+        this.abortController.abort();
+      }
+      this.abortController = new AbortController();
+      const { signal } = this.abortController;
+      appendedOptions = { ...options, signal };
     }
-    this.abortController = new AbortController();
-    const { signal } = this.abortController;
 
     const isSecure = url.startsWith('https:');
     this.log.debug('SSE HTTP start request', url);
 
-    const appendedOptions = { ...options, signal };
-
     (isSecure ? https : http)
-      .request(url, appendedOptions, (res) => {
+      .request(url, appendedOptions ? appendedOptions : options, (res) => {
         this.log.debug('SSE got HTTP response code', res.statusCode);
 
         if (res.statusCode >= 400 && res.statusCode <= 599) {
@@ -227,7 +230,6 @@ export class StreamProcessor {
     return this.readyState === StreamProcessor.CONNECTED;
   }
 
-
   close(): void {
     if (this.readyState === StreamProcessor.CLOSED) {
       this.log.info('SteamProcessor already closed');
@@ -237,16 +239,14 @@ export class StreamProcessor {
     this.readyState = StreamProcessor.CLOSED;
     this.log.info('Closing StreamProcessor');
 
-    if (typeof AbortController === 'object') {
+    if (typeof AbortController === 'function') {
       this.abortController.abort();
-    }
-    else {
+    } else {
       this.request.destroy();
       this.request = undefined;
     }
 
     this.eventBus.emit(StreamEvent.DISCONNECTED);
     this.log.info('StreamProcessor closed');
-    
   }
 }
