@@ -123,6 +123,7 @@ export class StreamProcessor {
       return;
     }
 
+    // If the user is running Node 15 and greater, we can use AbortController to close the connection
     let appendedOptions = undefined;
     if (typeof AbortController === 'function') {
       // Cleanup the previous AbortController instance if it exists
@@ -137,7 +138,7 @@ export class StreamProcessor {
     const isSecure = url.startsWith('https:');
     this.log.debug('SSE HTTP start request', url);
 
-    (isSecure ? https : http)
+    this.request = (isSecure ? https : http)
       .request(url, appendedOptions ? appendedOptions : options, (res) => {
         this.log.debug('SSE got HTTP response code', res.statusCode);
 
@@ -165,7 +166,7 @@ export class StreamProcessor {
         );
       })
       .setTimeout(StreamProcessor.SSE_TIMEOUT_MS)
-      .end();
+      this.request.end()
   }
 
   private processData(data: any): void {
