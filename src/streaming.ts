@@ -6,7 +6,7 @@ import { Repository } from './repository';
 import { ConsoleLog } from './log';
 
 import https, { RequestOptions } from 'https';
-import http from 'http';
+import http, { ClientRequest } from 'http';
 
 type FetchFunction = (
   identifier: string,
@@ -17,6 +17,7 @@ type FetchFunction = (
 export class StreamProcessor {
   static readonly CONNECTED = 1;
   static readonly RETRYING = 2;
+  static readonly CLOSED = 3;
   static readonly SSE_TIMEOUT_MS = 30000;
 
   private readonly apiKey: string;
@@ -28,6 +29,7 @@ export class StreamProcessor {
   private readonly retryDelayMs: number;
 
   private options: Options;
+  private request: ClientRequest;
   private eventBus: EventEmitter;
   private readyState: number;
   private log: ConsoleLog;
@@ -82,17 +84,19 @@ export class StreamProcessor {
     };
 
     const onFailed = (msg: string) => {
-      this.retryAttempt += 1;
+      if (this.readyState !== StreamProcessor.CLOSED) {
+        this.retryAttempt += 1;
 
-      const delayMs = this.getRandomRetryDelayMs();
-      this.log.warn(`SSE disconnected: ${msg} will retry in ${delayMs}ms`);
-      this.readyState = StreamProcessor.RETRYING;
-      this.eventBus.emit(StreamEvent.RETRYING);
+        const delayMs = this.getRandomRetryDelayMs();
+        this.log.warn(`SSE disconnected: ${msg} will retry in ${delayMs}ms`);
+        this.readyState = StreamProcessor.RETRYING;
+        this.eventBus.emit(StreamEvent.RETRYING);
 
-      setTimeout(() => {
-        this.log.info('SSE retrying to connect');
-        this.connect(url, options, onConnected, onFailed);
-      }, delayMs);
+        setTimeout(() => {
+          this.log.info('SSE retrying to connect');
+          this.connect(url, options, onConnected, onFailed);
+        }, delayMs);
+      }
     };
 
     this.connect(url, options, onConnected, onFailed);
@@ -119,7 +123,7 @@ export class StreamProcessor {
     const isSecure = url.startsWith('https:');
     this.log.debug('SSE HTTP start request', url);
 
-    (isSecure ? https : http)
+    this.request = (isSecure ? https : http)
       .request(url, options, (res) => {
         this.log.debug('SSE got HTTP response code', res.statusCode);
 
@@ -146,8 +150,8 @@ export class StreamProcessor {
             'ms',
         );
       })
-      .setTimeout(StreamProcessor.SSE_TIMEOUT_MS)
-      .end();
+      .setTimeout(StreamProcessor.SSE_TIMEOUT_MS);
+    this.request.end();
   }
 
   private processData(data: any): void {
@@ -212,14 +216,19 @@ export class StreamProcessor {
     return this.readyState === StreamProcessor.CONNECTED;
   }
 
-  stop(): void {
-    this.log.info('Stopping StreamProcessor');
-    this.eventBus.emit(StreamEvent.DISCONNECTED);
-  }
-
   close(): void {
+    if (this.readyState === StreamProcessor.CLOSED) {
+      this.log.info('SteamProcessor already closed');
+      return;
+    }
+
+    this.readyState = StreamProcessor.CLOSED;
     this.log.info('Closing StreamProcessor');
-    this.stop();
+
+    this.request.destroy();
+    this.request = undefined;
+
+    this.eventBus.emit(StreamEvent.DISCONNECTED);
     this.log.info('StreamProcessor closed');
   }
 }
