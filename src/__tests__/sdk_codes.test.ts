@@ -1,11 +1,17 @@
-import { ConsoleLog, Logger } from "../log";
+import { Logger } from "../log";
 import * as sdkCodes from '../sdk_codes';
 
 describe('SDK Tests', () => {
   let logger: Logger;
 
   beforeEach(() => {
-    logger = new ConsoleLog()
+    logger = {
+      trace: jest.fn(),
+      debug: jest.fn(),
+      info: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+    };
   });
 
   test('Run all sdk_code functions without raising exceptions', () => {
