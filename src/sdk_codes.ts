@@ -37,7 +37,7 @@ const sdkCodes: SDKCodeMessages = {
   7004: 'Target metrics exceeded max size, remaining targets for this analytics interval will not be sent',
 };
 
-function getSDKCodeMessage(key: number): string {
+export function getSDKCodeMessage(key: number): string {
   if (key in sdkCodes) {
     return sdkCodes[key];
   } else {
@@ -45,91 +45,91 @@ function getSDKCodeMessage(key: number): string {
   }
 }
 
-function sdkErrMsg(
+export function sdkErrMsg(
   errorCode: number,
   appendText = '',
-): String {
+): string {
   return `SDKCODE:${errorCode}: ${getSDKCodeMessage(
     errorCode
   )} ${appendText}`;}
 
-function warnMissingSDKKey(logger: Logger): void {
+export function warnMissingSDKKey(logger: Logger): void {
   logger.warn(sdkErrMsg(1002, ''));
 }
 
-function infoPollStarted(durationSec: number, logger: Logger): void {
+export function infoPollStarted(durationSec: number, logger: Logger): void {
   logger.info(sdkErrMsg(4000, `${durationSec * 1000}`));
 }
 
-function infoSDKInitOK(logger: Logger): void {
+export function infoSDKInitOK(logger: Logger): void {
   logger.info(sdkErrMsg(1000, ''));
 }
 
-function infoSDKInitWaiting(logger: Logger): void {
+export function infoSDKInitWaiting(logger: Logger): void {
   logger.info(sdkErrMsg(1003, ''));
 }
 
-function infoSDKStartClose(logger: Logger): void {
+export function infoSDKStartClose(logger: Logger): void {
   logger.info(sdkErrMsg(3000, ''));
 }
 
-function infoSDKCloseSuccess(logger: Logger): void {
+export function infoSDKCloseSuccess(logger: Logger): void {
   logger.info(sdkErrMsg(3001, ''));
 }
 
-function infoSDKAuthOK(logger: Logger): void {
+export function infoSDKAuthOK(logger: Logger): void {
   logger.info(sdkErrMsg(2000, ''));
 }
 
-function infoPollingStopped(reason: string, logger: Logger): void {
+export function infoPollingStopped(reason: string, logger: Logger): void {
   logger.info(sdkErrMsg(4001, reason));
 }
 
-function infoStreamConnected(logger: Logger): void {
+export function infoStreamConnected(logger: Logger): void {
   logger.info(sdkErrMsg(5000, ''));
 }
 
-function infoStreamEventReceived(eventJson: string, logger: Logger): void {
+export function infoStreamEventReceived(eventJson: string, logger: Logger): void {
   logger.info(sdkErrMsg(5002, eventJson));
 }
 
-function infoStreamStopped(logger: Logger): void {
+export function infoStreamStopped(logger: Logger): void {
   logger.info(sdkErrMsg(5004, ''));
 }
 
-function infoMetricsThreadStarted(interval: number, logger: Logger): void {
+export function infoMetricsThreadStarted(interval: number, logger: Logger): void {
   logger.info(sdkErrMsg(7000, `${interval}`));
 }
 
-function infoMetricsSuccess(logger: Logger): void {
+export function infoMetricsSuccess(logger: Logger): void {
   logger.info(sdkErrMsg(7003, ''));
 }
 
-function infoMetricsTargetExceeded(logger: Logger): void {
+export function infoMetricsTargetExceeded(logger: Logger): void {
   logger.info(sdkErrMsg(7004, ''));
 }
 
-function infoMetricsThreadExited(logger: Logger): void {
+export function infoMetricsThreadExited(logger: Logger): void {
   logger.info(sdkErrMsg(7001, ''));
 }
 
-function infoEvalSuccess(logger: Logger): void {
+export function infoEvalSuccess(logger: Logger): void {
   logger.info(sdkErrMsg(6000, ''));
 }
 
-function warnAuthFailedSrvDefaults(logger: Logger): void {
+export function warnAuthFailedSrvDefaults(logger: Logger): void {
   logger.warn(sdkErrMsg(2001, ''));
 }
 
-function warnFailedInitAuthError(logger: Logger): void {
+export function warnFailedInitAuthError(logger: Logger): void {
   logger.warn(sdkErrMsg(1001, ''));
 }
 
-function warnAuthFailedExceedRetries(logger: Logger): void {
+export function warnAuthFailedExceedRetries(logger: Logger): void {
   logger.warn(sdkErrMsg(2003, ''));
 }
 
-function warnAuthRetrying(
+export function warnAuthRetrying(
   attempt: number,
   error: string,
   logger: Logger
@@ -140,19 +140,19 @@ function warnAuthRetrying(
   ));
 }
 
-function warnStreamDisconnected(reason: string, logger: Logger): void {
+export function warnStreamDisconnected(reason: string, logger: Logger): void {
   logger.warn(sdkErrMsg(5001, reason));
 }
 
-function warnStreamRetrying(seconds: number, logger: Logger): void {
+export function warnStreamRetrying(seconds: number, logger: Logger): void {
   logger.warn(sdkErrMsg(5003, `${seconds}`));
 }
 
-function warnPostMetricsFailed(reason: string, logger: Logger): void {
+export function warnPostMetricsFailed(reason: string, logger: Logger): void {
   logger.warn(sdkErrMsg(7002, reason));
 }
 
-function warnDefaultVariationServed(
+export function warnDefaultVariationServed(
   flag: string,
   target: string,
   defaultValue: string,
