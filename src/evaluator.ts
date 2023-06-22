@@ -23,7 +23,7 @@ import {
 } from './openapi';
 import murmurhash from 'murmurhash';
 import { ConsoleLog } from './log';
-import { debugEvalSuccess } from "./sdk_codes";
+import { debugEvalSuccess } from './sdk_codes';
 
 type Callback = (
   fc: FeatureConfig,
@@ -397,7 +397,6 @@ export class Evaluator {
       return result;
     }
 
-
     return defaultValue;
   }
 
@@ -455,7 +454,12 @@ export class Evaluator {
       callback,
     );
     if (variation) {
-      debugEvalSuccess(`${JSON.stringify(variation.value)}`, identifier, target, this.log);
+      debugEvalSuccess(
+        `${JSON.stringify(variation.value)}`,
+        identifier,
+        target,
+        this.log,
+      );
       return JSON.parse(variation.value);
     }
 
