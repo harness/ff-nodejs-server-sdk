@@ -199,6 +199,11 @@ export default class Client {
 
       const decoded: Claims = jwt_decode(this.authToken);
 
+      if (!decoded.environment) {
+        this.failure = true;
+        console.error('Error while authenticating, err:  the JWT token has missing claim "environmentUUID" ');
+      }
+
       this.environment = decoded.environment;
       this.cluster = decoded.clusterIdentifier || '1';
     } catch (error) {
