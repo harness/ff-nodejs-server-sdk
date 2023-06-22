@@ -20,11 +20,14 @@ import {
   infoMetricsThreadStarted,
   infoPollStarted,
   infoSDKCloseSuccess,
-  infoSDKInitOK, infoSDKStartClose, infoStreamConnected,
+  infoSDKInitOK,
+  infoSDKStartClose,
+  infoStreamConnected,
   warnAuthFailedSrvDefaults,
   warnDefaultVariationServed,
-  warnFailedInitAuthError, warnMissingSDKKey
-} from "./sdk_codes";
+  warnFailedInitAuthError,
+  warnMissingSDKKey,
+} from './sdk_codes';
 
 axios.defaults.timeout = 30000;
 axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
@@ -200,9 +203,9 @@ export default class Client {
 
   private async authenticate(): Promise<void> {
     if (!this.sdkKey) {
-      warnMissingSDKKey(this.log)
-      this.failure = true
-      return
+      warnMissingSDKKey(this.log);
+      this.failure = true;
+      return;
     }
     try {
       const response = await this.api.authenticate({
@@ -259,17 +262,17 @@ export default class Client {
       case Processor.POLL:
         this.pollerReady = true;
         this.log.debug('PollingProcessor ready');
-        infoPollStarted(this.options.pollInterval, this.log)
+        infoPollStarted(this.options.pollInterval, this.log);
         break;
       case Processor.STREAM:
         this.streamReady = true;
         this.log.debug('StreamingProcessor ready');
-        infoStreamConnected(this.log)
+        infoStreamConnected(this.log);
         break;
       case Processor.METRICS:
         this.metricReady = true;
         this.log.debug('MetricsProcessor ready');
-        infoMetricsThreadStarted(this.options.eventsSyncInterval, this.log)
+        infoMetricsThreadStarted(this.options.eventsSyncInterval, this.log);
         break;
     }
 
@@ -416,7 +419,7 @@ export default class Client {
   }
 
   close(): void {
-    infoSDKStartClose(this.log)
+    infoSDKStartClose(this.log);
     this.closing = true;
     this.pollProcessor.close();
     if (this.streamProcessor) {
@@ -427,6 +430,6 @@ export default class Client {
     }
     this.eventBus.removeAllListeners();
     this.closing = false;
-    infoSDKCloseSuccess(this.log)
+    infoSDKCloseSuccess(this.log);
   }
 }

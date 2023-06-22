@@ -3,7 +3,7 @@ import { Options } from './types';
 import EventEmitter from 'events';
 import { Repository } from './repository';
 import { ConsoleLog } from './log';
-import { infoPollingStopped } from "./sdk_codes";
+import { infoPollingStopped } from './sdk_codes';
 
 export enum PollerEvent {
   READY = 'poller_ready',
@@ -43,7 +43,7 @@ export class PollingProcessor {
   private poll() {
     if (this.stopped) {
       this.log.info('PollingProcessor stopped');
-      infoPollingStopped(this.log)
+      infoPollingStopped(this.log);
       return;
     }
 
@@ -81,7 +81,7 @@ export class PollingProcessor {
         // we will check one more time if processor is stopped
         if (this.stopped) {
           this.log.info('PollingProcessor stopped');
-          infoPollingStopped(this.log)
+          infoPollingStopped(this.log);
           return;
         }
         pollAgain();

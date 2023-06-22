@@ -7,7 +7,12 @@ import { ConsoleLog } from './log';
 
 import https, { RequestOptions } from 'https';
 import http, { ClientRequest } from 'http';
-import { debugStreamEventReceived, infoStreamStopped, warnStreamDisconnected, warnStreamRetrying } from "./sdk_codes";
+import {
+  debugStreamEventReceived,
+  infoStreamStopped,
+  warnStreamDisconnected,
+  warnStreamRetrying,
+} from './sdk_codes';
 
 type FetchFunction = (
   identifier: string,
@@ -138,7 +143,7 @@ export class StreamProcessor {
 
         res
           .on('data', (data) => {
-            debugStreamEventReceived(this.log)
+            debugStreamEventReceived(this.log);
             this.processData(data);
           })
           .on('close', () => {
@@ -235,6 +240,6 @@ export class StreamProcessor {
 
     this.eventBus.emit(StreamEvent.DISCONNECTED);
     this.log.info('StreamProcessor closed');
-    infoStreamStopped(this.log)
+    infoStreamStopped(this.log);
   }
 }
