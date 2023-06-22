@@ -32,7 +32,7 @@ const sdkCodes: SDKCodeMessages = {
   6001: 'Evaluation Failed, returning default variation: ',
   // SDK_METRICS_7xxx
   7000: 'Metrics thread started with request interval:',
-  7001: 'Metrics thread exited',
+  7001: 'Metrics stopped',
   7002: 'Posting metrics failed, reason:',
   7003: 'Metrics posted successfully',
 };

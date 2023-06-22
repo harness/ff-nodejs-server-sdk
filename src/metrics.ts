@@ -54,6 +54,7 @@ export const MetricsProcessor = (
   conf: Configuration,
   options: Options,
   eventBus: events.EventEmitter,
+  closed = false
 ): MetricsProcessorInterface => {
   const data: Map<string, AnalyticsEvent> = new Map<string, AnalyticsEvent>();
   let syncInterval: NodeJS.Timeout;
@@ -178,6 +179,10 @@ export const MetricsProcessor = (
   };
 
   const _send = (): void => {
+    if (closed) {
+      return
+    }
+
     const metrics: Metrics = _summarize();
     if (metrics) {
       log.debug('Start sending metrics data');
@@ -213,6 +218,7 @@ export const MetricsProcessor = (
     log.info('Closing MetricsProcessor');
     clearInterval(syncInterval);
     _send();
+    closed = true
     log.info('MetricsProcessor closed');
     infoMetricsThreadExited(log)
   };
