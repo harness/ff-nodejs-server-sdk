@@ -2,17 +2,13 @@ import { Logger } from '../log';
 import * as sdkCodes from '../sdk_codes';
 
 describe('SDK Tests', () => {
-  let logger: Logger;
-
-  beforeEach(() => {
-    logger = {
-      trace: jest.fn(),
-      debug: jest.fn(),
-      info: jest.fn(),
-      warn: jest.fn(),
-      error: jest.fn(),
-    };
-  });
+  const logger: Logger = {
+    trace: jest.fn(),
+    debug: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  };
 
   test('Run all sdk_code functions without raising exceptions', () => {
     expect(() => {
