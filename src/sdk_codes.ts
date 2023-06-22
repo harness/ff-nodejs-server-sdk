@@ -1,4 +1,5 @@
 import { Logger } from './log';
+import { Target } from "./types";
 
 interface SDKCodeMessages {
   [key: number]: string;
@@ -154,7 +155,7 @@ export function warnPostMetricsFailed(reason: string, logger: Logger): void {
 
 export function warnDefaultVariationServed(
   flag: string,
-  target: string,
+  target: Target,
   defaultValue: string,
   logger: Logger
 ): void {

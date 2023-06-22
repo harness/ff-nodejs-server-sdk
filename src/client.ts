@@ -16,7 +16,13 @@ import {
   MetricsProcessorInterface,
 } from './metrics';
 import { Logger } from './log';
-import { infoSDKAuthOK, infoSDKInitOK, warnAuthFailedSrvDefaults, warnFailedInitAuthError } from "./sdk_codes";
+import {
+  infoSDKAuthOK,
+  infoSDKInitOK,
+  warnAuthFailedSrvDefaults,
+  warnDefaultVariationServed,
+  warnFailedInitAuthError
+} from "./sdk_codes";
 
 axios.defaults.timeout = 30000;
 axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
@@ -325,6 +331,10 @@ export default class Client {
     target: Target,
     defaultValue = false,
   ): Promise<boolean> {
+    if (!this.initialized) {
+      warnDefaultVariationServed(identifier, target, defaultValue.toString(), this.log)
+      Promise.resolve(defaultValue)
+    }
     return this.evaluator.boolVariation(
       identifier,
       target,
