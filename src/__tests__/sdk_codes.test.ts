@@ -39,7 +39,6 @@ describe('SDK Tests', () => {
       sdkCodes.warnStreamRetrying(4, logger)
       sdkCodes.warnPostMetricsFailed("dummy error", logger)
       sdkCodes.warnDefaultVariationServed("flag", { name: "dummy", identifier: "dummy"}, "default value", logger)
-      // Call other functions here
     }).not.toThrow();
   });
 });
