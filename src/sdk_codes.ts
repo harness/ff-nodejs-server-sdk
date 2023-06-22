@@ -10,7 +10,6 @@ const sdkCodes: SDKCodeMessages = {
   1000: 'The SDK has successfully initialized',
   1001: 'The SDK has failed to initialize due to an authentication error - defaults will be served',
   1002: 'The SDK has failed to initialize due to a missing or empty API key - defaults will be served',
-  1003: 'The SDK is waiting for initialization to complete',
   // SDK_AUTH_2xxx
   2000: 'Authentication was successful',
   2001: 'Authentication failed with a non-recoverable error',
@@ -62,10 +61,6 @@ export function infoPollStarted(durationSec: number, logger: Logger): void {
 
 export function infoSDKInitOK(logger: Logger): void {
   logger.info(sdkErrMsg(1000, ''));
-}
-
-export function infoSDKInitWaiting(logger: Logger): void {
-  logger.info(sdkErrMsg(1003, ''));
 }
 
 export function infoSDKStartClose(logger: Logger): void {

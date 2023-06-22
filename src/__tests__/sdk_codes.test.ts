@@ -20,7 +20,6 @@ describe('SDK Tests', () => {
       sdkCodes.infoSDKCloseSuccess(logger);
       sdkCodes.infoMetricsThreadStarted(5000, logger);
       sdkCodes.infoPollStarted(60, logger)
-      sdkCodes.infoSDKInitWaiting( logger)
       sdkCodes.infoSDKStartClose( logger)
       sdkCodes.infoSDKAuthOK( logger)
       sdkCodes.infoPollingStopped("Dummy reason", logger)
@@ -30,7 +29,7 @@ describe('SDK Tests', () => {
       sdkCodes.infoMetricsSuccess( logger)
       sdkCodes.infoMetricsTargetExceeded( logger)
       sdkCodes.infoMetricsThreadExited( logger)
-      sdkCodes.debugEvalSuccess( logger)
+      sdkCodes.debugEvalSuccess("dummy result", "dummy identifier", { name: "dummy", identifier: "dummy"}, logger)
       sdkCodes.warnAuthFailedSrvDefaults( logger)
       sdkCodes.warnMissingSDKKey( logger)
       sdkCodes.warnFailedInitAuthError( logger)
@@ -39,7 +38,7 @@ describe('SDK Tests', () => {
       sdkCodes.warnStreamDisconnected("dummy reason", logger)
       sdkCodes.warnStreamRetrying(4, logger)
       sdkCodes.warnPostMetricsFailed("dummy error", logger)
-      sdkCodes.warnDefaultVariationServed("flag", "target", "default value", logger)
+      sdkCodes.warnDefaultVariationServed("flag", { name: "dummy", identifier: "dummy"}, "default value", logger)
       // Call other functions here
     }).not.toThrow();
   });

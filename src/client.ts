@@ -17,10 +17,10 @@ import {
 } from './metrics';
 import { Logger } from './log';
 import {
-  infoSDKInitOK, infoSDKInitWaiting,
+  infoSDKInitOK,
   warnAuthFailedSrvDefaults,
   warnDefaultVariationServed,
-  warnFailedInitAuthError
+  warnFailedInitAuthError, warnMissingSDKKey
 } from "./sdk_codes";
 
 axios.defaults.timeout = 30000;
@@ -196,6 +196,11 @@ export default class Client {
   }
 
   private async authenticate(): Promise<void> {
+    if (!this.sdkKey) {
+      warnMissingSDKKey(this.log)
+      this.failure = true
+      return
+    }
     try {
       const response = await this.api.authenticate({
         apiKey: this.sdkKey,
@@ -217,11 +222,12 @@ export default class Client {
     } catch (error) {
       this.failure = true;
       console.error('Error while authenticating, err: ', error);
+      warnAuthFailedSrvDefaults(this.log);
+      warnFailedInitAuthError(this.log);
     }
   }
 
   waitForInitialization(): Promise<Client> {
-    infoSDKInitWaiting(this.log)
     if (this.waitForInitialize) {
       return this.waitForInitialize;
     }
@@ -279,11 +285,9 @@ export default class Client {
   private async run(): Promise<void> {
     await this.authenticate();
 
-    // If authentication has failed then we don't want to continue. We will warn
+    // If authentication has failed then we don't want to continue. We have already warned
     // the user that authentication has failed, and that the SDK will serve defaults.
     if (this.failure) {
-      warnAuthFailedSrvDefaults(this.log);
-      warnFailedInitAuthError(this.log);
       return;
     }
 
