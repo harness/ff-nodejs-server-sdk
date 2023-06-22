@@ -30,7 +30,7 @@ describe('SDK Tests', () => {
       sdkCodes.infoMetricsSuccess( logger)
       sdkCodes.infoMetricsTargetExceeded( logger)
       sdkCodes.infoMetricsThreadExited( logger)
-      sdkCodes.infoEvalSuccess( logger)
+      sdkCodes.debugEvalSuccess( logger)
       sdkCodes.warnAuthFailedSrvDefaults( logger)
       sdkCodes.warnMissingSDKKey( logger)
       sdkCodes.warnFailedInitAuthError( logger)

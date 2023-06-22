@@ -118,8 +118,20 @@ export function infoMetricsThreadExited(logger: Logger): void {
   logger.info(sdkErrMsg(7001, ''));
 }
 
-export function infoEvalSuccess(result: string, flagIdentifier: string, target: Target, logger: Logger): void {
-  logger.debug(sdkErrMsg(6000, `result=${result}, flag identifier=${flagIdentifier}, target=${JSON.stringify(target)}`))
+export function debugEvalSuccess(
+  result: string,
+  flagIdentifier: string,
+  target: Target,
+  logger: Logger,
+): void {
+  logger.debug(
+    sdkErrMsg(
+      6000,
+      `result=${result}, flag identifier=${flagIdentifier}, target=${JSON.stringify(
+        target,
+      )}`,
+    ),
+  );
 }
 
 export function warnAuthFailedSrvDefaults(logger: Logger): void {
@@ -163,6 +175,11 @@ export function warnDefaultVariationServed(
   logger: Logger,
 ): void {
   logger.warn(
-    sdkErrMsg(6001, `default variation used=${defaultValue}, flag=${flag}, target=${JSON.stringify(target)}`),
+    sdkErrMsg(
+      6001,
+      `default variation used=${defaultValue}, flag=${flag}, target=${JSON.stringify(
+        target,
+      )}`,
+    ),
   );
 }

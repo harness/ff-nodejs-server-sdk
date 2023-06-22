@@ -17,12 +17,14 @@ import {
 } from './metrics';
 import { Logger } from './log';
 import {
+  debugEvalSuccess,
   infoSDKAuthOK,
   infoSDKInitOK,
   warnAuthFailedSrvDefaults,
   warnDefaultVariationServed,
-  warnFailedInitAuthError
-} from "./sdk_codes";
+  warnFailedInitAuthError,
+} from './sdk_codes';
+import { Str } from './string';
 
 axios.defaults.timeout = 30000;
 axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
@@ -208,7 +210,9 @@ export default class Client {
 
       if (!decoded.environment) {
         this.failure = true;
-        console.error('Error while authenticating, err:  the JWT token has missing claim "environmentUUID" ');
+        console.error(
+          'Error while authenticating, err:  the JWT token has missing claim "environmentUUID" ',
+        );
       }
 
       this.environment = decoded.environment;
@@ -226,7 +230,7 @@ export default class Client {
 
     if (this.initialized) {
       this.waitForInitialize = Promise.resolve(this);
-      infoSDKInitOK(this.log)
+      infoSDKInitOK(this.log);
       // We unblock the call even if initialization has failed. We've
       // already warned the user that initialization has failed and that
       // defaults will be served
@@ -280,9 +284,9 @@ export default class Client {
     // If authentication has failed then we don't want to continue. We will warn
     // the user that authentication has failed, and that the SDK will serve defaults.
     if (this.failure) {
-      warnAuthFailedSrvDefaults(this.log)
-      warnFailedInitAuthError(this.log)
-      return
+      warnAuthFailedSrvDefaults(this.log);
+      warnFailedInitAuthError(this.log);
+      return;
     }
 
     this.pollProcessor = new PollingProcessor(
@@ -323,7 +327,7 @@ export default class Client {
 
     this.log.info('finished setting up processors');
     this.initialized = true;
-    infoSDKInitOK(this.log)
+    infoSDKInitOK(this.log);
   }
 
   boolVariation(
@@ -332,10 +336,15 @@ export default class Client {
     defaultValue = false,
   ): Promise<boolean> {
     if (!this.initialized) {
-      warnDefaultVariationServed(identifier, target, defaultValue.toString(), this.log)
-      Promise.resolve(defaultValue)
+      warnDefaultVariationServed(
+        identifier,
+        target,
+        defaultValue.toString(),
+        this.log,
+      );
+      Promise.resolve(defaultValue);
     }
-    return this.evaluator.boolVariation(
+    const result = this.evaluator.boolVariation(
       identifier,
       target,
       defaultValue,
@@ -345,6 +354,8 @@ export default class Client {
         }
       },
     );
+    debugEvalSuccess(`${result}`, identifier, target, this.log);
+    return result;
   }
 
   stringVariation(
