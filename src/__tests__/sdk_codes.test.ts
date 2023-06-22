@@ -1,4 +1,4 @@
-import { Logger } from '../log';
+import type { Logger } from '../log';
 import * as sdkCodes from '../sdk_codes';
 
 describe('SDK Tests', () => {
