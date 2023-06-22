@@ -27,7 +27,6 @@ describe('SDK Tests', () => {
       sdkCodes.debugStreamEventReceived(logger);
       sdkCodes.infoStreamStopped(logger);
       sdkCodes.infoMetricsSuccess(logger);
-      sdkCodes.infoMetricsTargetExceeded(logger);
       sdkCodes.infoMetricsThreadExited(logger);
       sdkCodes.debugEvalSuccess(
         'dummy result',
