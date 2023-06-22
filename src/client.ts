@@ -17,11 +17,11 @@ import {
 } from './metrics';
 import { Logger } from './log';
 import {
-  infoSDKInitOK,
+  infoSDKInitOK, infoSDKInitWaiting,
   warnAuthFailedSrvDefaults,
   warnDefaultVariationServed,
-  warnFailedInitAuthError,
-} from './sdk_codes';
+  warnFailedInitAuthError
+} from "./sdk_codes";
 
 axios.defaults.timeout = 30000;
 axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
@@ -221,6 +221,7 @@ export default class Client {
   }
 
   waitForInitialization(): Promise<Client> {
+    infoSDKInitWaiting(this.log)
     if (this.waitForInitialize) {
       return this.waitForInitialize;
     }
