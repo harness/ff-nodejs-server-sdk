@@ -17,7 +17,10 @@ import {
 } from './metrics';
 import { Logger } from './log';
 import {
-  infoSDKInitOK,
+  infoMetricsThreadStarted,
+  infoPollStarted,
+  infoSDKCloseSuccess,
+  infoSDKInitOK, infoSDKStartClose, infoStreamConnected,
   warnAuthFailedSrvDefaults,
   warnDefaultVariationServed,
   warnFailedInitAuthError, warnMissingSDKKey
@@ -256,14 +259,17 @@ export default class Client {
       case Processor.POLL:
         this.pollerReady = true;
         this.log.debug('PollingProcessor ready');
+        infoPollStarted(this.options.pollInterval, this.log)
         break;
       case Processor.STREAM:
         this.streamReady = true;
         this.log.debug('StreamingProcessor ready');
+        infoStreamConnected(this.log)
         break;
       case Processor.METRICS:
         this.metricReady = true;
         this.log.debug('MetricsProcessor ready');
+        infoMetricsThreadStarted(this.options.eventsSyncInterval, this.log)
         break;
     }
 
@@ -410,6 +416,7 @@ export default class Client {
   }
 
   close(): void {
+    infoSDKStartClose(this.log)
     this.closing = true;
     this.pollProcessor.close();
     if (this.streamProcessor) {
@@ -420,5 +427,6 @@ export default class Client {
     }
     this.eventBus.removeAllListeners();
     this.closing = false;
+    infoSDKCloseSuccess(this.log)
   }
 }

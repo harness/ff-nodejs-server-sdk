@@ -27,8 +27,7 @@ const sdkCodes: SDKCodeMessages = {
   5002: 'SSE event received: ',
   5003: 'SSE retrying to connect in',
   5004: 'SSE stopped',
-  // SDK_EVAL_6xxx - these are hardcoded in `client.ts` as they
-  // are more complex
+  // SDK_EVAL_6xxx -
   6000: 'Evaluation successful: ',
   6001: 'Evaluation Failed, returning default variation: ',
   // SDK_METRICS_7xxx
@@ -36,7 +35,6 @@ const sdkCodes: SDKCodeMessages = {
   7001: 'Metrics thread exited',
   7002: 'Posting metrics failed, reason:',
   7003: 'Metrics posted successfully',
-  7004: 'Target metrics exceeded max size, remaining targets for this analytics interval will not be sent',
 };
 
 export function getSDKCodeMessage(key: number): string {
@@ -75,19 +73,16 @@ export function infoSDKAuthOK(logger: Logger): void {
   logger.info(sdkErrMsg(2000, ''));
 }
 
-export function infoPollingStopped(reason: string, logger: Logger): void {
-  logger.info(sdkErrMsg(4001, reason));
+export function infoPollingStopped(logger: Logger): void {
+  logger.info(sdkErrMsg(4001));
 }
 
 export function infoStreamConnected(logger: Logger): void {
   logger.info(sdkErrMsg(5000, ''));
 }
 
-export function infoStreamEventReceived(
-  eventJson: string,
-  logger: Logger,
-): void {
-  logger.info(sdkErrMsg(5002, eventJson));
+export function debugStreamEventReceived(logger: Logger): void {
+  logger.debug(sdkErrMsg(5002));
 }
 
 export function infoStreamStopped(logger: Logger): void {
@@ -103,10 +98,6 @@ export function infoMetricsThreadStarted(
 
 export function infoMetricsSuccess(logger: Logger): void {
   logger.info(sdkErrMsg(7003, ''));
-}
-
-export function infoMetricsTargetExceeded(logger: Logger): void {
-  logger.info(sdkErrMsg(7004, ''));
 }
 
 export function infoMetricsThreadExited(logger: Logger): void {
