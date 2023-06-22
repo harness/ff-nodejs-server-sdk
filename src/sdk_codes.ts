@@ -119,7 +119,7 @@ export function infoMetricsThreadExited(logger: Logger): void {
 }
 
 export function infoEvalSuccess(result: string, flagIdentifier: string, target: Target, logger: Logger): void {
-  logger.info(sdkErrMsg(6000, `result=${result}, flag identifier=${flagIdentifier}, target=${JSON.stringify(target)}`))
+  logger.debug(sdkErrMsg(6000, `result=${result}, flag identifier=${flagIdentifier}, target=${JSON.stringify(target)}`))
 }
 
 export function warnAuthFailedSrvDefaults(logger: Logger): void {
