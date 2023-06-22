@@ -16,6 +16,7 @@ import {
   MetricsProcessorInterface,
 } from './metrics';
 import { Logger } from './log';
+import { infoSDKAuthOK, infoSDKInitOK, warnAuthFailedSrvDefaults, warnFailedInitAuthError } from "./sdk_codes";
 
 axios.defaults.timeout = 30000;
 axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
@@ -219,8 +220,12 @@ export default class Client {
 
     if (this.initialized) {
       this.waitForInitialize = Promise.resolve(this);
+      infoSDKInitOK(this.log)
+      // We unblock the call even if initialization has failed. We've
+      // already warned the user that initialization has failed and that
+      // defaults will be served
     } else if (this.failure) {
-      this.waitForInitialize = Promise.reject(this.failure);
+      this.waitForInitialize = Promise.resolve(this);
     } else {
       this.waitForInitialize = new Promise((resolve, reject) => {
         this.eventBus.once(Event.READY, () => {
@@ -260,12 +265,19 @@ export default class Client {
       return;
     }
 
-    this.initialized = true;
     this.eventBus.emit(Event.READY);
   }
 
   private async run(): Promise<void> {
     await this.authenticate();
+
+    // If authentication has failed then we don't want to continue. We will warn
+    // the user that authentication has failed, and that the SDK will serve defaults.
+    if (this.failure) {
+      warnAuthFailedSrvDefaults(this.log)
+      warnFailedInitAuthError(this.log)
+      return
+    }
 
     this.pollProcessor = new PollingProcessor(
       this.environment,
@@ -304,6 +316,8 @@ export default class Client {
     }
 
     this.log.info('finished setting up processors');
+    this.initialized = true;
+    infoSDKInitOK(this.log)
   }
 
   boolVariation(
