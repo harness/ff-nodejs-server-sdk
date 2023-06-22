@@ -230,7 +230,7 @@ export default class Client {
       // We unblock the call even if initialization has failed. We've
       // already warned the user that initialization has failed and that
       // defaults will be served
-    } else if (this.failure) {
+    } else if (!this.initialized) {
       this.waitForInitialize = Promise.resolve(this);
     } else {
       this.waitForInitialize = new Promise((resolve, reject) => {

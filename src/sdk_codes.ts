@@ -1,5 +1,5 @@
 import { Logger } from './log';
-import { Target } from "./types";
+import { Target } from './types';
 
 interface SDKCodeMessages {
   [key: number]: string;
@@ -28,8 +28,10 @@ const sdkCodes: SDKCodeMessages = {
   5002: 'SSE event received: ',
   5003: 'SSE retrying to connect in',
   5004: 'SSE stopped',
-  // SDK_EVAL_6xxx - these are hardcoded in `variation.py` as they
+  // SDK_EVAL_6xxx - these are hardcoded in `client.ts` as they
   // are more complex
+  6000: 'Evaluation successful: ',
+  6001: 'Evaluation Failed, returning default variation: ',
   // SDK_METRICS_7xxx
   7000: 'Metrics thread started with request interval:',
   7001: 'Metrics thread exited',
@@ -46,13 +48,9 @@ export function getSDKCodeMessage(key: number): string {
   }
 }
 
-export function sdkErrMsg(
-  errorCode: number,
-  appendText = '',
-): string {
-  return `SDKCODE:${errorCode}: ${getSDKCodeMessage(
-    errorCode
-  )} ${appendText}`;}
+export function sdkErrMsg(errorCode: number, appendText = ''): string {
+  return `SDKCODE:${errorCode}: ${getSDKCodeMessage(errorCode)} ${appendText}`;
+}
 
 export function warnMissingSDKKey(logger: Logger): void {
   logger.warn(sdkErrMsg(1002, ''));
@@ -90,7 +88,10 @@ export function infoStreamConnected(logger: Logger): void {
   logger.info(sdkErrMsg(5000, ''));
 }
 
-export function infoStreamEventReceived(eventJson: string, logger: Logger): void {
+export function infoStreamEventReceived(
+  eventJson: string,
+  logger: Logger,
+): void {
   logger.info(sdkErrMsg(5002, eventJson));
 }
 
@@ -98,7 +99,10 @@ export function infoStreamStopped(logger: Logger): void {
   logger.info(sdkErrMsg(5004, ''));
 }
 
-export function infoMetricsThreadStarted(interval: number, logger: Logger): void {
+export function infoMetricsThreadStarted(
+  interval: number,
+  logger: Logger,
+): void {
   logger.info(sdkErrMsg(7000, `${interval}`));
 }
 
@@ -114,8 +118,8 @@ export function infoMetricsThreadExited(logger: Logger): void {
   logger.info(sdkErrMsg(7001, ''));
 }
 
-export function infoEvalSuccess(logger: Logger): void {
-  logger.info(sdkErrMsg(6000, ''));
+export function infoEvalSuccess(result: string, flagIdentifier: string, target: Target, logger: Logger): void {
+  logger.info(sdkErrMsg(6000, `result=${result}, flag identifier=${flagIdentifier}, target=${JSON.stringify(target)}`))
 }
 
 export function warnAuthFailedSrvDefaults(logger: Logger): void {
@@ -133,12 +137,11 @@ export function warnAuthFailedExceedRetries(logger: Logger): void {
 export function warnAuthRetrying(
   attempt: number,
   error: string,
-  logger: Logger
+  logger: Logger,
 ): void {
-  logger.warn(sdkErrMsg(
-    2002,
-    `attempt ${attempt}, got error: ${error}, Retrying ...`
-  ));
+  logger.warn(
+    sdkErrMsg(2002, `attempt ${attempt}, got error: ${error}, Retrying ...`),
+  );
 }
 
 export function warnStreamDisconnected(reason: string, logger: Logger): void {
@@ -157,10 +160,9 @@ export function warnDefaultVariationServed(
   flag: string,
   target: Target,
   defaultValue: string,
-  logger: Logger
+  logger: Logger,
 ): void {
-  logger.warn(sdkErrMsg(
-    6001,
-    `flag=${flag}, target=${target}, default=${defaultValue}`,
-  ));
+  logger.warn(
+    sdkErrMsg(6001, `flag=${flag}, target=${JSON.stringify(target)}, default=${defaultValue}`),
+  );
 }
