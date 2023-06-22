@@ -163,6 +163,6 @@ export function warnDefaultVariationServed(
   logger: Logger,
 ): void {
   logger.warn(
-    sdkErrMsg(6001, `flag=${flag}, target=${JSON.stringify(target)}, default=${defaultValue}`),
+    sdkErrMsg(6001, `, default value=${defaultValue}, flag=${flag}, target=${JSON.stringify(target)}`),
   );
 }
