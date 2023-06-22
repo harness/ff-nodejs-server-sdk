@@ -455,9 +455,8 @@ export class Evaluator {
       callback,
     );
     if (variation) {
-      const result = JSON.parse(variation.value);
-      debugEvalSuccess(`${result}`, identifier, target, this.log);
-      return result;
+      debugEvalSuccess(`${JSON.stringify(variation.value)}`, identifier, target, this.log);
+      return JSON.parse(variation.value);
     }
 
     return defaultValue;

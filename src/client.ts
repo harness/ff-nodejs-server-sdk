@@ -17,14 +17,11 @@ import {
 } from './metrics';
 import { Logger } from './log';
 import {
-  debugEvalSuccess,
-  infoSDKAuthOK,
   infoSDKInitOK,
   warnAuthFailedSrvDefaults,
   warnDefaultVariationServed,
   warnFailedInitAuthError,
 } from './sdk_codes';
-import { Str } from './string';
 
 axios.defaults.timeout = 30000;
 axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
