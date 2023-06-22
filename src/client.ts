@@ -344,7 +344,7 @@ export default class Client {
       );
       Promise.resolve(defaultValue);
     }
-    const result = this.evaluator.boolVariation(
+    return this.evaluator.boolVariation(
       identifier,
       target,
       defaultValue,
@@ -354,8 +354,6 @@ export default class Client {
         }
       },
     );
-    debugEvalSuccess(`${result}`, identifier, target, this.log);
-    return result;
   }
 
   stringVariation(

@@ -23,6 +23,7 @@ import {
 } from './openapi';
 import murmurhash from 'murmurhash';
 import { ConsoleLog } from './log';
+import { debugEvalSuccess } from "./sdk_codes";
 
 type Callback = (
   fc: FeatureConfig,
@@ -391,8 +392,11 @@ export class Evaluator {
       callback,
     );
     if (variation) {
-      return variation.value.toLowerCase() === 'true';
+      const result = variation.value.toLowerCase() === 'true';
+      debugEvalSuccess(`${result}`, identifier, target, this.log);
+      return result;
     }
+
 
     return defaultValue;
   }
@@ -410,6 +414,7 @@ export class Evaluator {
       callback,
     );
     if (variation) {
+      debugEvalSuccess(`${variation.value}`, identifier, target, this.log);
       return variation.value;
     }
 
@@ -429,7 +434,9 @@ export class Evaluator {
       callback,
     );
     if (variation) {
-      return parseFloat(variation.value);
+      const result = parseFloat(variation.value);
+      debugEvalSuccess(`${result}`, identifier, target, this.log);
+      return result;
     }
 
     return defaultValue;
@@ -448,7 +455,9 @@ export class Evaluator {
       callback,
     );
     if (variation) {
-      return JSON.parse(variation.value);
+      const result = JSON.parse(variation.value);
+      debugEvalSuccess(`${result}`, identifier, target, this.log);
+      return result;
     }
 
     return defaultValue;
