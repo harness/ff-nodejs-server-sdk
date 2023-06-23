@@ -50,7 +50,7 @@ export function sdkErrMsg(errorCode: number, appendText = ''): string {
 }
 
 export function warnMissingSDKKey(logger: Logger): void {
-  logger.warn(sdkErrMsg(1002, ''));
+  logger.warn(sdkErrMsg(1002));
 }
 
 export function infoPollStarted(durationSec: number, logger: Logger): void {
