@@ -37,7 +37,7 @@ const sdkCodes: SDKCodeMessages = {
   7003: 'Metrics posted successfully',
 };
 
-export function getSDKCodeMessage(key: number): string {
+function getSDKCodeMessage(key: number): string {
   if (key in sdkCodes) {
     return sdkCodes[key];
   } else {
