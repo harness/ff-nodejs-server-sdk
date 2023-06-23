@@ -353,7 +353,7 @@ export default class Client {
         defaultValue.toString(),
         this.log,
       );
-      Promise.resolve(defaultValue);
+      return Promise.resolve(defaultValue);
     }
     return this.evaluator.boolVariation(
       identifier,
@@ -379,7 +379,7 @@ export default class Client {
         defaultValue.toString(),
         this.log,
       );
-      Promise.resolve(defaultValue);
+      return Promise.resolve(defaultValue);
     }
     return this.evaluator.stringVariation(
       identifier,
@@ -405,7 +405,7 @@ export default class Client {
         defaultValue.toString(),
         this.log,
       );
-      Promise.resolve(defaultValue);
+      return Promise.resolve(defaultValue);
     }
     return this.evaluator.numberVariation(
       identifier,
@@ -431,7 +431,7 @@ export default class Client {
         defaultValue.toString(),
         this.log,
       );
-      Promise.resolve(defaultValue);
+      return Promise.resolve(defaultValue);
     }
     return this.evaluator.jsonVariation(
       identifier,
