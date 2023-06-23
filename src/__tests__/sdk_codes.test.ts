@@ -1,7 +1,7 @@
 import type { Logger } from '../log';
 import * as sdkCodes from '../sdk_codes';
 
-describe('SDK Tests', () => {
+describe('SDK Codes', () => {
   const logger: Logger = {
     trace: jest.fn(),
     debug: jest.fn(),
