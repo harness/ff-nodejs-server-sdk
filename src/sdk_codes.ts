@@ -45,7 +45,7 @@ function getSDKCodeMessage(key: number): string {
   }
 }
 
-export function sdkErrMsg(errorCode: number, appendText = ''): string {
+function getSdkErrMsg(errorCode: number, appendText = ''): string {
   return `SDKCODE:${errorCode}: ${getSDKCodeMessage(errorCode)} ${appendText}`;
 }
 
