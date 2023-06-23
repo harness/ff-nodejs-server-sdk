@@ -45,10 +45,9 @@ function getSdkErrMsg(
   errorCode: number,
   appendText: string | number = '',
 ): string {
-  const appendedText = String(appendText);
   return `SDKCODE:${errorCode}: ${getSDKCodeMessage(
     errorCode,
-  )} ${appendedText}`;
+  )} ${appendText}`;
 }
 
 export function warnMissingSDKKey(logger: Logger): void {
