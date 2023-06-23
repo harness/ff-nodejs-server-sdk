@@ -20,7 +20,7 @@ const sdkCodes: Record<number, string> = {
   // SDK_STREAM_5xxx
   5000: 'SSE stream successfully connected',
   5001: 'SSE stream disconnected, reason:',
-  5002: 'SSE event received: ',
+  5002: 'SSE event received',
   5003: 'SSE retrying to connect in',
   5004: 'SSE stopped',
   // SDK_EVAL_6xxx -
