@@ -54,19 +54,19 @@ export function infoPollStarted(durationSec: number, logger: Logger): void {
 }
 
 export function infoSDKInitOK(logger: Logger): void {
-  logger.info(getSdkErrMsg(1000, ''));
+  logger.info(getSdkErrMsg(1000));
 }
 
 export function infoSDKStartClose(logger: Logger): void {
-  logger.info(getSdkErrMsg(3000, ''));
+  logger.info(getSdkErrMsg(3000));
 }
 
 export function infoSDKCloseSuccess(logger: Logger): void {
-  logger.info(getSdkErrMsg(3001, ''));
+  logger.info(getSdkErrMsg(3001));
 }
 
 export function infoSDKAuthOK(logger: Logger): void {
-  logger.info(getSdkErrMsg(2000, ''));
+  logger.info(getSdkErrMsg(2000));
 }
 
 export function infoPollingStopped(logger: Logger): void {
@@ -74,7 +74,7 @@ export function infoPollingStopped(logger: Logger): void {
 }
 
 export function infoStreamConnected(logger: Logger): void {
-  logger.info(getSdkErrMsg(5000, ''));
+  logger.info(getSdkErrMsg(5000));
 }
 
 export function debugStreamEventReceived(logger: Logger): void {
@@ -82,7 +82,7 @@ export function debugStreamEventReceived(logger: Logger): void {
 }
 
 export function infoStreamStopped(logger: Logger): void {
-  logger.info(getSdkErrMsg(5004, ''));
+  logger.info(getSdkErrMsg(5004));
 }
 
 export function infoMetricsThreadStarted(
@@ -93,11 +93,11 @@ export function infoMetricsThreadStarted(
 }
 
 export function infoMetricsSuccess(logger: Logger): void {
-  logger.info(getSdkErrMsg(7003, ''));
+  logger.info(getSdkErrMsg(7003));
 }
 
 export function infoMetricsThreadExited(logger: Logger): void {
-  logger.info(getSdkErrMsg(7001, ''));
+  logger.info(getSdkErrMsg(7001));
 }
 
 export function debugEvalSuccess(
@@ -117,15 +117,15 @@ export function debugEvalSuccess(
 }
 
 export function warnAuthFailedSrvDefaults(logger: Logger): void {
-  logger.warn(getSdkErrMsg(2001, ''));
+  logger.warn(getSdkErrMsg(2001));
 }
 
 export function warnFailedInitAuthError(logger: Logger): void {
-  logger.warn(getSdkErrMsg(1001, ''));
+  logger.warn(getSdkErrMsg(1001));
 }
 
 export function warnAuthFailedExceedRetries(logger: Logger): void {
-  logger.warn(getSdkErrMsg(2003, ''));
+  logger.warn(getSdkErrMsg(2003));
 }
 
 export function warnAuthRetrying(
