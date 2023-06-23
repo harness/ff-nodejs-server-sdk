@@ -46,58 +46,58 @@ function getSdkErrMsg(errorCode: number, appendText = ''): string {
 }
 
 export function warnMissingSDKKey(logger: Logger): void {
-  logger.warn(sdkErrMsg(1002));
+  logger.warn(getSdkErrMsg(1002));
 }
 
 export function infoPollStarted(durationSec: number, logger: Logger): void {
-  logger.info(sdkErrMsg(4000, `${durationSec * 1000}`));
+  logger.info(getSdkErrMsg(4000, `${durationSec * 1000}`));
 }
 
 export function infoSDKInitOK(logger: Logger): void {
-  logger.info(sdkErrMsg(1000, ''));
+  logger.info(getSdkErrMsg(1000, ''));
 }
 
 export function infoSDKStartClose(logger: Logger): void {
-  logger.info(sdkErrMsg(3000, ''));
+  logger.info(getSdkErrMsg(3000, ''));
 }
 
 export function infoSDKCloseSuccess(logger: Logger): void {
-  logger.info(sdkErrMsg(3001, ''));
+  logger.info(getSdkErrMsg(3001, ''));
 }
 
 export function infoSDKAuthOK(logger: Logger): void {
-  logger.info(sdkErrMsg(2000, ''));
+  logger.info(getSdkErrMsg(2000, ''));
 }
 
 export function infoPollingStopped(logger: Logger): void {
-  logger.info(sdkErrMsg(4001));
+  logger.info(getSdkErrMsg(4001));
 }
 
 export function infoStreamConnected(logger: Logger): void {
-  logger.info(sdkErrMsg(5000, ''));
+  logger.info(getSdkErrMsg(5000, ''));
 }
 
 export function debugStreamEventReceived(logger: Logger): void {
-  logger.debug(sdkErrMsg(5002));
+  logger.debug(getSdkErrMsg(5002));
 }
 
 export function infoStreamStopped(logger: Logger): void {
-  logger.info(sdkErrMsg(5004, ''));
+  logger.info(getSdkErrMsg(5004, ''));
 }
 
 export function infoMetricsThreadStarted(
   interval: number,
   logger: Logger,
 ): void {
-  logger.info(sdkErrMsg(7000, `${interval}`));
+  logger.info(getSdkErrMsg(7000, `${interval}`));
 }
 
 export function infoMetricsSuccess(logger: Logger): void {
-  logger.info(sdkErrMsg(7003, ''));
+  logger.info(getSdkErrMsg(7003, ''));
 }
 
 export function infoMetricsThreadExited(logger: Logger): void {
-  logger.info(sdkErrMsg(7001, ''));
+  logger.info(getSdkErrMsg(7001, ''));
 }
 
 export function debugEvalSuccess(
@@ -107,7 +107,7 @@ export function debugEvalSuccess(
   logger: Logger,
 ): void {
   logger.debug(
-    sdkErrMsg(
+    getSdkErrMsg(
       6000,
       `result=${result}, flag identifier=${flagIdentifier}, target=${JSON.stringify(
         target,
@@ -117,15 +117,15 @@ export function debugEvalSuccess(
 }
 
 export function warnAuthFailedSrvDefaults(logger: Logger): void {
-  logger.warn(sdkErrMsg(2001, ''));
+  logger.warn(getSdkErrMsg(2001, ''));
 }
 
 export function warnFailedInitAuthError(logger: Logger): void {
-  logger.warn(sdkErrMsg(1001, ''));
+  logger.warn(getSdkErrMsg(1001, ''));
 }
 
 export function warnAuthFailedExceedRetries(logger: Logger): void {
-  logger.warn(sdkErrMsg(2003, ''));
+  logger.warn(getSdkErrMsg(2003, ''));
 }
 
 export function warnAuthRetrying(
@@ -134,20 +134,20 @@ export function warnAuthRetrying(
   logger: Logger,
 ): void {
   logger.warn(
-    sdkErrMsg(2002, `attempt ${attempt}, got error: ${error}, Retrying ...`),
+    getSdkErrMsg(2002, `attempt ${attempt}, got error: ${error}, Retrying ...`),
   );
 }
 
 export function warnStreamDisconnected(reason: string, logger: Logger): void {
-  logger.warn(sdkErrMsg(5001, reason));
+  logger.warn(getSdkErrMsg(5001, reason));
 }
 
 export function warnStreamRetrying(seconds: number, logger: Logger): void {
-  logger.warn(sdkErrMsg(5003, `${seconds}`));
+  logger.warn(getSdkErrMsg(5003, `${seconds}`));
 }
 
 export function warnPostMetricsFailed(reason: string, logger: Logger): void {
-  logger.warn(sdkErrMsg(7002, reason));
+  logger.warn(getSdkErrMsg(7002, reason));
 }
 
 export function warnDefaultVariationServed(
@@ -157,7 +157,7 @@ export function warnDefaultVariationServed(
   logger: Logger,
 ): void {
   logger.warn(
-    sdkErrMsg(
+    getSdkErrMsg(
       6001,
       `default variation used=${defaultValue}, flag=${flag}, target=${JSON.stringify(
         target,
