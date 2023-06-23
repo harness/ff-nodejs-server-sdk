@@ -355,6 +355,7 @@ export default class Client {
       );
       return Promise.resolve(defaultValue);
     }
+
     return this.evaluator.boolVariation(
       identifier,
       target,
@@ -381,6 +382,7 @@ export default class Client {
       );
       return Promise.resolve(defaultValue);
     }
+
     return this.evaluator.stringVariation(
       identifier,
       target,
@@ -407,6 +409,7 @@ export default class Client {
       );
       return Promise.resolve(defaultValue);
     }
+
     return this.evaluator.numberVariation(
       identifier,
       target,
@@ -433,6 +436,7 @@ export default class Client {
       );
       return Promise.resolve(defaultValue);
     }
+    
     return this.evaluator.jsonVariation(
       identifier,
       target,
