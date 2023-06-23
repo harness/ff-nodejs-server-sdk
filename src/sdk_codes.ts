@@ -15,7 +15,7 @@ const sdkCodes: Record<number, string> = {
   3000: 'Closing SDK',
   3001: 'SDK Closed successfully',
   // SDK_POLL_4xxx
-  4000: 'Polling started, intervalMs:',
+  4000: 'Polling started, interval:',
   4001: 'Polling stopped',
   // SDK_STREAM_5xxx
   5000: 'SSE stream successfully connected',
@@ -41,16 +41,22 @@ function getSDKCodeMessage(key: number): string {
   }
 }
 
-function getSdkErrMsg(errorCode: number, appendText = ''): string {
-  return `SDKCODE:${errorCode}: ${getSDKCodeMessage(errorCode)} ${appendText}`;
+function getSdkErrMsg(
+  errorCode: number,
+  appendText: string | number = '',
+): string {
+  const appendedText = String(appendText);
+  return `SDKCODE:${errorCode}: ${getSDKCodeMessage(
+    errorCode,
+  )} ${appendedText}`;
 }
 
 export function warnMissingSDKKey(logger: Logger): void {
   logger.warn(getSdkErrMsg(1002));
 }
 
-export function infoPollStarted(durationSec: number, logger: Logger): void {
-  logger.info(getSdkErrMsg(4000, `${durationSec * 1000}`));
+export function infoPollStarted(durationMS: number, logger: Logger): void {
+  logger.info(getSdkErrMsg(4000, durationMS / 1000 + ' seconds'));
 }
 
 export function infoSDKInitOK(logger: Logger): void {
@@ -89,7 +95,7 @@ export function infoMetricsThreadStarted(
   interval: number,
   logger: Logger,
 ): void {
-  logger.info(getSdkErrMsg(7000, `${interval}`));
+  logger.info(getSdkErrMsg(7000, interval / 1000 + ' seconds'));
 }
 
 export function infoMetricsSuccess(logger: Logger): void {
@@ -134,7 +140,10 @@ export function warnAuthRetrying(
   logger: Logger,
 ): void {
   logger.warn(
-    getSdkErrMsg(2002, `attempt=${attempt}, error=${error}, continue retrying=true`),
+    getSdkErrMsg(
+      2002,
+      `attempt=${attempt}, error=${error}, continue retrying=true`,
+    ),
   );
 }
 
