@@ -455,7 +455,7 @@ export class Evaluator {
     );
     if (variation) {
       debugEvalSuccess(
-        `${JSON.stringify(variation.value)}`,
+        `${variation.value}`,
         identifier,
         target,
         this.log,
