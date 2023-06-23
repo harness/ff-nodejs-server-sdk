@@ -16,7 +16,7 @@ const sdkCodes: Record<number, string> = {
   3001: 'SDK Closed successfully',
   // SDK_POLL_4xxx
   4000: 'Polling started, intervalMs:',
-  4001: 'Polling stopped, reason:',
+  4001: 'Polling stopped',
   // SDK_STREAM_5xxx
   5000: 'SSE stream successfully connected',
   5001: 'SSE stream disconnected, reason:',
