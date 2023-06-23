@@ -1,11 +1,7 @@
 import { Logger } from './log';
 import { Target } from './types';
 
-interface SDKCodeMessages {
-  [key: number]: string;
-}
-
-const sdkCodes: SDKCodeMessages = {
+const sdkCodes: Record<number, string> = {
   // SDK_INIT_1xxx
   1000: 'The SDK has successfully initialized',
   1001: 'The SDK has failed to initialize due to an authentication error - defaults will be served',
