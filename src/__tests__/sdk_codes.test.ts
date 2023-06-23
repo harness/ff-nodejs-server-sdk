@@ -10,40 +10,41 @@ describe('SDK Codes', () => {
     error: jest.fn(),
   };
 
-  test('Run all sdk_code functions without raising exceptions', () => {
-    expect(() => {
-      sdkCodes.infoSDKInitOK(logger);
-      sdkCodes.infoSDKCloseSuccess(logger);
-      sdkCodes.infoMetricsThreadStarted(5000, logger);
-      sdkCodes.infoPollStarted(60, logger);
-      sdkCodes.infoSDKStartClose(logger);
-      sdkCodes.infoSDKAuthOK(logger);
-      sdkCodes.infoPollingStopped(logger);
-      sdkCodes.infoStreamConnected(logger);
-      sdkCodes.debugStreamEventReceived(logger);
-      sdkCodes.infoStreamStopped(logger);
-      sdkCodes.infoMetricsSuccess(logger);
-      sdkCodes.infoMetricsThreadExited(logger);
-      sdkCodes.debugEvalSuccess(
+  test.each([
+    ['infoSDKInitOK', [logger]],
+    ['infoSDKCloseSuccess', [logger]],
+    ['infoMetricsThreadStarted', [5000, logger]],
+    ['infoPollStarted', [60, logger]],
+    ['infoSDKStartClose', [logger]],
+    ['infoSDKAuthOK', [logger]],
+    ['infoPollingStopped', [logger]],
+    ['infoStreamConnected', [logger]],
+    ['debugStreamEventReceived', [logger]],
+    ['infoStreamStopped', [logger]],
+    ['infoMetricsSuccess', [logger]],
+    ['infoMetricsThreadExited', [logger]],
+    [
+      'debugEvalSuccess',
+      [
         'dummy result',
         'dummy identifier',
         { name: 'dummy', identifier: 'dummy' },
         logger,
-      );
-      sdkCodes.warnAuthFailedSrvDefaults(logger);
-      sdkCodes.warnMissingSDKKey(logger);
-      sdkCodes.warnFailedInitAuthError(logger);
-      sdkCodes.warnAuthFailedExceedRetries(logger);
-      sdkCodes.warnAuthRetrying(1, 'dummy error', logger);
-      sdkCodes.warnStreamDisconnected('dummy reason', logger);
-      sdkCodes.warnStreamRetrying(4, logger);
-      sdkCodes.warnPostMetricsFailed('dummy error', logger);
-      sdkCodes.warnDefaultVariationServed(
-        'flag',
-        { name: 'dummy', identifier: 'dummy' },
-        'default value',
-        logger,
-      );
-    }).not.toThrow();
+      ],
+    ],
+    ['warnAuthFailedSrvDefaults', [logger]],
+    ['warnMissingSDKKey', [logger]],
+    ['warnFailedInitAuthError', [logger]],
+    ['warnAuthFailedExceedRetries', [logger]],
+    ['warnAuthRetrying', [1, 'dummy error', logger]],
+    ['warnStreamDisconnected', ['dummy reason', logger]],
+    ['warnStreamRetrying', [4, logger]],
+    ['warnPostMetricsFailed', ['dummy error', logger]],
+    [
+      'warnDefaultVariationServed',
+      ['flag', { name: 'dummy', identifier: 'dummy' }, 'default value', logger],
+    ],
+  ])('it should not throw when %s is called', (fn, args) => {
+    expect(() => sdkCodes[fn](...args)).not.toThrow();
   });
 });
