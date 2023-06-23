@@ -372,6 +372,15 @@ export default class Client {
     target: Target,
     defaultValue = '',
   ): Promise<string> {
+    if (!this.initialized) {
+      warnDefaultVariationServed(
+        identifier,
+        target,
+        defaultValue.toString(),
+        this.log,
+      );
+      Promise.resolve(defaultValue);
+    }
     return this.evaluator.stringVariation(
       identifier,
       target,
@@ -389,6 +398,15 @@ export default class Client {
     target: Target,
     defaultValue = 0,
   ): Promise<number> {
+    if (!this.initialized) {
+      warnDefaultVariationServed(
+        identifier,
+        target,
+        defaultValue.toString(),
+        this.log,
+      );
+      Promise.resolve(defaultValue);
+    }
     return this.evaluator.numberVariation(
       identifier,
       target,
@@ -406,6 +424,15 @@ export default class Client {
     target: Target,
     defaultValue = {},
   ): Promise<Record<string, unknown>> {
+    if (!this.initialized) {
+      warnDefaultVariationServed(
+        identifier,
+        target,
+        defaultValue.toString(),
+        this.log,
+      );
+      Promise.resolve(defaultValue);
+    }
     return this.evaluator.jsonVariation(
       identifier,
       target,
