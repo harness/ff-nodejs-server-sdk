@@ -9,7 +9,7 @@ const sdkCodes: Record<number, string> = {
   // SDK_AUTH_2xxx
   2000: 'Authentication was successful',
   2001: 'Authentication failed with a non-recoverable error',
-  2002: 'Authentication attempt',
+  2002: 'Authentication attempt failed:',
   2003: 'Authentication failed and max retries have been exceeded',
   // SDK_CLOSE_3xxx
   3000: 'Closing SDK',
@@ -134,7 +134,7 @@ export function warnAuthRetrying(
   logger: Logger,
 ): void {
   logger.warn(
-    getSdkErrMsg(2002, `attempt ${attempt}, got error: ${error}, Retrying ...`),
+    getSdkErrMsg(2002, `attempt=${attempt}, error=${error}, continue retrying=true`),
   );
 }
 
