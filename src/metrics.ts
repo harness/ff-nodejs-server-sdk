@@ -24,6 +24,11 @@ import {
 } from './openapi';
 import { Options, Target } from './types';
 import { VERSION } from './version';
+import {
+  infoMetricsSuccess,
+  infoMetricsThreadExited,
+  warnPostMetricsFailed,
+} from './sdk_codes';
 
 export enum MetricEvent {
   READY = 'metrics_ready',
@@ -53,6 +58,7 @@ export const MetricsProcessor = (
   conf: Configuration,
   options: Options,
   eventBus: events.EventEmitter,
+  closed = false,
 ): MetricsProcessorInterface => {
   const data: Map<string, AnalyticsEvent> = new Map<string, AnalyticsEvent>();
   let syncInterval: NodeJS.Timeout;
@@ -177,6 +183,10 @@ export const MetricsProcessor = (
   };
 
   const _send = (): void => {
+    if (closed) {
+      return;
+    }
+
     const metrics: Metrics = _summarize();
     if (metrics) {
       log.debug('Start sending metrics data');
@@ -184,6 +194,7 @@ export const MetricsProcessor = (
         .postMetrics(environment, cluster, metrics)
         .then((response) => {
           log.debug('Metrics server returns: ', response.status);
+          infoMetricsSuccess(log);
           if (response.status >= 400) {
             log.error(
               'Error while sending metrics data with status code: ',
@@ -192,6 +203,7 @@ export const MetricsProcessor = (
           }
         })
         .catch((error: Error) => {
+          warnPostMetricsFailed(`${error}`, log);
           log.debug('Metrics server returns error: ', error);
         });
     }
@@ -210,7 +222,9 @@ export const MetricsProcessor = (
     log.info('Closing MetricsProcessor');
     clearInterval(syncInterval);
     _send();
+    closed = true;
     log.info('MetricsProcessor closed');
+    infoMetricsThreadExited(log);
   };
 
   return {

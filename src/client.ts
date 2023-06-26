@@ -16,6 +16,18 @@ import {
   MetricsProcessorInterface,
 } from './metrics';
 import { Logger } from './log';
+import {
+  infoMetricsThreadStarted,
+  infoPollStarted,
+  infoSDKCloseSuccess,
+  infoSDKInitOK,
+  infoSDKStartClose,
+  infoStreamConnected,
+  warnAuthFailedSrvDefaults,
+  warnDefaultVariationServed,
+  warnFailedInitAuthError,
+  warnMissingSDKKey,
+} from './sdk_codes';
 
 axios.defaults.timeout = 30000;
 axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
@@ -190,6 +202,11 @@ export default class Client {
   }
 
   private async authenticate(): Promise<void> {
+    if (!this.sdkKey) {
+      warnMissingSDKKey(this.log);
+      this.failure = true;
+      return;
+    }
     try {
       const response = await this.api.authenticate({
         apiKey: this.sdkKey,
@@ -199,11 +216,20 @@ export default class Client {
 
       const decoded: Claims = jwt_decode(this.authToken);
 
+      if (!decoded.environment) {
+        this.failure = true;
+        console.error(
+          'Error while authenticating, err:  the JWT token has missing claim "environmentUUID" ',
+        );
+      }
+
       this.environment = decoded.environment;
       this.cluster = decoded.clusterIdentifier || '1';
     } catch (error) {
       this.failure = true;
       console.error('Error while authenticating, err: ', error);
+      warnAuthFailedSrvDefaults(this.log);
+      warnFailedInitAuthError(this.log);
     }
   }
 
@@ -214,8 +240,12 @@ export default class Client {
 
     if (this.initialized) {
       this.waitForInitialize = Promise.resolve(this);
-    } else if (this.failure) {
-      this.waitForInitialize = Promise.reject(this.failure);
+      infoSDKInitOK(this.log);
+      // We unblock the call even if initialization has failed. We've
+      // already warned the user that initialization has failed and that
+      // defaults will be served
+    } else if (!this.initialized) {
+      this.waitForInitialize = Promise.resolve(this);
     } else {
       this.waitForInitialize = new Promise((resolve, reject) => {
         this.eventBus.once(Event.READY, () => {
@@ -232,14 +262,17 @@ export default class Client {
       case Processor.POLL:
         this.pollerReady = true;
         this.log.debug('PollingProcessor ready');
+        infoPollStarted(this.options.pollInterval, this.log);
         break;
       case Processor.STREAM:
         this.streamReady = true;
         this.log.debug('StreamingProcessor ready');
+        infoStreamConnected(this.log);
         break;
       case Processor.METRICS:
         this.metricReady = true;
         this.log.debug('MetricsProcessor ready');
+        infoMetricsThreadStarted(this.options.eventsSyncInterval, this.log);
         break;
     }
 
@@ -255,12 +288,17 @@ export default class Client {
       return;
     }
 
-    this.initialized = true;
     this.eventBus.emit(Event.READY);
   }
 
   private async run(): Promise<void> {
     await this.authenticate();
+
+    // If authentication has failed then we don't want to continue. We have already warned
+    // the user that authentication has failed, and that the SDK will serve defaults.
+    if (this.failure) {
+      return;
+    }
 
     this.pollProcessor = new PollingProcessor(
       this.environment,
@@ -299,6 +337,8 @@ export default class Client {
     }
 
     this.log.info('finished setting up processors');
+    this.initialized = true;
+    infoSDKInitOK(this.log);
   }
 
   boolVariation(
@@ -306,6 +346,16 @@ export default class Client {
     target: Target,
     defaultValue = false,
   ): Promise<boolean> {
+    if (!this.initialized) {
+      warnDefaultVariationServed(
+        identifier,
+        target,
+        defaultValue.toString(),
+        this.log,
+      );
+      return Promise.resolve(defaultValue);
+    }
+
     return this.evaluator.boolVariation(
       identifier,
       target,
@@ -323,6 +373,16 @@ export default class Client {
     target: Target,
     defaultValue = '',
   ): Promise<string> {
+    if (!this.initialized) {
+      warnDefaultVariationServed(
+        identifier,
+        target,
+        defaultValue.toString(),
+        this.log,
+      );
+      return Promise.resolve(defaultValue);
+    }
+
     return this.evaluator.stringVariation(
       identifier,
       target,
@@ -340,6 +400,16 @@ export default class Client {
     target: Target,
     defaultValue = 0,
   ): Promise<number> {
+    if (!this.initialized) {
+      warnDefaultVariationServed(
+        identifier,
+        target,
+        defaultValue.toString(),
+        this.log,
+      );
+      return Promise.resolve(defaultValue);
+    }
+
     return this.evaluator.numberVariation(
       identifier,
       target,
@@ -357,6 +427,16 @@ export default class Client {
     target: Target,
     defaultValue = {},
   ): Promise<Record<string, unknown>> {
+    if (!this.initialized) {
+      warnDefaultVariationServed(
+        identifier,
+        target,
+        defaultValue.toString(),
+        this.log,
+      );
+      return Promise.resolve(defaultValue);
+    }
+    
     return this.evaluator.jsonVariation(
       identifier,
       target,
@@ -370,6 +450,7 @@ export default class Client {
   }
 
   close(): void {
+    infoSDKStartClose(this.log);
     this.closing = true;
     this.pollProcessor.close();
     if (this.streamProcessor) {
@@ -380,5 +461,6 @@ export default class Client {
     }
     this.eventBus.removeAllListeners();
     this.closing = false;
+    infoSDKCloseSuccess(this.log);
   }
 }

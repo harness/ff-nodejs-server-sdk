@@ -23,6 +23,7 @@ import {
 } from './openapi';
 import murmurhash from 'murmurhash';
 import { ConsoleLog } from './log';
+import { debugEvalSuccess, warnDefaultVariationServed } from './sdk_codes';
 
 type Callback = (
   fc: FeatureConfig,
@@ -391,9 +392,16 @@ export class Evaluator {
       callback,
     );
     if (variation) {
-      return variation.value.toLowerCase() === 'true';
+      const result = variation.value.toLowerCase() === 'true';
+      debugEvalSuccess(`${result}`, identifier, target, this.log);
+      return result;
     }
-
+    warnDefaultVariationServed(
+      identifier,
+      target,
+      defaultValue.toString(),
+      this.log,
+    );
     return defaultValue;
   }
 
@@ -410,9 +418,15 @@ export class Evaluator {
       callback,
     );
     if (variation) {
+      debugEvalSuccess(`${variation.value}`, identifier, target, this.log);
       return variation.value;
     }
-
+    warnDefaultVariationServed(
+      identifier,
+      target,
+      defaultValue.toString(),
+      this.log,
+    );
     return defaultValue;
   }
 
@@ -429,9 +443,16 @@ export class Evaluator {
       callback,
     );
     if (variation) {
-      return parseFloat(variation.value);
+      const result = parseFloat(variation.value);
+      debugEvalSuccess(`${result}`, identifier, target, this.log);
+      return result;
     }
-
+    warnDefaultVariationServed(
+      identifier,
+      target,
+      defaultValue.toString(),
+      this.log,
+    );
     return defaultValue;
   }
 
@@ -448,9 +469,15 @@ export class Evaluator {
       callback,
     );
     if (variation) {
+      debugEvalSuccess(`${variation.value}`, identifier, target, this.log);
       return JSON.parse(variation.value);
     }
-
+    warnDefaultVariationServed(
+      identifier,
+      target,
+      defaultValue.toString(),
+      this.log,
+    );
     return defaultValue;
   }
 }

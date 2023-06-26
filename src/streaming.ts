@@ -7,6 +7,12 @@ import { ConsoleLog } from './log';
 
 import https, { RequestOptions } from 'https';
 import http, { ClientRequest } from 'http';
+import {
+  debugStreamEventReceived,
+  infoStreamStopped,
+  warnStreamDisconnected,
+  warnStreamRetrying,
+} from './sdk_codes';
 
 type FetchFunction = (
   identifier: string,
@@ -88,7 +94,8 @@ export class StreamProcessor {
         this.retryAttempt += 1;
 
         const delayMs = this.getRandomRetryDelayMs();
-        this.log.warn(`SSE disconnected: ${msg} will retry in ${delayMs}ms`);
+        warnStreamDisconnected(msg, this.log);
+        warnStreamRetrying(delayMs, this.log);
         this.readyState = StreamProcessor.RETRYING;
         this.eventBus.emit(StreamEvent.RETRYING);
 
@@ -135,7 +142,10 @@ export class StreamProcessor {
         onConnected();
 
         res
-          .on('data', (data) => this.processData(data))
+          .on('data', (data) => {
+            debugStreamEventReceived(this.log);
+            this.processData(data);
+          })
           .on('close', () => {
             onFailed('SSE stream closed');
           });
@@ -230,5 +240,6 @@ export class StreamProcessor {
 
     this.eventBus.emit(StreamEvent.DISCONNECTED);
     this.log.info('StreamProcessor closed');
+    infoStreamStopped(this.log);
   }
 }
