@@ -43,6 +43,7 @@ export enum Event {
   FAILED = 'failed',
   CHANGED = 'changed',
 }
+
 export default class Client {
   private evaluator: Evaluator;
   private repository: Repository;
@@ -60,7 +61,7 @@ export default class Client {
   private metricsProcessor: MetricsProcessorInterface;
   private initialized = false;
   private failure = false;
-  private waitForInitialize: Promise<Client>;
+  private waitForInitializePromise: Promise<Client>;
   private pollerReady = false;
   private streamReady = false;
   private metricReady = false;
@@ -124,6 +125,7 @@ export default class Client {
       this.log.error(
         'Issue with streaming: falling back to polling while the SDK attempts to reconnect',
       );
+
       if (!this.closing) {
         this.pollProcessor.start();
       }
@@ -134,9 +136,11 @@ export default class Client {
       this.log.error(
         'Unrecoverable issue with streaming: falling back to polling',
       );
+
       if (!this.closing) {
         this.pollProcessor.start();
       }
+
       this.eventBus.emit(Event.FAILED);
     });
 
@@ -188,6 +192,7 @@ export default class Client {
     for (const value of Object.values(Event)) {
       arrayObjects.push(value);
     }
+
     if (arrayObjects.includes(event)) {
       this.eventBus.on(event, callback);
     }
@@ -207,6 +212,7 @@ export default class Client {
       this.failure = true;
       return;
     }
+
     try {
       const response = await this.api.authenticate({
         apiKey: this.sdkKey,
@@ -234,27 +240,26 @@ export default class Client {
   }
 
   waitForInitialization(): Promise<Client> {
-    if (this.waitForInitialize) {
-      return this.waitForInitialize;
+    if (!this.waitForInitializePromise) {
+      if (this.initialized) {
+        this.waitForInitializePromise = Promise.resolve(this);
+        infoSDKInitOK(this.log);
+        // We unblock the call even if initialization has failed. We've
+        // already warned the user that initialization has failed and that
+        // defaults will be served
+      } else if (!this.initialized && this.failure) {
+        this.waitForInitializePromise = Promise.resolve(this);
+      } else {
+        this.waitForInitializePromise = new Promise((resolve, reject) => {
+          this.eventBus.once(Event.READY, () => {
+            setTimeout(() => resolve(this), 0);
+          });
+          this.eventBus.once(Event.FAILED, reject);
+        });
+      }
     }
 
-    if (this.initialized) {
-      this.waitForInitialize = Promise.resolve(this);
-      infoSDKInitOK(this.log);
-      // We unblock the call even if initialization has failed. We've
-      // already warned the user that initialization has failed and that
-      // defaults will be served
-    } else if (!this.initialized) {
-      this.waitForInitialize = Promise.resolve(this);
-    } else {
-      this.waitForInitialize = new Promise((resolve, reject) => {
-        this.eventBus.once(Event.READY, () => {
-          setTimeout(() => resolve(this), 0);
-        });
-        this.eventBus.once(Event.FAILED, reject);
-      });
-    }
-    return this.waitForInitialize;
+    return this.waitForInitializePromise;
   }
 
   private initialize(processor: Processor): void {
@@ -308,6 +313,7 @@ export default class Client {
       this.eventBus,
       this.repository,
     );
+
     this.pollProcessor.start();
 
     if (this.options.enableStream) {
@@ -353,6 +359,7 @@ export default class Client {
         defaultValue.toString(),
         this.log,
       );
+
       return Promise.resolve(defaultValue);
     }
 
@@ -380,6 +387,7 @@ export default class Client {
         defaultValue.toString(),
         this.log,
       );
+
       return Promise.resolve(defaultValue);
     }
 
@@ -407,6 +415,7 @@ export default class Client {
         defaultValue.toString(),
         this.log,
       );
+
       return Promise.resolve(defaultValue);
     }
 
@@ -434,9 +443,10 @@ export default class Client {
         defaultValue.toString(),
         this.log,
       );
+
       return Promise.resolve(defaultValue);
     }
-    
+
     return this.evaluator.jsonVariation(
       identifier,
       target,
@@ -453,12 +463,15 @@ export default class Client {
     infoSDKStartClose(this.log);
     this.closing = true;
     this.pollProcessor.close();
+
     if (this.streamProcessor) {
       this.streamProcessor.close();
     }
+
     if (this.metricsProcessor) {
       this.metricsProcessor.close();
     }
+
     this.eventBus.removeAllListeners();
     this.closing = false;
     infoSDKCloseSuccess(this.log);

@@ -70,8 +70,10 @@ export class PollingProcessor {
       .then(() => {
         // when first fetch is successful then poller is ready
         if (!this.initialized) {
-          this.initialized = true;
-          this.eventBus.emit(PollerEvent.READY);
+          setTimeout(() => {
+            this.initialized = true;
+            this.eventBus.emit(PollerEvent.READY);
+          }, 0);
         }
       })
       .catch((error) => {
