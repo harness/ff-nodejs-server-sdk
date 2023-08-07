@@ -182,7 +182,7 @@ export const MetricsProcessor = (
     };
   };
 
-  const _send = (): void => {
+  const _send = async () => {
     if (closed) {
       return;
     }
@@ -190,24 +190,45 @@ export const MetricsProcessor = (
     const metrics: Metrics = _summarize();
     if (metrics) {
       log.debug('Start sending metrics data');
-      api
-        .postMetrics(environment, cluster, metrics)
-        .then((response) => {
-          log.debug('Metrics server returns: ', response.status);
-          infoMetricsSuccess(log);
-          if (response.status >= 400) {
-            log.error(
-              'Error while sending metrics data with status code: ',
-              response.status,
-            );
-          }
-        })
-        .catch((error: Error) => {
-          warnPostMetricsFailed(`${error}`, log);
-          log.debug('Metrics server returns error: ', error);
-        });
+      try {
+        const response = await postMetricsWithRetry(
+          environment,
+          cluster,
+          metrics,
+        );
+        log.debug('Metrics server returns:', response.status);
+        infoMetricsSuccess(log);
+      } catch (error) {
+        warnPostMetricsFailed(`${error}`, log);
+      }
     }
   };
+
+  async function postMetricsWithRetry(
+    environment: string,
+    cluster: string,
+    metrics: Metrics,
+    retries = 3,
+  ) {
+    // specify the return type explicitly
+    let lastError: Error | null = null;
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        const response = await api.postMetrics(environment, cluster, metrics);
+        if (response.status >= 400 && response.status <= 599) {
+          throw new Error(`HTTP Error: ${response.status}`);
+        }
+        return response; // Exit function if successful.
+      } catch (error) {
+        lastError = error;
+        if (attempt === retries) {
+          log.debug('Failed to send metrics after retries:', error.message);
+
+        }
+      }
+    }
+      throw lastError;
+  }
 
   const start = (): void => {
     log.info(
