@@ -143,7 +143,6 @@ export class StreamProcessor {
 
         res
           .on('data', (data) => {
-            debugStreamEventReceived(this.log);
             this.processData(data);
           })
           .on('close', () => {
@@ -175,6 +174,7 @@ export class StreamProcessor {
       const msg = JSON.parse(line.substring(5));
 
       if (msg.domain === 'flag') {
+        debugStreamEventReceived(this.log);
         this.msgProcessor(
           msg,
           this.api.getFeatureConfigByIdentifier.bind(this.api),
@@ -182,6 +182,7 @@ export class StreamProcessor {
           this.repository.deleteFlag.bind(this.repository),
         );
       } else if (msg.domain === 'target-segment') {
+        debugStreamEventReceived(this.log);
         this.msgProcessor(
           msg,
           this.api.getSegmentByIdentifier.bind(this.api),
@@ -220,11 +221,14 @@ export class StreamProcessor {
     return;
   }
 
-  private async retryAsyncOperation(fn, retries = 3) {
+  private async retryAsyncOperation(fn, retries = 5) {
     for (let i = 0; i < retries; i++) {
       try {
         return await fn();
       } catch (error) {
+        this.log.warn(
+          `Failed attempt ${i + 1} of ${retries}.`
+        );
         if (i === retries - 1) {
           throw error;
         }
