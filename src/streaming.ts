@@ -184,23 +184,10 @@ export class StreamProcessor {
       } else if (msg.domain === 'target-segment') {
         this.msgProcessor(
           msg,
-          this.getSegmentByIdentifierWithRetries(3),
+          this.api.getSegmentByIdentifier.bind(this.api),
           this.repository.setSegment.bind(this.repository),
           this.repository.deleteSegment.bind(this.repository),
         );
-      }
-    }
-  }
-
-  private getSegmentByIdentifierWithRetries(maxRetries: number) {
-    for (let i = 0; i < maxRetries; i++) {
-      try {
-        return this.api.getSegmentByIdentifier.bind(this.api);
-      } catch (error) {
-        console.log(`Attempt ${i + 1} failed. Retrying...`);
-        if (i === maxRetries - 1) {
-          throw error;
-        }
       }
     }
   }
@@ -233,15 +220,14 @@ export class StreamProcessor {
     return;
   }
 
-  private async retryAsyncOperation(fn, retries = 3, delay = 1000) {
+  private async retryAsyncOperation(fn, retries = 3) {
     for (let i = 0; i < retries; i++) {
       try {
         return await fn();
       } catch (error) {
         if (i === retries - 1) {
           throw error;
-        } // rethrow the last error
-        await new Promise((res) => setTimeout(res, delay)); // delay before the next attempt
+        }
       }
     }
   }
