@@ -223,11 +223,10 @@ export const MetricsProcessor = (
         lastError = error;
         if (attempt === retries) {
           log.debug('Failed to send metrics after retries:', error.message);
-
         }
       }
     }
-      throw lastError;
+    throw lastError;
   }
 
   const start = (): void => {
