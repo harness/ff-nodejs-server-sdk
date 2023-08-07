@@ -177,7 +177,7 @@ export class StreamProcessor {
       if (msg.domain === 'flag') {
         this.msgProcessor(
           msg,
-          this.getFeatureConfigByIdentifierWithRetries(3),
+          this.api.getFeatureConfigByIdentifier.bind(this.api),
           this.repository.setFlag.bind(this.repository),
           this.repository.deleteFlag.bind(this.repository),
         );
@@ -188,19 +188,6 @@ export class StreamProcessor {
           this.repository.setSegment.bind(this.repository),
           this.repository.deleteSegment.bind(this.repository),
         );
-      }
-    }
-  }
-
-  private getFeatureConfigByIdentifierWithRetries(maxRetries: number) {
-    for (let i = 0; i < maxRetries; i++) {
-      try {
-        return this.api.getFeatureConfigByIdentifier.bind(this.api);
-      } catch (error) {
-        console.log(`Attempt ${i + 1} failed. Retrying...`);
-        if (i === maxRetries - 1) {
-          throw error;
-        }
       }
     }
   }
@@ -227,10 +214,8 @@ export class StreamProcessor {
     this.log.info('Processing message', msg);
     try {
       if (msg.event === 'create' || msg.event === 'patch') {
-        const { data } = await fn(
-          msg.identifier,
-          this.environment,
-          this.cluster,
+        const { data } = await this.retryAsyncOperation(() =>
+          fn(msg.identifier, this.environment, this.cluster),
         );
         setFn(msg.identifier, data);
       } else if (msg.event === 'delete') {
@@ -246,6 +231,19 @@ export class StreamProcessor {
     }
     this.log.info('Processing message finished', msg);
     return;
+  }
+
+  private async retryAsyncOperation(fn, retries = 3, delay = 1000) {
+    for (let i = 0; i < retries; i++) {
+      try {
+        return await fn();
+      } catch (error) {
+        if (i === retries - 1) {
+          throw error;
+        } // rethrow the last error
+        await new Promise((res) => setTimeout(res, delay)); // delay before the next attempt
+      }
+    }
   }
 
   connected(): boolean {
