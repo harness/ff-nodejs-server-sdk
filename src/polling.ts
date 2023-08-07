@@ -93,7 +93,7 @@ export class PollingProcessor {
   private async retrieveFlags(retries = 3): Promise<void> {
     for (let i = 0; i < retries; i++) {
       try {
-        this.log.debug('Fetching flags attempt ' + (i + 1));
+        this.log.debug('Fetching flags');
         const response = await this.api.getFeatureConfig(
           this.environment,
           this.cluster,
@@ -102,12 +102,14 @@ export class PollingProcessor {
         response.data.forEach((fc: FeatureConfig) =>
           this.repository.setFlag(fc.feature, fc),
         );
-        // If successful, break the loop early
         break;
       } catch (error) {
-        // If this was the last attempt, rethrow the error
+        this.log.debug(
+          `Fetching flags attempt ${i + 1} of ${retries} failed.`,
+        );
         if (i === retries - 1) {
-          this.log.error('Error loading flags', error);
+          this.log.error('Error loading flags and retries exceeded', error);
+          // Let error bubble up
           throw error;
         }
       }
@@ -118,7 +120,7 @@ export class PollingProcessor {
   private async retrieveSegments(retries = 3): Promise<void> {
     for (let i = 0; i < retries; i++) {
       try {
-        this.log.debug('Fetching segments attempt ' + (i + 1));
+        this.log.debug('Fetching segments');
         const response = await this.api.getAllSegments(
           this.environment,
           this.cluster,
@@ -127,12 +129,14 @@ export class PollingProcessor {
         response.data.forEach((segment: Segment) =>
           this.repository.setSegment(segment.identifier, segment),
         );
-        // If successful, break the loop early
         break;
       } catch (error) {
-        // If this was the last attempt, rethrow the error
+        this.log.debug(
+          `Fetching segments attempt ${i + 1} of ${retries} failed.`,
+        );
         if (i === retries - 1) {
-          this.log.error('Error loading segments', error);
+          this.log.error('Error loading segments and retries exceeded', error);
+          // Let error bubble up
           throw error;
         }
       }
