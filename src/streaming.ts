@@ -178,6 +178,7 @@ export class StreamProcessor {
         this.msgProcessor(
           msg,
           this.api.getFeatureConfigByIdentifier.bind(this.api),
+          "flag",
           this.repository.setFlag.bind(this.repository),
           this.repository.deleteFlag.bind(this.repository),
         );
@@ -186,6 +187,7 @@ export class StreamProcessor {
         this.msgProcessor(
           msg,
           this.api.getSegmentByIdentifier.bind(this.api),
+          "segment",
           this.repository.setSegment.bind(this.repository),
           this.repository.deleteSegment.bind(this.repository),
         );
@@ -196,14 +198,16 @@ export class StreamProcessor {
   private async msgProcessor(
     msg: StreamMsg,
     fn: FetchFunction,
+    fetchType: string,
     setFn: (identifier: string, data: FeatureConfig | Segment) => void,
     delFn: (identifier: string) => void,
   ): Promise<void> {
     this.log.info('Processing message', msg);
     try {
       if (msg.event === 'create' || msg.event === 'patch') {
-        const { data } = await this.retryAsyncOperation(() =>
-          fn(msg.identifier, this.environment, this.cluster),
+        const { data } = await this.retryFetchOperation(
+          () => fn(msg.identifier, this.environment, this.cluster),
+          fetchType,
         );
         setFn(msg.identifier, data);
       } else if (msg.event === 'delete') {
@@ -221,13 +225,13 @@ export class StreamProcessor {
     return;
   }
 
-  private async retryAsyncOperation(fn, retries = 5) {
+  private async retryFetchOperation(fn, fetchType: string, retries = 5) {
     for (let i = 0; i < retries; i++) {
       try {
         return await fn();
       } catch (error) {
-        this.log.warn(
-          `Failed attempt ${i + 1} of ${retries}.`
+        this.log.debug(
+          `Failed Fetching ${fetchType} attempt ${i + 1} of ${retries}.`,
         );
         if (i === retries - 1) {
           throw error;
