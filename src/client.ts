@@ -29,7 +29,6 @@ import {
   warnMissingSDKKey,
 } from './sdk_codes';
 
-axios.defaults.timeout = 30000;
 axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
 
 enum Processor {
@@ -71,6 +70,7 @@ export default class Client {
     this.sdkKey = sdkKey;
     this.options = { ...defaultOptions, ...options };
     this.log = this.options.logger;
+    axios.defaults.timeout = this.options.axiosTimeout;
 
     if (options.pollInterval < defaultOptions.pollInterval) {
       this.options.pollInterval = defaultOptions.pollInterval;

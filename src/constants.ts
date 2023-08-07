@@ -39,6 +39,7 @@ export const defaultOptions: Options = {
   eventsUrl: EVENTS_URL,
   pollInterval: PULL_INTERVAL,
   eventsSyncInterval: EVENTS_SYNC_INTERVAL,
+  axiosTimeout: 30000,
   enableStream: true,
   enableAnalytics: true,
   cache: new LRU({ max: 100 }),

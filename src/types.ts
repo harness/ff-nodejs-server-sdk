@@ -7,6 +7,7 @@ export interface Options {
   eventsUrl?: string;
   pollInterval?: number;
   eventsSyncInterval?: number;
+  axiosTimeout?: number,
   enableStream?: boolean;
   enableAnalytics?: boolean;
   cache?: KeyValueStore;

@@ -90,40 +90,55 @@ export class PollingProcessor {
       });
   }
 
-  private async retrieveFlags(): Promise<void> {
-    try {
-      this.log.debug('Fetching flags started');
-      const response = await this.api.getFeatureConfig(
-        this.environment,
-        this.cluster,
-      );
-      this.log.debug('Fetching flags finished');
-      response.data.forEach((fc: FeatureConfig) =>
-        this.repository.setFlag(fc.feature, fc),
-      );
-    } catch (error) {
-      this.log.error('Error loading flags', error);
-      throw error;
+  private async retrieveFlags(retries = 3): Promise<void> {
+    for (let i = 0; i < retries; i++) {
+      try {
+        this.log.debug('Fetching flags attempt ' + (i + 1));
+        const response = await this.api.getFeatureConfig(
+          this.environment,
+          this.cluster,
+        );
+        this.log.debug('Fetching flags finished');
+        response.data.forEach((fc: FeatureConfig) =>
+          this.repository.setFlag(fc.feature, fc),
+        );
+        // If successful, break the loop early
+        break;
+      } catch (error) {
+        // If this was the last attempt, rethrow the error
+        if (i === retries - 1) {
+          this.log.error('Error loading flags', error);
+          throw error;
+        }
+      }
     }
   }
 
-  private async retrieveSegments(): Promise<void> {
-    try {
-      this.log.debug('Fetching segments started');
-      const response = await this.api.getAllSegments(
-        this.environment,
-        this.cluster,
-      );
-      this.log.debug('Fetching segments finished');
-      // prepare cache for storing segments
-      response.data.forEach((segment: Segment) =>
-        this.repository.setSegment(segment.identifier, segment),
-      );
-    } catch (error) {
-      this.log.error('Error loading segments', error);
-      throw error;
+
+  private async retrieveSegments(retries = 3): Promise<void> {
+    for (let i = 0; i < retries; i++) {
+      try {
+        this.log.debug('Fetching segments attempt ' + (i + 1));
+        const response = await this.api.getAllSegments(
+          this.environment,
+          this.cluster,
+        );
+        this.log.debug('Fetching segments finished');
+        response.data.forEach((segment: Segment) =>
+          this.repository.setSegment(segment.identifier, segment),
+        );
+        // If successful, break the loop early
+        break;
+      } catch (error) {
+        // If this was the last attempt, rethrow the error
+        if (i === retries - 1) {
+          this.log.error('Error loading segments', error);
+          throw error;
+        }
+      }
     }
   }
+
 
   start(): void {
     if (!this.stopped) {

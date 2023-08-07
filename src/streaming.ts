@@ -177,17 +177,43 @@ export class StreamProcessor {
       if (msg.domain === 'flag') {
         this.msgProcessor(
           msg,
-          this.api.getFeatureConfigByIdentifier.bind(this.api),
+          this.getFeatureConfigByIdentifierWithRetries(3),
           this.repository.setFlag.bind(this.repository),
           this.repository.deleteFlag.bind(this.repository),
         );
       } else if (msg.domain === 'target-segment') {
         this.msgProcessor(
           msg,
-          this.api.getSegmentByIdentifier.bind(this.api),
+          this.getSegmentByIdentifierWithRetries(3),
           this.repository.setSegment.bind(this.repository),
           this.repository.deleteSegment.bind(this.repository),
         );
+      }
+    }
+  }
+
+  private getFeatureConfigByIdentifierWithRetries(maxRetries: number) {
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        return this.api.getFeatureConfigByIdentifier.bind(this.api);
+      } catch (error) {
+        console.log(`Attempt ${i + 1} failed. Retrying...`);
+        if (i === maxRetries - 1) {
+          throw error;
+        }
+      }
+    }
+  }
+
+  private getSegmentByIdentifierWithRetries(maxRetries: number) {
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        return this.api.getSegmentByIdentifier.bind(this.api);
+      } catch (error) {
+        console.log(`Attempt ${i + 1} failed. Retrying...`);
+        if (i === maxRetries - 1) {
+          throw error;
+        }
       }
     }
   }
