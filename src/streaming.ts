@@ -202,7 +202,7 @@ export class StreamProcessor {
     setFn: (identifier: string, data: FeatureConfig | Segment) => void,
     delFn: (identifier: string) => void,
   ): Promise<void> {
-    this.log.info('Processing message', msg);
+    this.log.info(`Processing message with type ${fetchType}`, msg);
     try {
       if (msg.event === 'create' || msg.event === 'patch') {
         const { data } = await this.retryFetchOperation(
@@ -215,13 +215,12 @@ export class StreamProcessor {
       }
     } catch (error) {
       this.log.error(
-        'Error while fetching data with identifier:',
+        `Error while fetching ${fetchType} with identifier:`,
         msg.identifier,
         error,
       );
-      throw error;
     }
-    this.log.info('Processing message finished', msg);
+    this.log.info(`Processing message with type ${fetchType} finished`, msg);
     return;
   }
 
@@ -231,9 +230,13 @@ export class StreamProcessor {
         return await fn();
       } catch (error) {
         this.log.debug(
-          `Failed Fetching ${fetchType} attempt ${i + 1} of ${retries}.`,
+          `Fetching ${fetchType} attempt ${i + 1} of ${retries} failed.`,
         );
         if (i === retries - 1) {
+          this.log.debug(
+            `Failed Fetching ${fetchType} and exceeded retries ${retries}.`,
+          );
+          // Allow error to bubble up
           throw error;
         }
       }
