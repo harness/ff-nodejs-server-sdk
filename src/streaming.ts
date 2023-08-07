@@ -178,7 +178,7 @@ export class StreamProcessor {
         this.msgProcessor(
           msg,
           this.api.getFeatureConfigByIdentifier.bind(this.api),
-          "flag",
+          'flag',
           this.repository.setFlag.bind(this.repository),
           this.repository.deleteFlag.bind(this.repository),
         );
@@ -187,7 +187,7 @@ export class StreamProcessor {
         this.msgProcessor(
           msg,
           this.api.getSegmentByIdentifier.bind(this.api),
-          "segment",
+          'segment',
           this.repository.setSegment.bind(this.repository),
           this.repository.deleteSegment.bind(this.repository),
         );
