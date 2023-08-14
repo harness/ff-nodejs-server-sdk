@@ -210,7 +210,6 @@ export const MetricsProcessor = (
     metrics: Metrics,
     retries = 3,
   ) {
-    // specify the return type explicitly
     let lastError: Error | null = null;
     for (let attempt = 1; attempt <= retries; attempt++) {
       try {
