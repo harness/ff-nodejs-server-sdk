@@ -217,7 +217,7 @@ export const MetricsProcessor = (
         if (response.status >= 400 && response.status <= 599) {
           throw new Error(`HTTP Error: ${response.status}`);
         }
-        return response; // Exit function if successful.
+        return response; 
       } catch (error) {
         lastError = error;
         if (attempt === retries) {
