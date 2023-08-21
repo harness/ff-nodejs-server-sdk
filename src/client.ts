@@ -236,6 +236,7 @@ export default class Client {
       console.error('Error while authenticating, err: ', error);
       warnAuthFailedSrvDefaults(this.log);
       warnFailedInitAuthError(this.log);
+      this.eventBus.emit(Event.FAILED);
     }
   }
 
