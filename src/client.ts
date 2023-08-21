@@ -255,6 +255,10 @@ export default class Client {
           this.eventBus.once(Event.READY, () => {
             setTimeout(() => resolve(this), 0);
           });
+          // TODO - we can return the rejection here, live I've done, which will
+          // mean users have to surround this function with a try-catch or `then`
+          // and do error handling. Or we can just return the resolve here. Will
+          // discuss in PR.
           this.eventBus.once(Event.FAILED, reject);
         });
       }
