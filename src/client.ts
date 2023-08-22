@@ -246,7 +246,10 @@ export default class Client {
         this.waitForInitializePromise = Promise.resolve(this);
         infoSDKInitOK(this.log);
       } else if (!this.initialized && this.failure) {
-        this.waitForInitializePromise = Promise.reject(this);
+        // We unblock the call even if initialization has failed. We've
+        // already warned the user that initialization has failed with the reason and that
+        // defaults will be served
+        this.waitForInitializePromise = Promise.resolve(this);
       } else {
         this.waitForInitializePromise = new Promise((resolve, reject) => {
           this.eventBus.once(Event.READY, () => {
