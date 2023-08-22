@@ -211,20 +211,25 @@ export const MetricsProcessor = (
     retries = 3,
   ) {
     let lastError: Error;
+
     for (let attempt = 1; attempt <= retries; attempt++) {
       try {
         const response = await api.postMetrics(environment, cluster, metrics);
+
         if (response.status >= 400 && response.status <= 599) {
           throw new Error(`HTTP Error: ${response.status}`);
         }
-        return response; 
+
+        return response;
       } catch (error) {
         lastError = error;
+
         if (attempt === retries) {
           log.debug('Failed to send metrics after retries:', error.message);
         }
       }
     }
+
     throw lastError;
   }
 
