@@ -236,7 +236,7 @@ export default class Client {
       console.error('Error while authenticating, err: ', error);
       warnAuthFailedSrvDefaults(this.log);
       warnFailedInitAuthError(this.log);
-      this.eventBus.emit(Event.FAILED);
+      this.eventBus.emit(Event.FAILED, error);
     }
   }
 
@@ -245,20 +245,13 @@ export default class Client {
       if (this.initialized) {
         this.waitForInitializePromise = Promise.resolve(this);
         infoSDKInitOK(this.log);
-        // We unblock the call even if initialization has failed. We've
-        // already warned the user that initialization has failed and that
-        // defaults will be served
       } else if (!this.initialized && this.failure) {
-        this.waitForInitializePromise = Promise.resolve(this);
+        this.waitForInitializePromise = Promise.reject(this);
       } else {
         this.waitForInitializePromise = new Promise((resolve, reject) => {
           this.eventBus.once(Event.READY, () => {
             setTimeout(() => resolve(this), 0);
           });
-          // TODO - we can return the rejection here, like it's already doing, which will
-          // mean users have to surround this function with a try-catch or `then`
-          // and do error handling. Or we can just return the resolve here. Will
-          // discuss in PR.
           this.eventBus.once(Event.FAILED, reject);
         });
       }
