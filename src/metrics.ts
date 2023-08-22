@@ -182,7 +182,7 @@ export const MetricsProcessor = (
     };
   };
 
-  const _send = async () => {
+  const _send = async (): Promise<void> => {
     if (closed) {
       return;
     }
