@@ -90,8 +90,8 @@ export class PollingProcessor {
       });
   }
 
-  private async retrieveFlags(retries = 3): Promise<void> {
-    for (let i = 0; i < retries; i++) {
+  private async retrieveFlags(attempts = 3): Promise<void> {
+    for (let i = 0; i < attempts; i++) {
       try {
         this.log.debug('Fetching flags');
 
@@ -108,11 +108,11 @@ export class PollingProcessor {
         return;
       } catch (error) {
         this.log.debug(
-          `Fetching flags attempt ${i + 1} of ${retries} failed.`,
+          `Fetching flags attempt ${i + 1} of ${attempts} failed.`,
         );
 
-        if (i === retries - 1) {
-          this.log.error('Error loading flags and retries exceeded', error);
+        if (i === attempts - 1) {
+          this.log.error(`Error loading flags and reached max attempts: ${attempts}`, error);
 
           // Let error bubble up
           throw error;
@@ -122,8 +122,8 @@ export class PollingProcessor {
   }
 
 
-  private async retrieveSegments(retries = 3): Promise<void> {
-    for (let i = 0; i < retries; i++) {
+  private async retrieveSegments(attempts = 3): Promise<void> {
+    for (let i = 0; i < attempts; i++) {
       try {
         this.log.debug('Fetching segments');
         const response = await this.api.getAllSegments(
@@ -137,10 +137,10 @@ export class PollingProcessor {
         return;
       } catch (error) {
         this.log.debug(
-          `Fetching segments attempt ${i + 1} of ${retries} failed.`,
+          `Fetching segments attempt ${i + 1} of ${attempts} failed.`,
         );
-        if (i === retries - 1) {
-          this.log.error('Error loading segments and retries exceeded', error);
+        if (i === attempts - 1) {
+          this.log.error(`Error loading segments and reached max attempts: ${attempts}`, error);
           // Let error bubble up
           throw error;
         }

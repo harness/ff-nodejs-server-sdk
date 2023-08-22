@@ -226,17 +226,17 @@ export class StreamProcessor {
     return;
   }
 
-  private async retryFetchOperation(fn, fetchType: string, retries = 3) {
-    for (let i = 0; i < retries; i++) {
+  private async retryFetchOperation(fn, fetchType: string, attempts = 3) {
+    for (let i = 0; i < attempts; i++) {
       try {
         return await fn();
       } catch (error) {
         this.log.debug(
-          `Fetching ${fetchType} attempt ${i + 1} of ${retries} failed.`,
+          `Fetching ${fetchType} attempt ${i + 1} of ${attempts} failed.`,
         );
-        if (i === retries - 1) {
+        if (i === attempts - 1) {
           this.log.debug(
-            `Failed Fetching ${fetchType} and exceeded retries ${retries}.`,
+            `Failed Fetching ${fetchType} and reached max attempts: ${attempts} .`,
           );
           // Allow error to bubble up
           throw error;

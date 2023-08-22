@@ -208,11 +208,11 @@ export const MetricsProcessor = (
     environment: string,
     cluster: string,
     metrics: Metrics,
-    retries = 3,
+    attempts = 3,
   ) {
     let lastError: Error;
 
-    for (let attempt = 0; attempt <= retries; attempt++) {
+    for (let i = 0; i <= attempts; i++) {
       try {
         const response = await api.postMetrics(environment, cluster, metrics);
 
@@ -224,8 +224,8 @@ export const MetricsProcessor = (
       } catch (error) {
         lastError = error;
 
-        if (attempt === retries - 1) {
-          log.debug('Failed to send metrics after retries:', error.message);
+        if (i === attempts - 1) {
+          log.debug(`Failed to send metrics and reached max attempts: ${attempts}`, error.message);
         }
       }
     }
