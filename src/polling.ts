@@ -105,7 +105,7 @@ export class PollingProcessor {
           this.repository.setFlag(fc.feature, fc),
         );
 
-        break;
+        return;
       } catch (error) {
         this.log.debug(
           `Fetching flags attempt ${i + 1} of ${retries} failed.`,
@@ -134,7 +134,7 @@ export class PollingProcessor {
         response.data.forEach((segment: Segment) =>
           this.repository.setSegment(segment.identifier, segment),
         );
-        break;
+        return;
       } catch (error) {
         this.log.debug(
           `Fetching segments attempt ${i + 1} of ${retries} failed.`,
