@@ -173,8 +173,11 @@ export class StreamProcessor {
       this.log.debug('SSE GOT:', line.substring(5));
       const msg = JSON.parse(line.substring(5));
 
-      if (msg.domain === 'flag') {
+      if (msg.domain) {
         debugStreamEventReceived(this.log);
+      }
+
+      if (msg.domain === 'flag') {
         this.msgProcessor(
           msg,
           this.api.getFeatureConfigByIdentifier.bind(this.api),
@@ -183,7 +186,6 @@ export class StreamProcessor {
           this.repository.deleteFlag.bind(this.repository),
         );
       } else if (msg.domain === 'target-segment') {
-        debugStreamEventReceived(this.log);
         this.msgProcessor(
           msg,
           this.api.getSegmentByIdentifier.bind(this.api),
