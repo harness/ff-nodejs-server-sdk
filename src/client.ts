@@ -236,6 +236,7 @@ export default class Client {
       console.error('Error while authenticating, err: ', error);
       warnAuthFailedSrvDefaults(this.log);
       warnFailedInitAuthError(this.log);
+      this.eventBus.emit(Event.FAILED, error);
     }
   }
 
@@ -244,10 +245,10 @@ export default class Client {
       if (this.initialized) {
         this.waitForInitializePromise = Promise.resolve(this);
         infoSDKInitOK(this.log);
-        // We unblock the call even if initialization has failed. We've
-        // already warned the user that initialization has failed and that
-        // defaults will be served
       } else if (!this.initialized && this.failure) {
+        // We unblock the call even if initialization has failed. We've
+        // already warned the user that initialization has failed with the reason and that
+        // defaults will be served
         this.waitForInitializePromise = Promise.resolve(this);
       } else {
         this.waitForInitializePromise = new Promise((resolve, reject) => {

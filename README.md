@@ -69,7 +69,11 @@ const { Client, Event } = require('@harnessio/ff-nodejs-server-sdk');
     },
   };
 
-  await client.waitForInitialization();
+  try {
+    await client.waitForInitialization();
+  } catch (e) {
+    console.log("Error when authenticating Feature Flags client: " + e)
+  }
 
   try {
     // Log the state of the flag every 10 seconds
