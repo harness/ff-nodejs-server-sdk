@@ -94,21 +94,26 @@ export class PollingProcessor {
     for (let i = 0; i < retries; i++) {
       try {
         this.log.debug('Fetching flags');
+
         const response = await this.api.getFeatureConfig(
           this.environment,
           this.cluster,
         );
+
         this.log.debug('Fetching flags finished');
         response.data.forEach((fc: FeatureConfig) =>
           this.repository.setFlag(fc.feature, fc),
         );
+
         break;
       } catch (error) {
         this.log.debug(
           `Fetching flags attempt ${i + 1} of ${retries} failed.`,
         );
+
         if (i === retries - 1) {
           this.log.error('Error loading flags and retries exceeded', error);
+
           // Let error bubble up
           throw error;
         }
