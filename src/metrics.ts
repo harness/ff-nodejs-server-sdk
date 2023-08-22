@@ -210,7 +210,7 @@ export const MetricsProcessor = (
     metrics: Metrics,
     retries = 3,
   ) {
-    let lastError: Error | null = null;
+    let lastError: Error;
     for (let attempt = 1; attempt <= retries; attempt++) {
       try {
         const response = await api.postMetrics(environment, cluster, metrics);
