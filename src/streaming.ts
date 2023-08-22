@@ -224,7 +224,7 @@ export class StreamProcessor {
     return;
   }
 
-  private async retryFetchOperation(fn, fetchType: string, retries = 5) {
+  private async retryFetchOperation(fn, fetchType: string, retries = 3) {
     for (let i = 0; i < retries; i++) {
       try {
         return await fn();
