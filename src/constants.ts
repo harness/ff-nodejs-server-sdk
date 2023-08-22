@@ -32,14 +32,15 @@ export const BASE_URL = 'https://config.ff.harness.io/api/1.0',
   SECOND = 1000,
   MINUTE = 60 * SECOND,
   PULL_INTERVAL = 1 * MINUTE,
-  EVENTS_SYNC_INTERVAL = 1 * MINUTE;
+  EVENTS_SYNC_INTERVAL = 1 * MINUTE,
+  AXIOS_TIMEOUT = 30000;
 
 export const defaultOptions: Options = {
   baseUrl: BASE_URL,
   eventsUrl: EVENTS_URL,
   pollInterval: PULL_INTERVAL,
   eventsSyncInterval: EVENTS_SYNC_INTERVAL,
-  axiosTimeout: 30000,
+  axiosTimeout: AXIOS_TIMEOUT,
   enableStream: true,
   enableAnalytics: true,
   cache: new LRU({ max: 100 }),
