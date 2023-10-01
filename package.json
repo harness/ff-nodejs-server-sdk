@@ -85,5 +85,11 @@
   ],
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "bundleDependencies": [
+    "axios",
+    "eventsource",
+    "keyv",
+    "keyv-file"
+  ]
 }
