@@ -70,12 +70,6 @@
     "murmurhash": "^2.0.0",
     "tslib": "~2.3.0"
   },
-  "bundledDependencies": [
-    "axios",
-    "eventsource",
-    "keyv",
-    "keyv-file"
-  ],
   "volta": {
     "node": "12.22.5"
   },
