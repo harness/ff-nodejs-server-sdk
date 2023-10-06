@@ -25,7 +25,11 @@ export class FileStore implements AsyncKeyValueStore {
     return this.keyv.delete(key);
   }
 
-  keys(): Promise<string[]> {
-    return Promise.resolve(this.keyvFile.keys());
+  keys(): Promise<Generator<string, void, void>> {
+    return Promise.resolve((function* (keys: string[]) {
+      for (const key of keys) {
+        yield key;
+      }
+    })(this.keyvFile.keys()));
   }
 }

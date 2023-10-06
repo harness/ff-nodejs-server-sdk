@@ -65,15 +65,15 @@ export interface Query {
 export interface KeyValueStore {
   set(key: string, value: unknown): void;
   get(key: string): unknown;
-  del(key: string): void;
-  keys(): string[];
+  delete(key: string): void;
+  keys(): Generator<string, void, void>;
 }
 
 export interface AsyncKeyValueStore {
   set(key: string, value: unknown): Promise<true>;
   get<T>(key: string): Promise<T>;
   del(key: string): Promise<boolean>;
-  keys(): Promise<string[]>;
+  keys(): Promise<Generator<string, void, void>>;
 }
 
 export interface Target {
