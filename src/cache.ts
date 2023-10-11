@@ -11,11 +11,13 @@ export class SimpleCache implements KeyValueStore {
     return this.cache[key];
   }
 
-  del(key: string): void {
+  delete(key: string): void {
     delete this.cache[key];
   }
 
-  keys(): string[] {
-    return Object.keys(this.cache);
+  *keys(): Generator<string, void, void> {
+    for (const key of Object.keys(this.cache)) {
+      yield key;
+    }
   }
 }

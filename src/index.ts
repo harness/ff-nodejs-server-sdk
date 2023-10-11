@@ -1,5 +1,5 @@
 import Client, { Event } from './client';
-import LRU from 'lru-cache';
+import * as LRU from 'lru-cache';
 import { Options, Target } from './types';
 import { Logger } from './log';
 import { AsyncKeyValueStore, KeyValueStore } from './types';

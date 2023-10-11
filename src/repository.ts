@@ -45,7 +45,7 @@ export class StorageRepository implements Repository {
     const flagKey = this.formatFlagKey(identifier);
     if (this.store) {
       await this.store.set(flagKey, fc);
-      this.cache.del(flagKey);
+      this.cache.delete(flagKey);
     } else {
       this.cache.set(flagKey, fc);
     }
@@ -61,7 +61,7 @@ export class StorageRepository implements Repository {
     const segmentKey = this.formatSegmentKey(identifier);
     if (this.store) {
       await this.store.set(segmentKey, segment);
-      this.cache.del(segmentKey);
+      this.cache.delete(segmentKey);
     } else {
       this.cache.set(segmentKey, segment);
     }
@@ -75,7 +75,7 @@ export class StorageRepository implements Repository {
     if (this.store) {
       await this.store.del(flagKey);
     }
-    this.cache.del(flagKey);
+    this.cache.delete(flagKey);
     if (this.eventBus) {
       this.eventBus.emit(RepositoryEvent.FLAG_DELETED, identifier);
     }
@@ -86,7 +86,7 @@ export class StorageRepository implements Repository {
     if (this.store) {
       await this.store.del(segmentKey);
     }
-    this.cache.del(segmentKey);
+    this.cache.delete(segmentKey);
     if (this.eventBus) {
       this.eventBus.emit(RepositoryEvent.SEGMENT_DELETED, identifier);
     }
@@ -172,4 +172,6 @@ export class StorageRepository implements Repository {
   private formatSegmentKey(key: string): string {
     return `segments/${key}`;
   }
+
+
 }
