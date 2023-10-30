@@ -233,7 +233,7 @@ export default class Client {
       this.cluster = decoded.clusterIdentifier || '1';
     } catch (error) {
       this.failure = true;
-      console.error('Error while authenticating, err: ', error);
+      console.error('Error while authenticating, err: ' + JSON.stringify(error));
       warnAuthFailedSrvDefaults(this.log);
       warnFailedInitAuthError(this.log);
       this.eventBus.emit(Event.FAILED, error);
