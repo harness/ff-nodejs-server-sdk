@@ -744,7 +744,7 @@ export class ClientApi extends BaseAPI {
       status: 200,
       statusText: 'OK',
       headers: {},
-      config: {},
+      config: {headers: null},
     };
   }
 
@@ -758,7 +758,7 @@ export class ClientApi extends BaseAPI {
       status: 200,
       statusText: 'OK',
       headers: {},
-      config: {},
+      config: {headers: null},
     };
   }
 
@@ -778,7 +778,7 @@ export class ClientApi extends BaseAPI {
       status: 200,
       statusText: 'OK',
       headers: {},
-      config: {},
+      config: {headers: null},
     };
   }
 
@@ -799,7 +799,7 @@ export class ClientApi extends BaseAPI {
       status: 200,
       statusText: 'OK',
       headers: {},
-      config: {},
+      config: {headers: null},
     };
   }
 
@@ -813,7 +813,7 @@ export class ClientApi extends BaseAPI {
       status: 200,
       statusText: 'OK',
       headers: {},
-      config: {},
+      config: {headers: null},
     };
   }
 
@@ -839,7 +839,7 @@ export class ClientApi extends BaseAPI {
       status: 200,
       statusText: 'OK',
       headers: {},
-      config: {},
+      config: {headers: null},
     };
   }
 
@@ -857,7 +857,7 @@ export class ClientApi extends BaseAPI {
       status: 200,
       statusText: 'OK',
       headers: {},
-      config: {},
+      config: {headers: null},
     };
   }
 
