@@ -23,7 +23,11 @@ import {
 } from './openapi';
 import murmurhash from 'murmurhash';
 import { ConsoleLog } from './log';
-import { debugEvalSuccess, warnDefaultVariationServed } from './sdk_codes';
+import {
+  debugEvalSuccess,
+  warnBucketByAttributeNotFound,
+  warnDefaultVariationServed,
+} from './sdk_codes';
 
 type Callback = (
   fc: FeatureConfig,
@@ -76,9 +80,19 @@ export class Evaluator {
     bucketBy: string,
     percentage: number,
   ): boolean {
-    const property = this.getAttrValue(target, bucketBy);
+    let property = this.getAttrValue(target, bucketBy);
     if (!property) {
-      return false;
+      const old_bucketBy = bucketBy;
+      bucketBy = 'identifier';
+      property = this.getAttrValue(target, bucketBy);
+      if (!property) {
+        return false;
+      }
+      warnBucketByAttributeNotFound(
+        old_bucketBy,
+        property?.toString(),
+        this.log,
+      );
     }
     const bucketId = this.getNormalizedNumber(property, bucketBy);
     return percentage > 0 && bucketId <= percentage;

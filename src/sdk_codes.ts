@@ -26,6 +26,7 @@ const sdkCodes: Record<number, string> = {
   // SDK_EVAL_6xxx -
   6000: 'Evaluation successful: ',
   6001: 'Evaluation Failed, returning default variation: ',
+  6002: "BucketBy attribute not found in target attributes, falling back to 'identifier':",
   // SDK_METRICS_7xxx
   7000: 'Metrics thread started with request interval:',
   7001: 'Metrics stopped',
@@ -171,5 +172,15 @@ export function warnDefaultVariationServed(
         target,
       )}`,
     ),
+  );
+}
+
+export function warnBucketByAttributeNotFound(
+  bucketBy: string,
+  usingValue: string,
+  logger: Logger,
+): void {
+  logger.warn(
+    getSdkErrMsg(6002, `missing=${bucketBy}, using value=${usingValue}`),
   );
 }
