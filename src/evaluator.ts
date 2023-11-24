@@ -85,9 +85,11 @@ export class Evaluator {
       const oldBucketBy = bucketBy;
       bucketBy = 'identifier';
       property = this.getAttrValue(target, bucketBy);
+      
       if (!property) {
         return false;
       }
+      
       warnBucketByAttributeNotFound(
         old_bucketBy,
         property?.toString(),
