@@ -82,7 +82,7 @@ export class Evaluator {
   ): boolean {
     let property = this.getAttrValue(target, bucketBy);
     if (!property) {
-      const old_bucketBy = bucketBy;
+      const oldBucketBy = bucketBy;
       bucketBy = 'identifier';
       property = this.getAttrValue(target, bucketBy);
       if (!property) {
