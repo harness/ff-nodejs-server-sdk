@@ -23,7 +23,11 @@ import {
 } from './openapi';
 import murmurhash from 'murmurhash';
 import { ConsoleLog } from './log';
-import { debugEvalSuccess, warnDefaultVariationServed } from './sdk_codes';
+import {
+  debugEvalSuccess,
+  warnBucketByAttributeNotFound,
+  warnDefaultVariationServed,
+} from './sdk_codes';
 
 type Callback = (
   fc: FeatureConfig,
@@ -54,8 +58,8 @@ export class Evaluator {
   }
 
   private getNormalizedNumberWithNormalizer(
-    property: Type,
     bucketBy: string,
+    property: Type,
     normalizer: number,
   ): number {
     const value = [bucketBy, property].join(':');
@@ -63,10 +67,10 @@ export class Evaluator {
     return (hash % normalizer) + 1;
   }
 
-  private getNormalizedNumber(property: Type, bucketBy: string): number {
+  private getNormalizedNumber(bucketBy: string, property: Type): number {
     return this.getNormalizedNumberWithNormalizer(
-      property,
       bucketBy,
+      property,
       ONE_HUNDRED,
     );
   }
@@ -76,11 +80,19 @@ export class Evaluator {
     bucketBy: string,
     percentage: number,
   ): boolean {
-    const property = this.getAttrValue(target, bucketBy);
+    let bb = bucketBy;
+    let property = this.getAttrValue(target, bb);
     if (!property) {
-      return false;
+      bb = 'identifier';
+      property = this.getAttrValue(target, bb);
+
+      if (!property) {
+        return false;
+      }
+
+      warnBucketByAttributeNotFound(bucketBy, property?.toString(), this.log);
     }
-    const bucketId = this.getNormalizedNumber(property, bucketBy);
+    const bucketId = this.getNormalizedNumber(bb, property);
     return percentage > 0 && bucketId <= percentage;
   }
 

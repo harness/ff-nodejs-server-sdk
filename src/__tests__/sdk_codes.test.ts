@@ -44,6 +44,7 @@ describe('SDK Codes', () => {
       'warnDefaultVariationServed',
       ['flag', { name: 'dummy', identifier: 'dummy' }, 'default value', logger],
     ],
+    ['warnBucketByAttributeNotFound', ['dummy1', 'dummy2', logger]],
   ])('it should not throw when %s is called', (fn, args) => {
     expect(() => sdkCodes[fn](...args)).not.toThrow();
   });
