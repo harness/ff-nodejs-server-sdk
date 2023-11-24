@@ -2,7 +2,7 @@ import { Evaluator } from '../evaluator';
 import { Logger } from '../log';
 
 describe('Evaluator', () => {
-  it('should return identifier if bucketby attribute does not exist', async () => {
+  it('should fallback to identifier if bucketby attribute does not exist', async () => {
     const logger: Logger = {
       trace: jest.fn(),
       debug: jest.fn(),
@@ -11,13 +11,13 @@ describe('Evaluator', () => {
       error: jest.fn(),
     };
 
-    const mockQuery = {
+    const mock_query = {
       getFlag: jest.fn(),
       getSegment: jest.fn(),
       findFlagsBySegment: jest.fn(),
     };
 
-    const featureConfig = {
+    const feature_config = {
       feature: 'flag',
       kind: 'string',
       state: 'on',
@@ -56,9 +56,9 @@ describe('Evaluator', () => {
       ],
     };
 
-    mockQuery.getFlag.mockReturnValue(featureConfig);
+    mock_query.getFlag.mockReturnValue(feature_config);
 
-    const evaluator = new Evaluator(mockQuery, logger);
+    const evaluator = new Evaluator(mock_query, logger);
 
     const target = {
       identifier: 'test', // Test will fall back to bucketing on this (bucket 57)
@@ -68,13 +68,13 @@ describe('Evaluator', () => {
       },
     };
 
-    const actualVariation = await evaluator.stringVariation(
+    const actual_variation = await evaluator.stringVariation(
       'flag',
       target,
       'fallback_value',
       null,
     );
 
-    expect(actualVariation).toEqual('wanted_value');
+    expect(actual_variation).toEqual('wanted_value');
   });
 });

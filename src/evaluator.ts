@@ -58,8 +58,8 @@ export class Evaluator {
   }
 
   private getNormalizedNumberWithNormalizer(
-    property: Type,
     bucketBy: string,
+    property: Type,
     normalizer: number,
   ): number {
     const value = [bucketBy, property].join(':');
@@ -67,10 +67,10 @@ export class Evaluator {
     return (hash % normalizer) + 1;
   }
 
-  private getNormalizedNumber(property: Type, bucketBy: string): number {
+  private getNormalizedNumber(bucketBy: string, property: Type): number {
     return this.getNormalizedNumberWithNormalizer(
-      property,
       bucketBy,
+      property,
       ONE_HUNDRED,
     );
   }
@@ -80,23 +80,19 @@ export class Evaluator {
     bucketBy: string,
     percentage: number,
   ): boolean {
-    let property = this.getAttrValue(target, bucketBy);
+    let bb = bucketBy;
+    let property = this.getAttrValue(target, bb);
     if (!property) {
-      const oldBucketBy = bucketBy;
-      bucketBy = 'identifier';
-      property = this.getAttrValue(target, bucketBy);
-      
+      bb = 'identifier';
+      property = this.getAttrValue(target, bb);
+
       if (!property) {
         return false;
       }
-      
-      warnBucketByAttributeNotFound(
-        old_bucketBy,
-        property?.toString(),
-        this.log,
-      );
+
+      warnBucketByAttributeNotFound(bb, property?.toString(), this.log);
     }
-    const bucketId = this.getNormalizedNumber(property, bucketBy);
+    const bucketId = this.getNormalizedNumber(bb, property);
     return percentage > 0 && bucketId <= percentage;
   }
 
