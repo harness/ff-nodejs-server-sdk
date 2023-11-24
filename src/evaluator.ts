@@ -90,7 +90,7 @@ export class Evaluator {
         return false;
       }
 
-      warnBucketByAttributeNotFound(bb, property?.toString(), this.log);
+      warnBucketByAttributeNotFound(bucketBy, property?.toString(), this.log);
     }
     const bucketId = this.getNormalizedNumber(bb, property);
     return percentage > 0 && bucketId <= percentage;
