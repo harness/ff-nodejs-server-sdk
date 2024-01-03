@@ -189,7 +189,7 @@ export const MetricsProcessor = (
 
     const metrics: Metrics = _summarize();
 
-    if (metrics && metrics.metricsData.length && metrics.targetData.length) {
+    if (metrics && (metrics.metricsData.length || metrics.targetData.length)) {
       log.debug('Start sending metrics data');
       api
         .postMetrics(environment, cluster, metrics)
