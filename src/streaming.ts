@@ -143,7 +143,6 @@ export class StreamProcessor {
 
         res
           .on('data', (data) => {
-            debugStreamEventReceived(this.log);
             this.processData(data);
           })
           .on('close', () => {
@@ -166,11 +165,16 @@ export class StreamProcessor {
 
   private processData(data: any): void {
     const lines = data.toString().split(/\r?\n/);
+    if (lines[0].startsWith(":")) {
+      this.log.debug("SSE Heartbeat received")
+      return;
+    }
     lines.forEach((line) => this.processLine(line));
   }
 
   private processLine(line: string): void {
     if (line.startsWith('data:')) {
+      debugStreamEventReceived(this.log);
       this.log.debug('SSE GOT:', line.substring(5));
       const msg = JSON.parse(line.substring(5));
 

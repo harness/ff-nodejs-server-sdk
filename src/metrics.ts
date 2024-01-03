@@ -101,11 +101,6 @@ export const MetricsProcessor = (
   };
 
   const _summarize = (): Metrics | unknown => {
-    if (!data) {
-      log.debug('No metrics data!');
-      return;
-    }
-
     const targetData: TargetData[] = [];
     const metricsData: MetricsData[] = [];
 
@@ -184,30 +179,34 @@ export const MetricsProcessor = (
 
   const _send = (): void => {
     if (closed) {
+      log.debug('SDK has been closed before metrics can be sent');
+      return;
+    }
+
+    if (data.size == 0) {
+      log.debug('No metrics to send in this interval');
       return;
     }
 
     const metrics: Metrics = _summarize();
 
-    if (metrics && metrics.metricsData.length && metrics.targetData.length) {
-      log.debug('Start sending metrics data');
-      api
-        .postMetrics(environment, cluster, metrics)
-        .then((response) => {
-          log.debug('Metrics server returns: ', response.status);
-          infoMetricsSuccess(log);
-          if (response.status >= 400) {
-            log.error(
-              'Error while sending metrics data with status code: ',
-              response.status,
-            );
-          }
-        })
-        .catch((error: Error) => {
-          warnPostMetricsFailed(`${error}`, log);
-          log.debug('Metrics server returns error: ', error);
-        });
-    }
+    log.debug('Start sending metrics data');
+    api
+      .postMetrics(environment, cluster, metrics)
+      .then((response) => {
+        log.debug('Metrics server returns: ', response.status);
+        infoMetricsSuccess(log);
+        if (response.status >= 400) {
+          log.error(
+            'Error while sending metrics data with status code: ',
+            response.status,
+          );
+        }
+      })
+      .catch((error: Error) => {
+        warnPostMetricsFailed(`${error}`, log);
+        log.debug('Metrics server returns error: ', error);
+      });
   };
 
   const start = (): void => {
