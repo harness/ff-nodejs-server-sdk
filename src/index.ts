@@ -28,28 +28,28 @@ export default {
   },
   boolVariation: function (
     identifier: string,
-    target: Target,
+    target?: Target,
     defaultValue = false,
   ): Promise<boolean> {
     return this.instance.boolVariation(identifier, target, defaultValue);
   },
   stringVariation: function (
     identifier: string,
-    target: Target,
+    target?: Target,
     defaultValue = '',
   ): Promise<string> {
     return this.instance.stringVariation(identifier, target, defaultValue);
   },
   numberVariation: function (
     identifier: string,
-    target: Target,
+    target?: Target,
     defaultValue = 0,
   ): Promise<number> {
     return this.instance.numberVariation(identifier, target, defaultValue);
   },
   jsonVariation: function (
     identifier: string,
-    target: Target,
+    target?: Target,
     defaultValue = '',
   ): Promise<Record<string, unknown>> {
     return this.instance.jsonVariation(identifier, target, defaultValue);
