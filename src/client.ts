@@ -350,7 +350,7 @@ export default class Client {
 
   boolVariation(
     identifier: string,
-    target: Target,
+    target?: Target,
     defaultValue = false,
   ): Promise<boolean> {
     if (!this.initialized) {
@@ -378,7 +378,7 @@ export default class Client {
 
   stringVariation(
     identifier: string,
-    target: Target,
+    target?: Target,
     defaultValue = '',
   ): Promise<string> {
     if (!this.initialized) {
@@ -406,7 +406,7 @@ export default class Client {
 
   numberVariation(
     identifier: string,
-    target: Target,
+    target?: Target,
     defaultValue = 0,
   ): Promise<number> {
     if (!this.initialized) {
@@ -434,7 +434,7 @@ export default class Client {
 
   jsonVariation(
     identifier: string,
-    target: Target,
+    target?: Target,
     defaultValue = {},
   ): Promise<Record<string, unknown>> {
     if (!this.initialized) {
