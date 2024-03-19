@@ -235,6 +235,9 @@ export const MetricsProcessor = (
       case 'symbol':
         return value.toString();
       case 'object':
+        if (Array.isArray(value)) {
+          return String(value)
+        }
         return value === null ? '' : JSON.stringify(value);
       default:
         return '';
