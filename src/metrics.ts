@@ -114,7 +114,10 @@ export const MetricsProcessor = (
         if (event.target.attributes) {
           targetAttributes = Object.entries(event.target.attributes).map(
             ([key, value]) => {
-              const stringValue = value === null || value === undefined ? '' : String(value);
+              const stringValue =
+                value === null || value === undefined
+                  ? ''
+                  : valueToString(value);
               return { key, value: stringValue };
             },
           );
@@ -220,6 +223,22 @@ export const MetricsProcessor = (
     );
     syncInterval = setInterval(_send, options.eventsSyncInterval);
     eventBus.emit(MetricEvent.READY);
+  };
+
+  const valueToString = (value: any): string => {
+    switch (typeof value) {
+      case 'string':
+        return value; // Return strings directly
+      case 'number':
+      case 'boolean':
+      case 'bigint':
+      case 'symbol':
+        return value.toString();
+      case 'object':
+        return value === null ? '' : JSON.stringify(value);
+      default:
+        return '';
+    }
   };
 
   const close = (): void => {
