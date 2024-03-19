@@ -228,7 +228,7 @@ export const MetricsProcessor = (
   const valueToString = (value: any): string => {
     switch (typeof value) {
       case 'string':
-        return value; // Return strings directly
+        return value;
       case 'number':
       case 'boolean':
       case 'bigint':
@@ -236,7 +236,7 @@ export const MetricsProcessor = (
         return value.toString();
       case 'object':
         if (Array.isArray(value)) {
-          return String(value)
+          return value.toString()
         }
         return value === null ? '' : JSON.stringify(value);
       default:
