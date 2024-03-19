@@ -240,7 +240,7 @@ export const MetricsProcessor = (
         }
         return value === null ? '' : JSON.stringify(value);
       default:
-        return '';
+        return String(value);
     }
   };
 
