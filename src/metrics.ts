@@ -113,9 +113,13 @@ export const MetricsProcessor = (
         let targetAttributes: KeyValue[] = [];
         if (event.target.attributes) {
           targetAttributes = Object.entries(event.target.attributes).map(
-            ([key, value]) => ({ key, value: value as string }),
+            ([key, value]) => {
+              const stringValue = value === null || value === undefined ? '' : String(value);
+              return { key, value: stringValue };
+            },
           );
         }
+
         let targetName = event.target.identifier;
         if (event.target.name) {
           targetName = event.target.name;
