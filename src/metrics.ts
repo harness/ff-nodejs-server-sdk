@@ -226,17 +226,7 @@ export const MetricsProcessor = (
   };
 
   const valueToString = (value: any): string => {
-    switch (typeof value) {
-      case 'string':
-        return value;
-      case 'object':
-        if (Array.isArray(value)) {
-          return value.toString()
-        }
-        return value === null ? '' : JSON.stringify(value);
-      default:
-        return String(value);
-    }
+    return typeof value === 'object' && !Array.isArray(value) ? JSON.stringify(value) : String(value)
   };
 
   const close = (): void => {
