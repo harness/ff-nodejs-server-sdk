@@ -113,9 +113,16 @@ export const MetricsProcessor = (
         let targetAttributes: KeyValue[] = [];
         if (event.target.attributes) {
           targetAttributes = Object.entries(event.target.attributes).map(
-            ([key, value]) => ({ key, value: value as string }),
+            ([key, value]) => {
+              const stringValue =
+                value === null || value === undefined
+                  ? ''
+                  : valueToString(value);
+              return { key, value: stringValue };
+            },
           );
         }
+
         let targetName = event.target.identifier;
         if (event.target.name) {
           targetName = event.target.name;
@@ -216,6 +223,10 @@ export const MetricsProcessor = (
     );
     syncInterval = setInterval(_send, options.eventsSyncInterval);
     eventBus.emit(MetricEvent.READY);
+  };
+
+  const valueToString = (value: any): string => {
+    return typeof value === 'object' && !Array.isArray(value) ? JSON.stringify(value) : String(value)
   };
 
   const close = (): void => {
