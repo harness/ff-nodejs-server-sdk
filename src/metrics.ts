@@ -229,11 +229,6 @@ export const MetricsProcessor = (
     switch (typeof value) {
       case 'string':
         return value;
-      case 'number':
-      case 'boolean':
-      case 'bigint':
-      case 'symbol':
-        return value.toString();
       case 'object':
         if (Array.isArray(value)) {
           return value.toString()
