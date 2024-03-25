@@ -50,25 +50,21 @@ export interface MetricsProcessorInterface {
 }
 
 export class MetricsProcessor implements MetricsProcessorInterface {
-  private environment: string;
-  private cluster: string;
-  private options: Options;
-  private eventBus: events.EventEmitter;
-  private closed: boolean;
   private data: Map<string, AnalyticsEvent> = new Map();
   private syncInterval?: NodeJS.Timeout;
   private api: MetricsApi;
-  private log: Logger;
+  private readonly log: Logger;
 
-  constructor(environment: string, cluster: string, conf: Configuration, options: Options, eventBus: events.EventEmitter, closed: boolean = false) {
-    this.environment = environment;
-    this.cluster = cluster || "1";
-    this.options = options;
-    this.eventBus = eventBus;
-    this.closed = closed;
-
+  constructor(
+    private environment: string,
+    private cluster: string = "1",
+    private conf: Configuration,
+    private options: Options,
+    private eventBus: events.EventEmitter,
+    private closed: boolean = false
+  ) {
     const configuration = new Configuration({
-      ...conf,
+      ...this.conf,
       basePath: options.eventsUrl,
     });
 
