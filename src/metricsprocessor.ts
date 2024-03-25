@@ -52,7 +52,6 @@ export interface MetricsProcessorInterface {
 export class MetricsProcessor implements MetricsProcessorInterface {
   private environment: string;
   private cluster: string;
-  private conf: Configuration;
   private options: Options;
   private eventBus: events.EventEmitter;
   private closed: boolean;
@@ -63,8 +62,7 @@ export class MetricsProcessor implements MetricsProcessorInterface {
 
   constructor(environment: string, cluster: string, conf: Configuration, options: Options, eventBus: events.EventEmitter, closed: boolean = false) {
     this.environment = environment;
-    this.cluster = cluster || '1';
-    this.conf = conf;
+    this.cluster = cluster || "1";
     this.options = options;
     this.eventBus = eventBus;
     this.closed = closed;
@@ -200,12 +198,12 @@ export class MetricsProcessor implements MetricsProcessorInterface {
   }
 
   private _send(): void {
-    if (closed) {
+    if (this.closed) {
       this.log.debug('SDK has been closed before metrics can be sent');
       return;
     }
 
-    if (data.size == 0) {
+    if (this.data.size == 0) {
       this.log.debug('No metrics to send in this interval');
       return;
     }
@@ -217,16 +215,16 @@ export class MetricsProcessor implements MetricsProcessorInterface {
       .postMetrics(this.environment, this.cluster, metrics)
       .then((response) => {
         this.log.debug('Metrics server returns: ', response.status);
-        infoMetricsSuccess(log);
+        infoMetricsSuccess(this.log);
         if (response.status >= 400) {
-          log.error(
+          this.log.error(
             'Error while sending metrics data with status code: ',
             response.status,
           );
         }
       })
       .catch((error: Error) => {
-        warnPostMetricsFailed(`${error}`, log);
+        warnPostMetricsFailed(`${error}`, this.log);
         this.log.debug('Metrics server returns error: ', error);
       });
   }
