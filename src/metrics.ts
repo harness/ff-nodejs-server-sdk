@@ -1,4 +1,4 @@
-import * as events from "events";
+import * as events from 'events';
 import {
   FEATURE_IDENTIFIER_ATTRIBUTE,
   FEATURE_NAME_ATTRIBUTE,
@@ -9,8 +9,8 @@ import {
   SDK_TYPE_ATTRIBUTE,
   SDK_VERSION_ATTRIBUTE,
   TARGET_ATTRIBUTE,
-  VARIATION_IDENTIFIER_ATTRIBUTE
-} from "./constants";
+  VARIATION_IDENTIFIER_ATTRIBUTE,
+} from './constants';
 import {
   Configuration,
   FeatureConfig,
@@ -20,12 +20,16 @@ import {
   MetricsData,
   MetricsDataMetricsTypeEnum,
   TargetData,
-  Variation
-} from "./openapi";
-import { Options, Target } from "./types";
-import { VERSION } from "./version";
-import { infoMetricsSuccess, infoMetricsThreadExited, warnPostMetricsFailed } from "./sdk_codes";
-import { Logger } from "./log";
+  Variation,
+} from './openapi';
+import { Options, Target } from './types';
+import { VERSION } from './version';
+import {
+  infoMetricsSuccess,
+  infoMetricsThreadExited,
+  warnPostMetricsFailed,
+} from './sdk_codes';
+import { Logger } from './log';
 
 export enum MetricEvent {
   READY = 'metrics_ready',
@@ -42,7 +46,11 @@ interface AnalyticsEvent {
 export interface MetricsProcessorInterface {
   start(): void;
   close(): void;
-  enqueue(target: Target, featureConfig: FeatureConfig, variation: Variation): void;
+  enqueue(
+    target: Target,
+    featureConfig: FeatureConfig,
+    variation: Variation,
+  ): void;
 }
 
 export class MetricsProcessor implements MetricsProcessorInterface {
@@ -53,11 +61,11 @@ export class MetricsProcessor implements MetricsProcessorInterface {
 
   constructor(
     private environment: string,
-    private cluster: string = "1",
+    private cluster: string = '1',
     private conf: Configuration,
     private options: Options,
     private eventBus: events.EventEmitter,
-    private closed: boolean = false
+    private closed: boolean = false,
   ) {
     const configuration = new Configuration({
       ...this.conf,
@@ -69,7 +77,10 @@ export class MetricsProcessor implements MetricsProcessorInterface {
   }
 
   start(): void {
-    this.log.info('Starting MetricsProcessor with request interval: ', this.options.eventsSyncInterval);
+    this.log.info(
+      'Starting MetricsProcessor with request interval: ',
+      this.options.eventsSyncInterval,
+    );
     this.syncInterval = setInterval(() => this._send(), 10000);
     this.eventBus.emit(MetricEvent.READY);
   }
@@ -85,8 +96,17 @@ export class MetricsProcessor implements MetricsProcessorInterface {
     infoMetricsThreadExited(this.log);
   }
 
-  enqueue(target: Target, featureConfig: FeatureConfig, variation: Variation): void {
-    const event: AnalyticsEvent = { target, featureConfig, variation, count: 0 };
+  enqueue(
+    target: Target,
+    featureConfig: FeatureConfig,
+    variation: Variation,
+  ): void {
+    const event: AnalyticsEvent = {
+      target,
+      featureConfig,
+      variation,
+      count: 0,
+    };
     const key = this._formatKey(event);
     const found = this.data.get(key);
     if (found) {
@@ -105,87 +125,87 @@ export class MetricsProcessor implements MetricsProcessorInterface {
   }
 
   private _summarize(): Metrics | unknown {
-      const targetData: TargetData[] = [];
-      const metricsData: MetricsData[] = [];
+    const targetData: TargetData[] = [];
+    const metricsData: MetricsData[] = [];
 
-      // clone map and clear data
-      const clonedData = new Map(this.data);
-      this.data.clear();
+    // clone map and clear data
+    const clonedData = new Map(this.data);
+    this.data.clear();
 
-      for (const event of clonedData.values()) {
-        if (event.target && !event.target.anonymous) {
-          let targetAttributes: KeyValue[] = [];
-          if (event.target.attributes) {
-            targetAttributes = Object.entries(event.target.attributes).map(
-              ([key, value]) => {
-                const stringValue =
-                  value === null || value === undefined
-                    ? ''
-                    : this.valueToString(value);
-                return { key, value: stringValue };
-              },
-            );
-          }
-
-          let targetName = event.target.identifier;
-          if (event.target.name) {
-            targetName = event.target.name;
-          }
-
-          const td: TargetData = {
-            identifier: event.target.identifier,
-            name: targetName,
-            attributes: targetAttributes,
-          };
-          targetData.push(td);
+    for (const event of clonedData.values()) {
+      if (event.target && !event.target.anonymous) {
+        let targetAttributes: KeyValue[] = [];
+        if (event.target.attributes) {
+          targetAttributes = Object.entries(event.target.attributes).map(
+            ([key, value]) => {
+              const stringValue =
+                value === null || value === undefined
+                  ? ''
+                  : this.valueToString(value);
+              return { key, value: stringValue };
+            },
+          );
         }
 
-        const metricsAttributes: KeyValue[] = [
-          {
-            key: FEATURE_IDENTIFIER_ATTRIBUTE,
-            value: event.featureConfig.feature,
-          },
-          {
-            key: FEATURE_NAME_ATTRIBUTE,
-            value: event.featureConfig.feature,
-          },
-          {
-            key: VARIATION_IDENTIFIER_ATTRIBUTE,
-            value: event.variation.identifier,
-          },
-          {
-            key: SDK_TYPE_ATTRIBUTE,
-            value: SDK_TYPE,
-          },
-          {
-            key: SDK_LANGUAGE_ATTRIBUTE,
-            value: SDK_LANGUAGE,
-          },
-          {
-            key: SDK_VERSION_ATTRIBUTE,
-            value: VERSION,
-          },
-          {
-            key: TARGET_ATTRIBUTE,
-            value: event?.target?.identifier ?? null,
-          },
-        ];
+        let targetName = event.target.identifier;
+        if (event.target.name) {
+          targetName = event.target.name;
+        }
 
-        // private target attributes
-        // need more info
-
-        const md: MetricsData = {
-          timestamp: Date.now(),
-          count: event.count,
-          metricsType: MetricsDataMetricsTypeEnum.Ffmetrics,
-          attributes: metricsAttributes,
+        const td: TargetData = {
+          identifier: event.target.identifier,
+          name: targetName,
+          attributes: targetAttributes,
         };
-        metricsData.push(md);
+        targetData.push(td);
       }
-      return {
-        targetData: targetData,
-        metricsData: metricsData,
+
+      const metricsAttributes: KeyValue[] = [
+        {
+          key: FEATURE_IDENTIFIER_ATTRIBUTE,
+          value: event.featureConfig.feature,
+        },
+        {
+          key: FEATURE_NAME_ATTRIBUTE,
+          value: event.featureConfig.feature,
+        },
+        {
+          key: VARIATION_IDENTIFIER_ATTRIBUTE,
+          value: event.variation.identifier,
+        },
+        {
+          key: SDK_TYPE_ATTRIBUTE,
+          value: SDK_TYPE,
+        },
+        {
+          key: SDK_LANGUAGE_ATTRIBUTE,
+          value: SDK_LANGUAGE,
+        },
+        {
+          key: SDK_VERSION_ATTRIBUTE,
+          value: VERSION,
+        },
+        {
+          key: TARGET_ATTRIBUTE,
+          value: event?.target?.identifier ?? null,
+        },
+      ];
+
+      // private target attributes
+      // need more info
+
+      const md: MetricsData = {
+        timestamp: Date.now(),
+        count: event.count,
+        metricsType: MetricsDataMetricsTypeEnum.Ffmetrics,
+        attributes: metricsAttributes,
       };
+      metricsData.push(md);
+    }
+    return {
+      targetData: targetData,
+      metricsData: metricsData,
+    };
   }
 
   private async _send(): Promise<void> {
@@ -203,11 +223,18 @@ export class MetricsProcessor implements MetricsProcessorInterface {
 
     this.log.debug('Start sending metrics data');
     try {
-      const response = await this.api.postMetrics(this.environment, this.cluster, metrics);
+      const response = await this.api.postMetrics(
+        this.environment,
+        this.cluster,
+        metrics,
+      );
       this.log.debug('Metrics server returns: ', response.status);
       infoMetricsSuccess(this.log);
       if (response.status >= 400) {
-        this.log.error('Error while sending metrics data with status code: ', response.status);
+        this.log.error(
+          'Error while sending metrics data with status code: ',
+          response.status,
+        );
       }
     } catch (error) {
       warnPostMetricsFailed(`${error}`, this.log);
@@ -216,6 +243,8 @@ export class MetricsProcessor implements MetricsProcessorInterface {
   }
 
   private valueToString(value: any): string {
-    return typeof value === 'object' && !Array.isArray(value) ? JSON.stringify(value) : String(value);
+    return typeof value === 'object' && !Array.isArray(value)
+      ? JSON.stringify(value)
+      : String(value);
   }
 }
