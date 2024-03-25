@@ -29,6 +29,7 @@ import {
   infoMetricsThreadExited,
   warnPostMetricsFailed,
 } from './sdk_codes';
+import { Logger } from "./log";
 
 export enum MetricEvent {
   READY = 'metrics_ready',
@@ -58,7 +59,7 @@ export class MetricsProcessor implements MetricsProcessorInterface {
   private data: Map<string, AnalyticsEvent> = new Map();
   private syncInterval?: NodeJS.Timeout;
   private api: MetricsApi;
-  private log: any;
+  private log: Logger;
 
   constructor(environment: string, cluster: string, conf: Configuration, options: Options, eventBus: events.EventEmitter, closed: boolean = false) {
     this.environment = environment;
@@ -119,8 +120,8 @@ export class MetricsProcessor implements MetricsProcessorInterface {
       const metricsData: MetricsData[] = [];
 
       // clone map and clear data
-      const clonedData = new Map(data);
-      data.clear();
+      const clonedData = new Map(this.data);
+      this.data.clear();
 
       for (const event of clonedData.values()) {
         if (event.target && !event.target.anonymous) {
@@ -131,7 +132,7 @@ export class MetricsProcessor implements MetricsProcessorInterface {
                 const stringValue =
                   value === null || value === undefined
                     ? ''
-                    : valueToString(value);
+                    : this.valueToString(value);
                 return { key, value: stringValue };
               },
             );
@@ -199,7 +200,35 @@ export class MetricsProcessor implements MetricsProcessorInterface {
   }
 
   private _send(): void {
-    // Method implementation remains the same
+    if (closed) {
+      this.log.debug('SDK has been closed before metrics can be sent');
+      return;
+    }
+
+    if (data.size == 0) {
+      this.log.debug('No metrics to send in this interval');
+      return;
+    }
+
+    const metrics: Metrics = this._summarize();
+
+    this.log.debug('Start sending metrics data');
+    this.api
+      .postMetrics(this.environment, this.cluster, metrics)
+      .then((response) => {
+        this.log.debug('Metrics server returns: ', response.status);
+        infoMetricsSuccess(log);
+        if (response.status >= 400) {
+          log.error(
+            'Error while sending metrics data with status code: ',
+            response.status,
+          );
+        }
+      })
+      .catch((error: Error) => {
+        warnPostMetricsFailed(`${error}`, log);
+        this.log.debug('Metrics server returns error: ', error);
+      });
   }
 
   private valueToString(value: any): string {
