@@ -14,7 +14,7 @@ import {
   MetricEvent,
   MetricsProcessor,
   MetricsProcessorInterface,
-} from './metrics';
+} from './metricsprocessor';
 import { Logger } from './log';
 import {
   infoMetricsThreadStarted,
@@ -333,7 +333,7 @@ export default class Client {
     }
 
     if (this.options.enableAnalytics) {
-      this.metricsProcessor = MetricsProcessor(
+      this.metricsProcessor = new MetricsProcessor(
         this.environment,
         this.cluster,
         this.configuration,
