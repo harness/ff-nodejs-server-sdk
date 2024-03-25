@@ -14,7 +14,7 @@ import {
   MetricEvent,
   MetricsProcessor,
   MetricsProcessorInterface,
-} from './metricsprocessor';
+} from './metrics';
 import { Logger } from './log';
 import {
   infoMetricsThreadStarted,
