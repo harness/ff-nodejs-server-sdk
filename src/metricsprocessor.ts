@@ -1,4 +1,4 @@
-import * as events from 'events';
+import * as events from "events";
 import {
   FEATURE_IDENTIFIER_ATTRIBUTE,
   FEATURE_NAME_ATTRIBUTE,
@@ -9,26 +9,22 @@ import {
   SDK_TYPE_ATTRIBUTE,
   SDK_VERSION_ATTRIBUTE,
   TARGET_ATTRIBUTE,
-  VARIATION_IDENTIFIER_ATTRIBUTE,
-} from './constants';
+  VARIATION_IDENTIFIER_ATTRIBUTE
+} from "./constants";
 import {
   Configuration,
   FeatureConfig,
+  KeyValue,
   Metrics,
   MetricsApi,
-  Variation,
-  TargetData,
-  KeyValue,
   MetricsData,
   MetricsDataMetricsTypeEnum,
-} from './openapi';
-import { Options, Target } from './types';
-import { VERSION } from './version';
-import {
-  infoMetricsSuccess,
-  infoMetricsThreadExited,
-  warnPostMetricsFailed,
-} from './sdk_codes';
+  TargetData,
+  Variation
+} from "./openapi";
+import { Options, Target } from "./types";
+import { VERSION } from "./version";
+import { infoMetricsSuccess, infoMetricsThreadExited, warnPostMetricsFailed } from "./sdk_codes";
 import { Logger } from "./log";
 
 export enum MetricEvent {
@@ -105,8 +101,7 @@ export class MetricsProcessor implements MetricsProcessorInterface {
     const feature = event.featureConfig.feature;
     const variation = event.variation.identifier;
     const value = event.variation.value;
-    const target = GLOBAL_TARGET;
-    return `${feature}/${variation}/${value}/${target}`;
+    return `${feature}/${variation}/${value}/${GLOBAL_TARGET}`;
   }
 
   private _summarize(): Metrics | unknown {
