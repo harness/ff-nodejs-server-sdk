@@ -70,7 +70,7 @@ export class MetricsProcessor implements MetricsProcessorInterface {
 
   start(): void {
     this.log.info('Starting MetricsProcessor with request interval: ', this.options.eventsSyncInterval);
-    this.syncInterval = setInterval(() => this._send(), this.options.eventsSyncInterval);
+    this.syncInterval = setInterval(() => this._send(), 10000);
     this.eventBus.emit(MetricEvent.READY);
   }
 
@@ -188,13 +188,13 @@ export class MetricsProcessor implements MetricsProcessorInterface {
       };
   }
 
-  private _send(): void {
+  private async _send(): Promise<void> {
     if (this.closed) {
       this.log.debug('SDK has been closed before metrics can be sent');
       return;
     }
 
-    if (this.data.size == 0) {
+    if (this.data.size === 0) {
       this.log.debug('No metrics to send in this interval');
       return;
     }
@@ -202,22 +202,17 @@ export class MetricsProcessor implements MetricsProcessorInterface {
     const metrics: Metrics = this._summarize();
 
     this.log.debug('Start sending metrics data');
-    this.api
-      .postMetrics(this.environment, this.cluster, metrics)
-      .then((response) => {
-        this.log.debug('Metrics server returns: ', response.status);
-        infoMetricsSuccess(this.log);
-        if (response.status >= 400) {
-          this.log.error(
-            'Error while sending metrics data with status code: ',
-            response.status,
-          );
-        }
-      })
-      .catch((error: Error) => {
-        warnPostMetricsFailed(`${error}`, this.log);
-        this.log.debug('Metrics server returns error: ', error);
-      });
+    try {
+      const response = await this.api.postMetrics(this.environment, this.cluster, metrics);
+      this.log.debug('Metrics server returns: ', response.status);
+      infoMetricsSuccess(this.log);
+      if (response.status >= 400) {
+        this.log.error('Error while sending metrics data with status code: ', response.status);
+      }
+    } catch (error) {
+      warnPostMetricsFailed(`${error}`, this.log);
+      this.log.debug('Metrics server returns error: ', error);
+    }
   }
 
   private valueToString(value: any): string {
