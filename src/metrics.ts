@@ -14,13 +14,13 @@ import {
 import {
   Configuration,
   FeatureConfig,
+  KeyValue,
   Metrics,
   MetricsApi,
-  Variation,
-  TargetData,
-  KeyValue,
   MetricsData,
   MetricsDataMetricsTypeEnum,
+  TargetData,
+  Variation,
 } from './openapi';
 import { Options, Target } from './types';
 import { VERSION } from './version';
@@ -29,6 +29,7 @@ import {
   infoMetricsThreadExited,
   warnPostMetricsFailed,
 } from './sdk_codes';
+import { Logger } from './log';
 
 export enum MetricEvent {
   READY = 'metrics_ready',
@@ -52,61 +53,84 @@ export interface MetricsProcessorInterface {
   ): void;
 }
 
-export const MetricsProcessor = (
-  environment: string,
-  cluster = '1',
-  conf: Configuration,
-  options: Options,
-  eventBus: events.EventEmitter,
-  closed = false,
-): MetricsProcessorInterface => {
-  const data: Map<string, AnalyticsEvent> = new Map<string, AnalyticsEvent>();
-  let syncInterval: NodeJS.Timeout;
+export class MetricsProcessor implements MetricsProcessorInterface {
+  private data: Map<string, AnalyticsEvent> = new Map();
+  private syncInterval?: NodeJS.Timeout;
+  private api: MetricsApi;
+  private readonly log: Logger;
 
-  const configuration = new Configuration({
-    ...conf,
-    basePath: options.eventsUrl,
-  });
-  const api = new MetricsApi(configuration);
-  const log = options.logger;
+  constructor(
+    private environment: string,
+    private cluster: string = '1',
+    private conf: Configuration,
+    private options: Options,
+    private eventBus: events.EventEmitter,
+    private closed: boolean = false,
+  ) {
+    const configuration = new Configuration({
+      ...this.conf,
+      basePath: options.eventsUrl,
+    });
 
-  const enqueue = (
+    this.api = new MetricsApi(configuration);
+    this.log = options.logger;
+  }
+
+  start(): void {
+    this.log.info(
+      'Starting MetricsProcessor with request interval: ',
+      this.options.eventsSyncInterval,
+    );
+    this.syncInterval = setInterval(() => this._send(), this.options.eventsSyncInterval);
+    this.eventBus.emit(MetricEvent.READY);
+  }
+
+  close(): void {
+    this.log.info('Closing MetricsProcessor');
+    if (this.syncInterval) {
+      clearInterval(this.syncInterval);
+    }
+    this._send();
+    this.closed = true;
+    this.log.info('MetricsProcessor closed');
+    infoMetricsThreadExited(this.log);
+  }
+
+  enqueue(
     target: Target,
     featureConfig: FeatureConfig,
     variation: Variation,
-  ): void => {
+  ): void {
     const event: AnalyticsEvent = {
       target,
       featureConfig,
       variation,
       count: 0,
     };
-
-    const key = _formatKey(event);
-    const found = data.get(key);
+    const key = this._formatKey(event);
+    const found = this.data.get(key);
     if (found) {
       found.count++;
     } else {
       event.count = 1;
-      data.set(key, event);
+      this.data.set(key, event);
     }
-  };
+  }
 
-  const _formatKey = (event: AnalyticsEvent): string => {
+  private _formatKey(event: AnalyticsEvent): string {
     const feature = event.featureConfig.feature;
     const variation = event.variation.identifier;
     const value = event.variation.value;
-    const target = GLOBAL_TARGET;
-    return `${feature}/${variation}/${value}/${target}`;
-  };
+    return `${feature}/${variation}/${value}/${GLOBAL_TARGET}`;
+  }
 
-  const _summarize = (): Metrics | unknown => {
+  private _summarize(): Metrics | unknown {
     const targetData: TargetData[] = [];
     const metricsData: MetricsData[] = [];
 
     // clone map and clear data
-    const clonedData = new Map(data);
-    data.clear();
+    const clonedData = new Map(this.data);
+    this.data.clear();
 
     for (const event of clonedData.values()) {
       if (event.target && !event.target.anonymous) {
@@ -117,7 +141,7 @@ export const MetricsProcessor = (
               const stringValue =
                 value === null || value === undefined
                   ? ''
-                  : valueToString(value);
+                  : this.valueToString(value);
               return { key, value: stringValue };
             },
           );
@@ -182,65 +206,45 @@ export const MetricsProcessor = (
       targetData: targetData,
       metricsData: metricsData,
     };
-  };
+  }
 
-  const _send = (): void => {
-    if (closed) {
-      log.debug('SDK has been closed before metrics can be sent');
+  private async _send(): Promise<void> {
+    if (this.closed) {
+      this.log.debug('SDK has been closed before metrics can be sent');
       return;
     }
 
-    if (data.size == 0) {
-      log.debug('No metrics to send in this interval');
+    if (this.data.size === 0) {
+      this.log.debug('No metrics to send in this interval');
       return;
     }
 
-    const metrics: Metrics = _summarize();
+    const metrics: Metrics = this._summarize();
 
-    log.debug('Start sending metrics data');
-    api
-      .postMetrics(environment, cluster, metrics)
-      .then((response) => {
-        log.debug('Metrics server returns: ', response.status);
-        infoMetricsSuccess(log);
-        if (response.status >= 400) {
-          log.error(
-            'Error while sending metrics data with status code: ',
-            response.status,
-          );
-        }
-      })
-      .catch((error: Error) => {
-        warnPostMetricsFailed(`${error}`, log);
-        log.debug('Metrics server returns error: ', error);
-      });
-  };
+    this.log.debug('Start sending metrics data');
+    try {
+      const response = await this.api.postMetrics(
+        this.environment,
+        this.cluster,
+        metrics,
+      );
+      this.log.debug('Metrics server returns: ', response.status);
+      infoMetricsSuccess(this.log);
+      if (response.status >= 400) {
+        this.log.error(
+          'Error while sending metrics data with status code: ',
+          response.status,
+        );
+      }
+    } catch (error) {
+      warnPostMetricsFailed(`${error}`, this.log);
+      this.log.debug('Metrics server returns error: ', error);
+    }
+  }
 
-  const start = (): void => {
-    log.info(
-      'Starting MetricsProcessor with request interval: ',
-      options.eventsSyncInterval,
-    );
-    syncInterval = setInterval(_send, options.eventsSyncInterval);
-    eventBus.emit(MetricEvent.READY);
-  };
-
-  const valueToString = (value: any): string => {
-    return typeof value === 'object' && !Array.isArray(value) ? JSON.stringify(value) : String(value)
-  };
-
-  const close = (): void => {
-    log.info('Closing MetricsProcessor');
-    clearInterval(syncInterval);
-    _send();
-    closed = true;
-    log.info('MetricsProcessor closed');
-    infoMetricsThreadExited(log);
-  };
-
-  return {
-    start,
-    close,
-    enqueue,
-  };
-};
+  private valueToString(value: any): string {
+    return typeof value === 'object' && !Array.isArray(value)
+      ? JSON.stringify(value)
+      : String(value);
+  }
+}
