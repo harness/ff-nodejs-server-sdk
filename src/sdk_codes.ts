@@ -1,9 +1,10 @@
 import { Logger } from './log';
 import { Target } from './types';
+import { VERSION } from './version';
 
 const sdkCodes: Record<number, string> = {
   // SDK_INIT_1xxx
-  1000: 'The SDK has successfully initialized',
+  1000: 'The SDK has successfully initialized, version ' + VERSION,
   1001: 'The SDK has failed to initialize due to an authentication error - defaults will be served',
   1002: 'The SDK has failed to initialize due to a missing or empty API key - defaults will be served',
   // SDK_AUTH_2xxx

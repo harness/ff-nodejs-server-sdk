@@ -356,7 +356,9 @@ export class Evaluator {
         if (!pqs.variations.includes(variation.identifier)) {
           return false;
         } else {
-          return await this.checkPreRequisite(preReqFeatureConfig, target);
+          if (!(await this.checkPreRequisite(preReqFeatureConfig, target))) {
+            return false;
+          }
         }
       }
     }
