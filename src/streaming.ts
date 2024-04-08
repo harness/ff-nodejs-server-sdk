@@ -14,8 +14,6 @@ import {
   warnStreamRetrying,
 } from './sdk_codes';
 
-import { SDK_INFO } from './client';
-
 type FetchFunction = (
   identifier: string,
   environment: string,
