@@ -14,6 +14,8 @@ import {
   warnStreamRetrying,
 } from './sdk_codes';
 
+import { SDK_INFO } from './client';
+
 type FetchFunction = (
   identifier: string,
   environment: string,
@@ -68,7 +70,7 @@ export class StreamProcessor {
     );
   }
 
-  start(): void {
+  start(headers: Record<string, string>): void {
     this.log.info('Starting new StreamProcessor');
 
     const url = `${this.options.baseUrl}/stream?cluster=${this.cluster}`;
@@ -79,6 +81,7 @@ export class StreamProcessor {
         Accept: 'text/event-stream',
         Authorization: `Bearer ${this.jwtToken}`,
         'API-Key': this.apiKey,
+        ...headers,
       },
     };
 
