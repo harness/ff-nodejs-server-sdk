@@ -12,6 +12,7 @@ export interface Options {
   cache?: KeyValueStore;
   store?: AsyncKeyValueStore;
   logger?: Logger;
+  tlsTrustedCa?: string;
 }
 
 export interface Claims {

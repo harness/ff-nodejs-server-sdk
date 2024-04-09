@@ -28,6 +28,8 @@ import {
   warnFailedInitAuthError,
   warnMissingSDKKey,
 } from './sdk_codes';
+import https from 'https';
+import * as fs from 'fs';
 
 axios.defaults.timeout = 30000;
 axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
@@ -104,6 +106,11 @@ export default class Client {
       this.eventBus,
     );
     this.evaluator = new Evaluator(this.repository, this.log);
+
+    if (options.tlsTrustedCa) {
+      https.globalAgent.options.ca = fs.readFileSync(options.tlsTrustedCa);
+    }
+
     this.api = new ClientApi(this.configuration);
     this.processEvents();
     this.run();
