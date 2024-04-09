@@ -33,6 +33,8 @@ const sdkCodes: Record<number, string> = {
   7001: 'Metrics stopped',
   7002: 'Posting metrics failed, reason:',
   7003: 'Metrics posted successfully',
+  7004: 'Target metrics exceeded max size, remaining targets for this analytics interval will not be sent',
+  7007: 'Evaluation metrics exceeded max size, remaining evaluations for this analytics interval will not be sent'
 };
 
 function getSDKCodeMessage(key: number): string {
@@ -105,6 +107,14 @@ export function infoMetricsSuccess(logger: Logger): void {
 
 export function infoMetricsThreadExited(logger: Logger): void {
   logger.info(getSdkErrMsg(7001));
+}
+
+export function infoTargetMetricsExceeded(logger: Logger): void {
+  logger.info(getSdkErrMsg(7004));
+}
+
+export function infoEvaluationMetricsExceeded(logger: Logger): void {
+  logger.info(getSdkErrMsg(7007));
 }
 
 export function debugEvalSuccess(
