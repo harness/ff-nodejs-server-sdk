@@ -33,6 +33,7 @@ export class StreamProcessor {
   private readonly api: ClientApi;
   private readonly repository: Repository;
   private readonly retryDelayMs: number;
+  private readonly headers: Record<string, string>;
 
   private options: Options;
   private request: ClientRequest;
@@ -50,6 +51,7 @@ export class StreamProcessor {
     cluster: string,
     eventBus: EventEmitter,
     repository: Repository,
+    headers: Record<string, string>,
   ) {
     this.api = api;
     this.apiKey = apiKey;
@@ -66,6 +68,7 @@ export class StreamProcessor {
     this.retryDelayMs = Math.floor(
       Math.random() * (maxDelay - minDelay) + minDelay,
     );
+    this.headers = headers;
   }
 
   start(): void {
@@ -79,6 +82,7 @@ export class StreamProcessor {
         Accept: 'text/event-stream',
         Authorization: `Bearer ${this.jwtToken}`,
         'API-Key': this.apiKey,
+        ...this.headers,
       },
     };
 

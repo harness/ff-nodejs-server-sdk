@@ -44,6 +44,8 @@ export enum Event {
   CHANGED = 'changed',
 }
 
+export const SDK_INFO = `NodeJS ${VERSION} Server`;
+
 export default class Client {
   private evaluator: Evaluator;
   private repository: Repository;
@@ -91,6 +93,7 @@ export default class Client {
       baseOptions: {
         headers: {
           'User-Agent': `NodeJsSDK/${VERSION}`,
+          'Harness-SDK-Info': SDK_INFO,
         },
       },
     });
@@ -229,6 +232,16 @@ export default class Client {
         );
       }
 
+      if (decoded.accountID) {
+        this.configuration.baseOptions.headers['Harness-AccountID'] =
+          decoded.accountID;
+      }
+
+      if (decoded.environmentIdentifier) {
+        this.configuration.baseOptions.headers['Harness-EnvironmentID'] =
+          decoded.environmentIdentifier;
+      }
+
       this.environment = decoded.environment;
       this.cluster = decoded.clusterIdentifier || '1';
     } catch (error) {
@@ -327,6 +340,7 @@ export default class Client {
         this.cluster,
         this.eventBus,
         this.repository,
+        this.configuration.baseOptions.headers,
       );
 
       this.streamProcessor.start();
