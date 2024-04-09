@@ -54,7 +54,8 @@ export interface MetricsProcessorInterface {
 }
 
 export class MetricsProcessor implements MetricsProcessorInterface {
-  private data: Map<string, AnalyticsEvent> = new Map();
+  private evaluationAnalytics: Map<string, AnalyticsEvent> = new Map();
+  private targetAnalytics: Map<string, Target> = new Map(); // New cache for Target metrics
   private syncInterval?: NodeJS.Timeout;
   private api: MetricsApi;
   private readonly log: Logger;
@@ -81,7 +82,10 @@ export class MetricsProcessor implements MetricsProcessorInterface {
       'Starting MetricsProcessor with request interval: ',
       this.options.eventsSyncInterval,
     );
-    this.syncInterval = setInterval(() => this._send(), this.options.eventsSyncInterval);
+    this.syncInterval = setInterval(
+      () => this._send(),
+      this.options.eventsSyncInterval,
+    );
     this.eventBus.emit(MetricEvent.READY);
   }
 
@@ -108,12 +112,16 @@ export class MetricsProcessor implements MetricsProcessorInterface {
       count: 0,
     };
     const key = this._formatKey(event);
-    const found = this.data.get(key);
+    const found = this.evaluationAnalytics.get(key);
     if (found) {
       found.count++;
     } else {
       event.count = 1;
-      this.data.set(key, event);
+      this.evaluationAnalytics.set(key, event);
+    }
+
+    if (target && !target.anonymous) {
+      this.targetAnalytics.set(target.identifier, target);
     }
   }
 
@@ -129,70 +137,27 @@ export class MetricsProcessor implements MetricsProcessorInterface {
     const metricsData: MetricsData[] = [];
 
     // clone map and clear data
-    const clonedData = new Map(this.data);
-    this.data.clear();
+    const clonedEvaluationAnalytics = new Map(this.evaluationAnalytics);
+    const clonedTargetAnalytics = new Map(this.targetAnalytics);
+    this.evaluationAnalytics.clear();
+    this.targetAnalytics.clear();
 
-    for (const event of clonedData.values()) {
-      if (event.target && !event.target.anonymous) {
-        let targetAttributes: KeyValue[] = [];
-        if (event.target.attributes) {
-          targetAttributes = Object.entries(event.target.attributes).map(
-            ([key, value]) => {
-              const stringValue =
-                value === null || value === undefined
-                  ? ''
-                  : this.valueToString(value);
-              return { key, value: stringValue };
-            },
-          );
-        }
-
-        let targetName = event.target.identifier;
-        if (event.target.name) {
-          targetName = event.target.name;
-        }
-
-        const td: TargetData = {
-          identifier: event.target.identifier,
-          name: targetName,
-          attributes: targetAttributes,
-        };
-        targetData.push(td);
-      }
-
+    clonedEvaluationAnalytics.forEach((event) => {
       const metricsAttributes: KeyValue[] = [
         {
           key: FEATURE_IDENTIFIER_ATTRIBUTE,
           value: event.featureConfig.feature,
         },
-        {
-          key: FEATURE_NAME_ATTRIBUTE,
-          value: event.featureConfig.feature,
-        },
+        { key: FEATURE_NAME_ATTRIBUTE, value: event.featureConfig.feature },
         {
           key: VARIATION_IDENTIFIER_ATTRIBUTE,
           value: event.variation.identifier,
         },
-        {
-          key: SDK_TYPE_ATTRIBUTE,
-          value: SDK_TYPE,
-        },
-        {
-          key: SDK_LANGUAGE_ATTRIBUTE,
-          value: SDK_LANGUAGE,
-        },
-        {
-          key: SDK_VERSION_ATTRIBUTE,
-          value: VERSION,
-        },
-        {
-          key: TARGET_ATTRIBUTE,
-          value: event?.target?.identifier ?? null,
-        },
+        { key: SDK_TYPE_ATTRIBUTE, value: SDK_TYPE },
+        { key: SDK_LANGUAGE_ATTRIBUTE, value: SDK_LANGUAGE },
+        { key: SDK_VERSION_ATTRIBUTE, value: VERSION },
+        { key: TARGET_ATTRIBUTE, value: event.target.identifier },
       ];
-
-      // private target attributes
-      // need more info
 
       const md: MetricsData = {
         timestamp: Date.now(),
@@ -201,7 +166,31 @@ export class MetricsProcessor implements MetricsProcessorInterface {
         attributes: metricsAttributes,
       };
       metricsData.push(md);
-    }
+    });
+
+    clonedTargetAnalytics.forEach((target) => {
+      let targetAttributes: KeyValue[] = [];
+      if (target.attributes) {
+        targetAttributes = Object.entries(target.attributes).map(
+          ([key, value]) => {
+            return { key, value: this.valueToString(value) };
+          },
+        );
+      }
+
+      let targetName = target.identifier;
+      if (target.name) {
+        targetName = target.name;
+      }
+
+      const td: TargetData = {
+        identifier: target.identifier,
+        name: targetName,
+        attributes: targetAttributes,
+      };
+      targetData.push(td);
+    });
+
     return {
       targetData: targetData,
       metricsData: metricsData,
@@ -214,7 +203,7 @@ export class MetricsProcessor implements MetricsProcessorInterface {
       return;
     }
 
-    if (this.data.size === 0) {
+    if (this.evaluationAnalytics.size === 0) {
       this.log.debug('No metrics to send in this interval');
       return;
     }
