@@ -123,9 +123,10 @@ export class MetricsProcessor implements MetricsProcessorInterface {
       this.evaluationAnalytics.set(key, event);
     }
 
-    if (target && target.identifier) {
-      // If target has been seen or is anonymous then ignore it
-      if (this.seenTargets.has(target.identifier) || target.anonymous) {
+    if (target && !target.anonymous) {
+
+      // If target has been seen then ignore it
+      if (this.seenTargets.has(target.identifier)) {
         return;
       }
 
