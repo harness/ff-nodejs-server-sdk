@@ -25,8 +25,10 @@ import {
 import { Options, Target } from './types';
 import { VERSION } from './version';
 import {
+  infoEvaluationMetricsExceeded,
   infoMetricsSuccess,
   infoMetricsThreadExited,
+  infoTargetMetricsExceeded,
   warnPostMetricsFailed,
 } from './sdk_codes';
 import { Logger } from './log';
@@ -63,6 +65,9 @@ export class MetricsProcessor implements MetricsProcessorInterface {
   // Maximum sizes for caches
   private MAX_EVALUATION_ANALYTICS_SIZE = 10000;
   private MAX_TARGET_ANALYTICS_SIZE = 100000;
+  private evaluationAnalyticsExceeded = false;
+  private targetAnalyticsExceeded = false;
+
   private syncInterval?: NodeJS.Timeout;
   private api: MetricsApi;
   private readonly log: Logger;
@@ -118,28 +123,48 @@ export class MetricsProcessor implements MetricsProcessorInterface {
       variation,
       count: 0,
     };
+    this.storeEvaluationAnalytic(event);
+    this.storeTargetAnalytic(target);
+  }
 
-    if (this.evaluationAnalytics.size < this.MAX_EVALUATION_ANALYTICS_SIZE) {
-      const key = this._formatKey(event);
-      const found = this.evaluationAnalytics.get(key);
-      if (found) {
-        found.count++;
-      } else {
-        event.count = 1;
-        this.evaluationAnalytics.set(key, event);
+  private storeTargetAnalytic(target: Target) {
+    if (this.targetAnalytics.size >= this.MAX_TARGET_ANALYTICS_SIZE) {
+      if (!this.targetAnalyticsExceeded) {
+        this.targetAnalyticsExceeded = true;
+        infoTargetMetricsExceeded(this.log);
       }
+
+      return;
     }
 
-    if (this.targetAnalytics.size < this.MAX_TARGET_ANALYTICS_SIZE) {
-      if (target && !target.anonymous) {
-        // If target has been seen then ignore it
-        if (this.seenTargets.has(target.identifier)) {
-          return;
-        }
-
-        this.seenTargets.add(target.identifier);
-        this.targetAnalytics.set(target.identifier, target);
+    if (target && !target.anonymous) {
+      // If target has been seen then ignore it
+      if (this.seenTargets.has(target.identifier)) {
+        return;
       }
+
+      this.seenTargets.add(target.identifier);
+      this.targetAnalytics.set(target.identifier, target);
+    }
+  }
+
+  private storeEvaluationAnalytic(event: AnalyticsEvent) {
+    if (this.evaluationAnalytics.size >= this.MAX_EVALUATION_ANALYTICS_SIZE) {
+      if (!this.evaluationAnalyticsExceeded) {
+        this.evaluationAnalyticsExceeded = true;
+        infoEvaluationMetricsExceeded(this.log);
+      }
+
+      return;
+    }
+
+    const key = this._formatKey(event);
+    const found = this.evaluationAnalytics.get(key);
+    if (found) {
+      found.count++;
+    } else {
+      event.count = 1;
+      this.evaluationAnalytics.set(key, event);
     }
   }
 
@@ -159,6 +184,8 @@ export class MetricsProcessor implements MetricsProcessorInterface {
     const clonedTargetAnalytics = new Map(this.targetAnalytics);
     this.evaluationAnalytics.clear();
     this.targetAnalytics.clear();
+    this.evaluationAnalyticsExceeded = false;
+    this.targetAnalyticsExceeded = false;
 
     clonedEvaluationAnalytics.forEach((event) => {
       const metricsAttributes: KeyValue[] = [
