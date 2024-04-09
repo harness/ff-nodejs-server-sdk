@@ -55,7 +55,10 @@ export interface MetricsProcessorInterface {
 
 export class MetricsProcessor implements MetricsProcessorInterface {
   private evaluationAnalytics: Map<string, AnalyticsEvent> = new Map();
-  private targetAnalytics: Map<string, Target> = new Map(); // New cache for Target metrics
+  private targetAnalytics: Map<string, Target> = new Map();
+
+  // Only store and send targets that haven't been sent before in the life of the client instance
+  private seenTargets: Set<string> = new Set();
   private syncInterval?: NodeJS.Timeout;
   private api: MetricsApi;
   private readonly log: Logger;
@@ -120,7 +123,13 @@ export class MetricsProcessor implements MetricsProcessorInterface {
       this.evaluationAnalytics.set(key, event);
     }
 
-    if (target && !target.anonymous) {
+    if (target && target.identifier) {
+      // If target has been seen or is anonymous then ignore it
+      if (this.seenTargets.has(target.identifier) || target.anonymous) {
+        return;
+      }
+
+      this.seenTargets.add(target.identifier);
       this.targetAnalytics.set(target.identifier, target);
     }
   }
