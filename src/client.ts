@@ -340,9 +340,10 @@ export default class Client {
         this.cluster,
         this.eventBus,
         this.repository,
+        this.configuration.baseOptions.headers,
       );
 
-      this.streamProcessor.start(this.configuration.baseOptions.headers);
+      this.streamProcessor.start();
     }
 
     if (this.options.enableAnalytics) {
