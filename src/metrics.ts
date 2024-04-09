@@ -148,15 +148,15 @@ export class MetricsProcessor implements MetricsProcessorInterface {
           key: FEATURE_IDENTIFIER_ATTRIBUTE,
           value: event.featureConfig.feature,
         },
-        { key: FEATURE_NAME_ATTRIBUTE, value: event.featureConfig.feature },
         {
           key: VARIATION_IDENTIFIER_ATTRIBUTE,
           value: event.variation.identifier,
         },
+        { key: FEATURE_NAME_ATTRIBUTE, value: event.featureConfig.feature },
         { key: SDK_TYPE_ATTRIBUTE, value: SDK_TYPE },
         { key: SDK_LANGUAGE_ATTRIBUTE, value: SDK_LANGUAGE },
         { key: SDK_VERSION_ATTRIBUTE, value: VERSION },
-        { key: TARGET_ATTRIBUTE, value: event.target.identifier },
+        { key: TARGET_ATTRIBUTE, value: event?.target?.identifier ?? null },
       ];
 
       const md: MetricsData = {
