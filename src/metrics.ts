@@ -59,6 +59,10 @@ export class MetricsProcessor implements MetricsProcessorInterface {
 
   // Only store and send targets that haven't been sent before in the life of the client instance
   private seenTargets: Set<string> = new Set();
+
+  // Maximum sizes for caches
+  private MAX_EVALUATION_ANALYTICS_SIZE = 10000;
+  private MAX_TARGET_ANALYTICS_SIZE = 100000;
   private syncInterval?: NodeJS.Timeout;
   private api: MetricsApi;
   private readonly log: Logger;
@@ -114,24 +118,28 @@ export class MetricsProcessor implements MetricsProcessorInterface {
       variation,
       count: 0,
     };
-    const key = this._formatKey(event);
-    const found = this.evaluationAnalytics.get(key);
-    if (found) {
-      found.count++;
-    } else {
-      event.count = 1;
-      this.evaluationAnalytics.set(key, event);
+
+    if (this.evaluationAnalytics.size < this.MAX_EVALUATION_ANALYTICS_SIZE) {
+      const key = this._formatKey(event);
+      const found = this.evaluationAnalytics.get(key);
+      if (found) {
+        found.count++;
+      } else {
+        event.count = 1;
+        this.evaluationAnalytics.set(key, event);
+      }
     }
 
-    if (target && !target.anonymous) {
+    if (this.targetAnalytics.size < this.MAX_TARGET_ANALYTICS_SIZE) {
+      if (target && !target.anonymous) {
+        // If target has been seen then ignore it
+        if (this.seenTargets.has(target.identifier)) {
+          return;
+        }
 
-      // If target has been seen then ignore it
-      if (this.seenTargets.has(target.identifier)) {
-        return;
+        this.seenTargets.add(target.identifier);
+        this.targetAnalytics.set(target.identifier, target);
       }
-
-      this.seenTargets.add(target.identifier);
-      this.targetAnalytics.set(target.identifier, target);
     }
   }
 
