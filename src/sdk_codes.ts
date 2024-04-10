@@ -109,12 +109,12 @@ export function infoMetricsThreadExited(logger: Logger): void {
   logger.info(getSdkErrMsg(7001));
 }
 
-export function infoTargetMetricsExceeded(logger: Logger): void {
-  logger.info(getSdkErrMsg(7004));
+export function warnTargetMetricsExceeded(logger: Logger): void {
+  logger.warn(getSdkErrMsg(7004));
 }
 
-export function infoEvaluationMetricsExceeded(logger: Logger): void {
-  logger.info(getSdkErrMsg(7007));
+export function warnEvaluationMetricsExceeded(logger: Logger): void {
+  logger.warn(getSdkErrMsg(7007));
 }
 
 export function debugEvalSuccess(

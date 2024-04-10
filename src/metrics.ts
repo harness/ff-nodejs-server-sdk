@@ -25,10 +25,10 @@ import {
 import { Options, Target } from './types';
 import { VERSION } from './version';
 import {
-  infoEvaluationMetricsExceeded,
+  warnEvaluationMetricsExceeded,
   infoMetricsSuccess,
   infoMetricsThreadExited,
-  infoTargetMetricsExceeded,
+  warnTargetMetricsExceeded,
   warnPostMetricsFailed,
 } from './sdk_codes';
 import { Logger } from './log';
@@ -131,7 +131,7 @@ export class MetricsProcessor implements MetricsProcessorInterface {
     if (this.targetAnalytics.size >= this.MAX_TARGET_ANALYTICS_SIZE) {
       if (!this.targetAnalyticsExceeded) {
         this.targetAnalyticsExceeded = true;
-        infoTargetMetricsExceeded(this.log);
+        warnTargetMetricsExceeded(this.log);
       }
 
       return;
@@ -152,7 +152,7 @@ export class MetricsProcessor implements MetricsProcessorInterface {
     if (this.evaluationAnalytics.size >= this.MAX_EVALUATION_ANALYTICS_SIZE) {
       if (!this.evaluationAnalyticsExceeded) {
         this.evaluationAnalyticsExceeded = true;
-        infoEvaluationMetricsExceeded(this.log);
+        warnEvaluationMetricsExceeded(this.log);
       }
 
       return;
