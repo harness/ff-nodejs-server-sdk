@@ -34,6 +34,7 @@ export class StreamProcessor {
   private readonly repository: Repository;
   private readonly retryDelayMs: number;
   private readonly headers: Record<string, string>;
+  private readonly httpsCa: Buffer;
 
   private options: Options;
   private request: ClientRequest;
@@ -52,6 +53,7 @@ export class StreamProcessor {
     eventBus: EventEmitter,
     repository: Repository,
     headers: Record<string, string>,
+    httpsCa: Buffer,
   ) {
     this.api = api;
     this.apiKey = apiKey;
@@ -69,6 +71,7 @@ export class StreamProcessor {
       Math.random() * (maxDelay - minDelay) + minDelay,
     );
     this.headers = headers;
+    this.httpsCa = httpsCa;
   }
 
   start(): void {
@@ -84,7 +87,12 @@ export class StreamProcessor {
         'API-Key': this.apiKey,
         ...this.headers,
       },
+      ca: undefined,
     };
+
+    if (this.httpsCa) {
+      options.ca = this.httpsCa;
+    }
 
     const onConnected = () => {
       this.log.info(`SSE stream connected OK: ${url}`);
@@ -169,8 +177,8 @@ export class StreamProcessor {
 
   private processData(data: any): void {
     const lines = data.toString().split(/\r?\n/);
-    if (lines[0].startsWith(":")) {
-      this.log.debug("SSE Heartbeat received")
+    if (lines[0].startsWith(':')) {
+      this.log.debug('SSE Heartbeat received');
       return;
     }
     lines.forEach((line) => this.processLine(line));

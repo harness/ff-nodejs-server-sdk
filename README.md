@@ -103,6 +103,21 @@ node example.js
 
 When you're finished you can exit the example by stopping the process using <kbd>control</kbd>-<kbd>c</kbd>.
 
+
+## Using custom TLS certificates
+
+If using a proxy or SMP instance that does not use a widely publicised pre-bundled CA you can provide your own CA using the `tlsTrustedCa` option.
+This option takes a path to a file that contains a bundle of certificates in PEM format. If this option is present, the HTTP client will ignore
+any pre-bundled certs so you need to include the entire certificate chain of your custom cert.
+
+```
+  const client = new Client(apiKey, {
+    baseUrl: 'https://ffserver:8000/api/1.0',
+    eventsUrl: 'https://ffserver:8001/api/1.0',
+    tlsTrustedCa: 'path_to_cert_chain.crt',
+  });
+```
+
 ## Additional Reading
 
 For further examples and config options, see the [Node.js SDK Reference](https://docs.harness.io/article/3v7fclfg59-node-js-sdk-reference) and the [test Node.js project](https://github.com/drone/ff-nodejs-server-sdk).
