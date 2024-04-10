@@ -148,7 +148,7 @@ export class MetricsProcessor implements MetricsProcessorInterface {
     }
   }
 
-  private storeEvaluationAnalytic(event: AnalyticsEvent) {
+  private storeEvaluationAnalytic(event: AnalyticsEvent): void {
     if (this.evaluationAnalytics.size >= this.MAX_EVALUATION_ANALYTICS_SIZE) {
       if (!this.evaluationAnalyticsExceeded) {
         this.evaluationAnalyticsExceeded = true;
