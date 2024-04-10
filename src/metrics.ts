@@ -225,12 +225,11 @@ export class MetricsProcessor implements MetricsProcessorInterface {
 
       const targetName = target.name || target.identifier;
 
-      const td: TargetData = {
+      targetData.push({
         identifier: target.identifier,
         name: targetName,
         attributes: targetAttributes,
-      };
-      targetData.push(td);
+      });
     });
 
     return {
@@ -245,7 +244,7 @@ export class MetricsProcessor implements MetricsProcessorInterface {
       return;
     }
 
-    if (this.evaluationAnalytics.size === 0) {
+    if (!this.evaluationAnalytics.size) {
       this.log.debug('No metrics to send in this interval');
       return;
     }
