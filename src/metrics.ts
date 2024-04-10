@@ -223,10 +223,7 @@ export class MetricsProcessor implements MetricsProcessorInterface {
         );
       }
 
-      let targetName = target.identifier;
-      if (target.name) {
-        targetName = target.name;
-      }
+      const targetName = target.name || target.identifier;
 
       const td: TargetData = {
         identifier: target.identifier,
