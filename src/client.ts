@@ -1,6 +1,6 @@
 import EventEmitter from 'events';
 import jwt_decode from 'jwt-decode';
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import axiosRetry from 'axios-retry';
 import { Claims, Options, StreamEvent, Target } from './types';
 import { Configuration, ClientApi, FeatureConfig, Variation } from './openapi';
@@ -70,6 +70,8 @@ export default class Client {
   private streamReady = false;
   private metricReady = false;
   private closing = false;
+  private httpsClient: AxiosInstance;
+  private httpsCa: Buffer;
 
   constructor(sdkKey: string, options: Options = {}) {
     this.sdkKey = sdkKey;
@@ -108,10 +110,22 @@ export default class Client {
     this.evaluator = new Evaluator(this.repository, this.log);
 
     if (options.tlsTrustedCa) {
-      https.globalAgent.options.ca = fs.readFileSync(options.tlsTrustedCa);
+      this.httpsCa = fs.readFileSync(options.tlsTrustedCa);
+      this.httpsClient = axios.create({
+        httpsAgent: new https.Agent({
+          ca: this.httpsCa,
+        }),
+      });
+
+      this.api = new ClientApi(
+        this.configuration,
+        this.options.baseUrl,
+        this.httpsClient,
+      );
+    } else {
+      this.api = new ClientApi(this.configuration);
     }
 
-    this.api = new ClientApi(this.configuration);
     this.processEvents();
     this.run();
   }
@@ -348,6 +362,7 @@ export default class Client {
         this.eventBus,
         this.repository,
         this.configuration.baseOptions.headers,
+        this.httpsCa,
       );
 
       this.streamProcessor.start();
@@ -360,6 +375,8 @@ export default class Client {
         this.configuration,
         this.options,
         this.eventBus,
+        false,
+        this.httpsClient,
       );
       this.metricsProcessor.start();
     }

@@ -30,6 +30,7 @@ import {
   warnPostMetricsFailed,
 } from './sdk_codes';
 import { Logger } from './log';
+import { AxiosInstance } from 'axios';
 
 export enum MetricEvent {
   READY = 'metrics_ready',
@@ -66,13 +67,18 @@ export class MetricsProcessor implements MetricsProcessorInterface {
     private options: Options,
     private eventBus: events.EventEmitter,
     private closed: boolean = false,
+    private httpsClient: AxiosInstance,
   ) {
     const configuration = new Configuration({
       ...this.conf,
       basePath: options.eventsUrl,
     });
+    if (httpsClient) {
+      this.api = new MetricsApi(this.conf, options.eventsUrl, this.httpsClient);
+    } else {
+      this.api = new MetricsApi(configuration);
+    }
 
-    this.api = new MetricsApi(configuration);
     this.log = options.logger;
   }
 
