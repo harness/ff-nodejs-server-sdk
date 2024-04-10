@@ -22,6 +22,8 @@ describe('SDK Codes', () => {
     ['debugStreamEventReceived', [logger]],
     ['infoStreamStopped', [logger]],
     ['infoMetricsSuccess', [logger]],
+    ['warnTargetMetricsExceeded', [logger]],
+    ['warnEvaluationMetricsExceeded', [logger]],
     ['infoMetricsThreadExited', [logger]],
     [
       'debugEvalSuccess',

@@ -25,8 +25,10 @@ import {
 import { Options, Target } from './types';
 import { VERSION } from './version';
 import {
+  warnEvaluationMetricsExceeded,
   infoMetricsSuccess,
   infoMetricsThreadExited,
+  warnTargetMetricsExceeded,
   warnPostMetricsFailed,
 } from './sdk_codes';
 import { Logger } from './log';
@@ -55,7 +57,18 @@ export interface MetricsProcessorInterface {
 }
 
 export class MetricsProcessor implements MetricsProcessorInterface {
-  private data: Map<string, AnalyticsEvent> = new Map();
+  private evaluationAnalytics: Map<string, AnalyticsEvent> = new Map();
+  private targetAnalytics: Map<string, Target> = new Map();
+
+  // Only store and send targets that haven't been sent before in the life of the client instance
+  private seenTargets: Set<string> = new Set();
+
+  // Maximum sizes for caches
+  private MAX_EVALUATION_ANALYTICS_SIZE = 10000;
+  private MAX_TARGET_ANALYTICS_SIZE = 100000;
+  private evaluationAnalyticsExceeded = false;
+  private targetAnalyticsExceeded = false;
+
   private syncInterval?: NodeJS.Timeout;
   private api: MetricsApi;
   private readonly log: Logger;
@@ -116,13 +129,48 @@ export class MetricsProcessor implements MetricsProcessorInterface {
       variation,
       count: 0,
     };
+    this.storeEvaluationAnalytic(event);
+    this.storeTargetAnalytic(target);
+  }
+
+  private storeTargetAnalytic(target: Target): void {
+    if (this.targetAnalytics.size >= this.MAX_TARGET_ANALYTICS_SIZE) {
+      if (!this.targetAnalyticsExceeded) {
+        this.targetAnalyticsExceeded = true;
+        warnTargetMetricsExceeded(this.log);
+      }
+
+      return;
+    }
+
+    if (target && !target.anonymous) {
+      // If target has been seen then ignore it
+      if (this.seenTargets.has(target.identifier)) {
+        return;
+      }
+
+      this.seenTargets.add(target.identifier);
+      this.targetAnalytics.set(target.identifier, target);
+    }
+  }
+
+  private storeEvaluationAnalytic(event: AnalyticsEvent): void {
+    if (this.evaluationAnalytics.size >= this.MAX_EVALUATION_ANALYTICS_SIZE) {
+      if (!this.evaluationAnalyticsExceeded) {
+        this.evaluationAnalyticsExceeded = true;
+        warnEvaluationMetricsExceeded(this.log);
+      }
+
+      return;
+    }
+
     const key = this._formatKey(event);
-    const found = this.data.get(key);
+    const found = this.evaluationAnalytics.get(key);
     if (found) {
       found.count++;
     } else {
       event.count = 1;
-      this.data.set(key, event);
+      this.evaluationAnalytics.set(key, event);
     }
   }
 
@@ -138,70 +186,29 @@ export class MetricsProcessor implements MetricsProcessorInterface {
     const metricsData: MetricsData[] = [];
 
     // clone map and clear data
-    const clonedData = new Map(this.data);
-    this.data.clear();
+    const clonedEvaluationAnalytics = new Map(this.evaluationAnalytics);
+    const clonedTargetAnalytics = new Map(this.targetAnalytics);
+    this.evaluationAnalytics.clear();
+    this.targetAnalytics.clear();
+    this.evaluationAnalyticsExceeded = false;
+    this.targetAnalyticsExceeded = false;
 
-    for (const event of clonedData.values()) {
-      if (event.target && !event.target.anonymous) {
-        let targetAttributes: KeyValue[] = [];
-        if (event.target.attributes) {
-          targetAttributes = Object.entries(event.target.attributes).map(
-            ([key, value]) => {
-              const stringValue =
-                value === null || value === undefined
-                  ? ''
-                  : this.valueToString(value);
-              return { key, value: stringValue };
-            },
-          );
-        }
-
-        let targetName = event.target.identifier;
-        if (event.target.name) {
-          targetName = event.target.name;
-        }
-
-        const td: TargetData = {
-          identifier: event.target.identifier,
-          name: targetName,
-          attributes: targetAttributes,
-        };
-        targetData.push(td);
-      }
-
+    clonedEvaluationAnalytics.forEach((event) => {
       const metricsAttributes: KeyValue[] = [
         {
           key: FEATURE_IDENTIFIER_ATTRIBUTE,
           value: event.featureConfig.feature,
         },
         {
-          key: FEATURE_NAME_ATTRIBUTE,
-          value: event.featureConfig.feature,
-        },
-        {
           key: VARIATION_IDENTIFIER_ATTRIBUTE,
           value: event.variation.identifier,
         },
-        {
-          key: SDK_TYPE_ATTRIBUTE,
-          value: SDK_TYPE,
-        },
-        {
-          key: SDK_LANGUAGE_ATTRIBUTE,
-          value: SDK_LANGUAGE,
-        },
-        {
-          key: SDK_VERSION_ATTRIBUTE,
-          value: VERSION,
-        },
-        {
-          key: TARGET_ATTRIBUTE,
-          value: event?.target?.identifier ?? null,
-        },
+        { key: FEATURE_NAME_ATTRIBUTE, value: event.featureConfig.feature },
+        { key: SDK_TYPE_ATTRIBUTE, value: SDK_TYPE },
+        { key: SDK_LANGUAGE_ATTRIBUTE, value: SDK_LANGUAGE },
+        { key: SDK_VERSION_ATTRIBUTE, value: VERSION },
+        { key: TARGET_ATTRIBUTE, value: event?.target?.identifier ?? null },
       ];
-
-      // private target attributes
-      // need more info
 
       const md: MetricsData = {
         timestamp: Date.now(),
@@ -210,7 +217,27 @@ export class MetricsProcessor implements MetricsProcessorInterface {
         attributes: metricsAttributes,
       };
       metricsData.push(md);
-    }
+    });
+
+    clonedTargetAnalytics.forEach((target) => {
+      let targetAttributes: KeyValue[] = [];
+      if (target.attributes) {
+        targetAttributes = Object.entries(target.attributes).map(
+          ([key, value]) => {
+            return { key, value: this.valueToString(value) };
+          },
+        );
+      }
+
+      const targetName = target.name || target.identifier;
+
+      targetData.push({
+        identifier: target.identifier,
+        name: targetName,
+        attributes: targetAttributes,
+      });
+    });
+
     return {
       targetData: targetData,
       metricsData: metricsData,
@@ -223,7 +250,7 @@ export class MetricsProcessor implements MetricsProcessorInterface {
       return;
     }
 
-    if (this.data.size === 0) {
+    if (!this.evaluationAnalytics.size) {
       this.log.debug('No metrics to send in this interval');
       return;
     }
