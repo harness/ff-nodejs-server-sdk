@@ -176,8 +176,8 @@ export class StreamProcessor {
 
   private processData(data: any): void {
     const lines = data.toString().split(/\r?\n/);
-    if (lines[0].startsWith(":")) {
-      this.log.debug("SSE Heartbeat received")
+    if (lines[0].startsWith(':')) {
+      this.log.debug('SSE Heartbeat received');
       return;
     }
     lines.forEach((line) => this.processLine(line));

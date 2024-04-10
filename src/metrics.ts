@@ -87,7 +87,10 @@ export class MetricsProcessor implements MetricsProcessorInterface {
       'Starting MetricsProcessor with request interval: ',
       this.options.eventsSyncInterval,
     );
-    this.syncInterval = setInterval(() => this._send(), this.options.eventsSyncInterval);
+    this.syncInterval = setInterval(
+      () => this._send(),
+      this.options.eventsSyncInterval,
+    );
     this.eventBus.emit(MetricEvent.READY);
   }
 
