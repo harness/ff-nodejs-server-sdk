@@ -127,7 +127,7 @@ export class MetricsProcessor implements MetricsProcessorInterface {
     this.storeTargetAnalytic(target);
   }
 
-  private storeTargetAnalytic(target: Target) {
+  private storeTargetAnalytic(target: Target): void {
     if (this.targetAnalytics.size >= this.MAX_TARGET_ANALYTICS_SIZE) {
       if (!this.targetAnalyticsExceeded) {
         this.targetAnalyticsExceeded = true;
