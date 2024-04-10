@@ -87,6 +87,7 @@ export class StreamProcessor {
         'API-Key': this.apiKey,
         ...this.headers,
       },
+      ca: undefined,
     };
 
     if (this.httpsCa) {
