@@ -152,13 +152,11 @@ export class Evaluator {
           return true;
         }
 
-        if (!!segment?.servingRules?.length) {
+        if (segment?.servingRules?.length) {
           // Use enhanced rules first if they're available
-          const sortedServingRules = segment.servingRules.sort(
-            (r1, r2) => r1.priority - r2.priority,
-          );
+          segment.servingRules.sort((r1, r2) => r1.priority - r2.priority);
 
-          for (const servingRule of sortedServingRules) {
+          for (const servingRule of segment.servingRules) {
             if (await this.evaluateClauses_v2(servingRule.clauses, target)) {
               return true;
             }
@@ -246,6 +244,10 @@ export class Evaluator {
     clauses: Clause[],
     target: Target,
   ): Promise<boolean> {
+    if (!clauses.length) {
+      return false;
+    }
+
     for (const clause of clauses) {
       if (!(await this.evaluateClause(clause, target))) {
         // first clause to false, short-circuit and exit with false
