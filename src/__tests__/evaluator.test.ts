@@ -222,10 +222,10 @@ describe('Evaluator', () => {
 
     const target = {
       identifier: name,
-      name: name,
+      name,
       attributes: {
-        email: email,
-        role: role,
+        email,
+        role,
       },
     };
 
