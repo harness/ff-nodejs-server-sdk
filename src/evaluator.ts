@@ -152,7 +152,7 @@ export class Evaluator {
           return true;
         }
 
-        if (segment.servingRules && segment.servingRules.length > 0) {
+        if (!!segment?.servingRules?.length) {
           // Use enhanced rules first if they're available
           const sortedServingRules = segment.servingRules.sort(
             (r1, r2) => r1.priority - r2.priority,
