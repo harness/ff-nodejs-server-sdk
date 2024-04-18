@@ -85,56 +85,56 @@ export interface AuthenticationResponse {
     authToken: string;
 }
 /**
- * 
+ * A clause describes what conditions are used to evaluate a flag
  * @export
  * @interface Clause
  */
 export interface Clause {
     /**
-     * 
+     * The unique ID for the clause
      * @type {string}
      * @memberof Clause
      */
-    id: string;
+    id?: string;
     /**
-     * 
+     * The attribute to use in the clause.  This can be any target attribute
      * @type {string}
      * @memberof Clause
      */
     attribute: string;
     /**
-     * 
+     * The type of operation such as equals, starts_with, contains
      * @type {string}
      * @memberof Clause
      */
     op: string;
     /**
-     * 
+     * The values that are compared against the operator
      * @type {Array<string>}
      * @memberof Clause
      */
     values: Array<string>;
     /**
-     * 
+     * Is the operation negated?
      * @type {boolean}
      * @memberof Clause
      */
     negate: boolean;
 }
 /**
- * 
+ * Describes a distribution rule
  * @export
  * @interface Distribution
  */
 export interface Distribution {
     /**
-     * 
+     * The attribute to use when distributing targets across buckets
      * @type {string}
      * @memberof Distribution
      */
     bucketBy: string;
     /**
-     * 
+     * A list of variations and the weight that should be given to each
      * @type {Array<WeightedVariation>}
      * @memberof Distribution
      */
@@ -263,7 +263,7 @@ export enum FeatureConfigKindEnum {
 }
 
 /**
- * 
+ * The state of a flag either off or on
  * @export
  * @enum {string}
  */
@@ -273,6 +273,31 @@ export enum FeatureState {
     Off = 'off'
 }
 
+/**
+ * The rule used to determine what variation to serve to a target
+ * @export
+ * @interface GroupServingRule
+ */
+export interface GroupServingRule {
+    /**
+     * The unique identifier for this rule
+     * @type {string}
+     * @memberof GroupServingRule
+     */
+    ruleId: string;
+    /**
+     * The rules priority relative to other rules.  The rules are evaluated in order with 1 being the highest
+     * @type {number}
+     * @memberof GroupServingRule
+     */
+    priority: number;
+    /**
+     * A list of clauses to use in the rule
+     * @type {Array<Clause>}
+     * @memberof GroupServingRule
+     */
+    clauses: Array<Clause>;
+}
 /**
  * 
  * @export
@@ -358,17 +383,23 @@ export enum MetricsDataMetricsTypeEnum {
  */
 export interface ModelError {
     /**
-     * 
+     * The http error code
      * @type {string}
      * @memberof ModelError
      */
     code: string;
     /**
-     * 
+     * The reason the request failed
      * @type {string}
      * @memberof ModelError
      */
     message: string;
+    /**
+     * Additional details about the error
+     * @type {object}
+     * @memberof ModelError
+     */
+    details?: object;
 }
 /**
  * 
@@ -377,124 +408,130 @@ export interface ModelError {
  */
 export interface Pagination {
     /**
-     * 
+     * The version of this object.  The version will be incremented each time the object is modified
      * @type {number}
      * @memberof Pagination
      */
     version?: number;
     /**
-     * 
+     * The total number of pages
      * @type {number}
      * @memberof Pagination
      */
     pageCount: number;
     /**
-     * 
+     * The total number of items
      * @type {number}
      * @memberof Pagination
      */
     itemCount: number;
     /**
-     * 
+     * The number of items per page
      * @type {number}
      * @memberof Pagination
      */
     pageSize: number;
     /**
-     * 
+     * The current page
      * @type {number}
      * @memberof Pagination
      */
     pageIndex: number;
 }
 /**
- * 
+ * Feature Flag pre-requisites
  * @export
  * @interface Prerequisite
  */
 export interface Prerequisite {
     /**
-     * 
+     * The feature identifier that is the prerequisite
      * @type {string}
      * @memberof Prerequisite
      */
     feature: string;
     /**
-     * 
+     * A list of variations that must be met
      * @type {Array<string>}
      * @memberof Prerequisite
      */
     variations: Array<string>;
 }
 /**
- * 
+ * A Target Group (Segment) response
  * @export
  * @interface Segment
  */
 export interface Segment {
     /**
-     * Unique identifier for the segment.
+     * Unique identifier for the target group.
      * @type {string}
      * @memberof Segment
      */
     identifier: string;
     /**
-     * Name of the segment.
+     * Name of the target group.
      * @type {string}
      * @memberof Segment
      */
     name: string;
     /**
-     * 
+     * The environment this target group belongs to
      * @type {string}
      * @memberof Segment
      */
     environment?: string;
     /**
-     * 
+     * Tags for this target group
      * @type {Array<Tag>}
      * @memberof Segment
      */
     tags?: Array<Tag>;
     /**
-     * 
+     * A list of Targets who belong to this target group
      * @type {Array<Target>}
      * @memberof Segment
      */
     included?: Array<Target>;
     /**
-     * 
+     * A list of Targets who are excluded from this target group
      * @type {Array<Target>}
      * @memberof Segment
      */
     excluded?: Array<Target>;
     /**
-     * An array of rules that can cause a user to be included in this segment.
+     * 
      * @type {Array<Clause>}
      * @memberof Segment
      */
     rules?: Array<Clause>;
     /**
-     * 
+     * An array of rules that can cause a user to be included in this segment.
+     * @type {Array<GroupServingRule>}
+     * @memberof Segment
+     */
+    servingRules?: Array<GroupServingRule>;
+    /**
+     * The data and time in milliseconds when the group was created
      * @type {number}
      * @memberof Segment
      */
     createdAt?: number;
     /**
-     * 
+     * The data and time in milliseconds when the group was last modified
      * @type {number}
      * @memberof Segment
      */
     modifiedAt?: number;
     /**
-     * 
+     * The version of this group.  Each time it is modified the version is incremented
      * @type {number}
      * @memberof Segment
      */
     version?: number;
 }
 /**
- * 
+ * Describe the distribution rule and the variation that should be served to the target
  * @export
  * @interface Serve
  */
@@ -513,25 +550,25 @@ export interface Serve {
     variation?: string;
 }
 /**
- * 
+ * The rule used to determine what variation to serve to a target
  * @export
  * @interface ServingRule
  */
 export interface ServingRule {
     /**
-     * 
+     * The unique identifier for this rule
      * @type {string}
      * @memberof ServingRule
      */
-    ruleId: string;
+    ruleId?: string;
     /**
-     * 
+     * The rules priority relative to other rules.  The rules are evaluated in order with 1 being the highest
      * @type {number}
      * @memberof ServingRule
      */
     priority: number;
     /**
-     * 
+     * A list of clauses to use in the rule
      * @type {Array<Clause>}
      * @memberof ServingRule
      */
@@ -544,86 +581,86 @@ export interface ServingRule {
     serve: Serve;
 }
 /**
- * A name and value pair.
+ * A Tag object used to tag feature flags - consists of name and identifier
  * @export
  * @interface Tag
  */
 export interface Tag {
     /**
-     * 
+     * The name of the tag
      * @type {string}
      * @memberof Tag
      */
     name: string;
     /**
-     * 
+     * The identifier of the tag
      * @type {string}
      * @memberof Tag
      */
-    value?: string;
+    identifier: string;
 }
 /**
- * 
+ * A Target object
  * @export
  * @interface Target
  */
 export interface Target {
     /**
-     * 
+     * The unique identifier for this target
      * @type {string}
      * @memberof Target
      */
     identifier: string;
     /**
-     * 
+     * The account ID that the target belongs to
      * @type {string}
      * @memberof Target
      */
     account: string;
     /**
-     * 
+     * The identifier for the organization that the target belongs to
      * @type {string}
      * @memberof Target
      */
     org: string;
     /**
-     * 
+     * The identifier for the environment that the target belongs to
      * @type {string}
      * @memberof Target
      */
     environment: string;
     /**
-     * 
+     * The identifier for the project that this target belongs to
      * @type {string}
      * @memberof Target
      */
     project: string;
     /**
-     * 
+     * The name of this Target
      * @type {string}
      * @memberof Target
      */
     name: string;
     /**
-     * 
+     * Indicates if this target is anonymous
      * @type {boolean}
      * @memberof Target
      */
     anonymous?: boolean;
     /**
-     * 
+     * a JSON representation of the attributes for this target
      * @type {object}
      * @memberof Target
      */
     attributes?: object;
     /**
-     * 
+     * The date and time in milliseconds when this Target was created
      * @type {number}
      * @memberof Target
      */
     createdAt?: number;
     /**
-     * 
+     * A list of Target Groups (Segments) that this Target belongs to
      * @type {Array<Segment>}
      * @memberof Target
      */
@@ -655,94 +692,94 @@ export interface TargetData {
     attributes: Array<KeyValue>;
 }
 /**
- * 
+ * Target map provides the details of a target that belongs to a flag
  * @export
  * @interface TargetMap
  */
 export interface TargetMap {
     /**
-     * 
+     * The identifier for the target
      * @type {string}
      * @memberof TargetMap
      */
-    identifier?: string;
+    identifier: string;
     /**
-     * 
+     * The name of the target
      * @type {string}
      * @memberof TargetMap
      */
     name: string;
 }
 /**
- * 
+ * A variation of a flag that can be returned to a target
  * @export
  * @interface Variation
  */
 export interface Variation {
     /**
-     * 
+     * The unique identifier for the variation
      * @type {string}
      * @memberof Variation
      */
     identifier: string;
     /**
-     * 
+     * The variation value to serve such as true or false for a boolean flag
      * @type {string}
      * @memberof Variation
      */
     value: string;
     /**
-     * 
+     * The user friendly name of the variation
      * @type {string}
      * @memberof Variation
      */
     name?: string;
     /**
-     * 
+     * A description of the variation
      * @type {string}
      * @memberof Variation
      */
     description?: string;
 }
 /**
- * 
+ * A mapping of variations to targets and target groups (segments).  The targets listed here should receive this variation.
  * @export
  * @interface VariationMap
  */
 export interface VariationMap {
     /**
-     * 
+     * The variation identifier
      * @type {string}
      * @memberof VariationMap
      */
     variation: string;
     /**
-     * 
+     * A list of target mappings
      * @type {Array<TargetMap>}
      * @memberof VariationMap
      */
     targets?: Array<TargetMap>;
     /**
-     * 
+     * A list of target groups (segments)
      * @type {Array<string>}
      * @memberof VariationMap
      */
     targetSegments?: Array<string>;
 }
 /**
- * 
+ * A variation and the weighting it should receive as part of a percentage rollout
  * @export
  * @interface WeightedVariation
  */
 export interface WeightedVariation {
     /**
-     * 
+     * The variation identifier
      * @type {string}
      * @memberof WeightedVariation
      */
     variation: string;
     /**
-     * 
+     * The weight to be given to the variation in percent
      * @type {number}
      * @memberof WeightedVariation
      */
@@ -1454,17 +1491,17 @@ export const MetricsApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * Send metrics to Analytics server
          * @summary Send metrics to the Analytics server.
-         * @param {string} environment environment parameter in query.
+         * @param {string} environmentUUID environment parameter in query.
          * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {Metrics} [metrics] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        postMetrics: async (environment: string, cluster?: string, metrics?: Metrics, options: any = {}): Promise<RequestArgs> => {
-            // verify required parameter 'environment' is not null or undefined
-            assertParamExists('postMetrics', 'environment', environment)
-            const localVarPath = `/metrics/{environment}`
-                .replace(`{${"environment"}}`, encodeURIComponent(String(environment)));
+        postMetrics: async (environmentUUID: string, cluster?: string, metrics?: Metrics, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'environmentUUID' is not null or undefined
+            assertParamExists('postMetrics', 'environmentUUID', environmentUUID)
+            const localVarPath = `/metrics/{environmentUUID}`
+                .replace(`{${"environmentUUID"}}`, encodeURIComponent(String(environmentUUID)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1475,6 +1512,9 @@ export const MetricsApiAxiosParamCreator = function (configuration?: Configurati
             const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            // authentication ApiKeyAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "api-key", configuration)
 
             // authentication BearerAuth required
             // http bearer authentication required
@@ -1511,14 +1551,14 @@ export const MetricsApiFp = function(configuration?: Configuration) {
         /**
          * Send metrics to Analytics server
          * @summary Send metrics to the Analytics server.
-         * @param {string} environment environment parameter in query.
+         * @param {string} environmentUUID environment parameter in query.
          * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {Metrics} [metrics] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async postMetrics(environment: string, cluster?: string, metrics?: Metrics, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.postMetrics(environment, cluster, metrics, options);
+        async postMetrics(environmentUUID: string, cluster?: string, metrics?: Metrics, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.postMetrics(environmentUUID, cluster, metrics, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -1534,14 +1574,14 @@ export const MetricsApiFactory = function (configuration?: Configuration, basePa
         /**
          * Send metrics to Analytics server
          * @summary Send metrics to the Analytics server.
-         * @param {string} environment environment parameter in query.
+         * @param {string} environmentUUID environment parameter in query.
          * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {Metrics} [metrics] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        postMetrics(environment: string, cluster?: string, metrics?: Metrics, options?: any): AxiosPromise<void> {
-            return localVarFp.postMetrics(environment, cluster, metrics, options).then((request) => request(axios, basePath));
+        postMetrics(environmentUUID: string, cluster?: string, metrics?: Metrics, options?: any): AxiosPromise<void> {
+            return localVarFp.postMetrics(environmentUUID, cluster, metrics, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -1556,15 +1596,15 @@ export class MetricsApi extends BaseAPI {
     /**
      * Send metrics to Analytics server
      * @summary Send metrics to the Analytics server.
-     * @param {string} environment environment parameter in query.
+     * @param {string} environmentUUID environment parameter in query.
      * @param {string} [cluster] Unique identifier for the cluster for the account
      * @param {Metrics} [metrics] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MetricsApi
      */
-    public postMetrics(environment: string, cluster?: string, metrics?: Metrics, options?: any) {
-        return MetricsApiFp(this.configuration).postMetrics(environment, cluster, metrics, options).then((request) => request(this.axios, this.basePath));
+    public postMetrics(environmentUUID: string, cluster?: string, metrics?: Metrics, options?: any) {
+        return MetricsApiFp(this.configuration).postMetrics(environmentUUID, cluster, metrics, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
