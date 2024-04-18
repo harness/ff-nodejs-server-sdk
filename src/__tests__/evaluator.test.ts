@@ -233,7 +233,6 @@ describe('Evaluator', () => {
       flagName,
       target,
       !expected,
-      null,
     );
 
     expect(result).toEqual(expected);
