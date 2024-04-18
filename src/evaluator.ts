@@ -152,17 +152,31 @@ export class Evaluator {
           return true;
         }
 
-        // Should Target be included via segment rules
-        if (
-          segment.rules &&
-          (await this.evaluateClauses(segment.rules, target))
-        ) {
-          this.log.debug(
-            'Target %s included in segment %s via rules\n',
-            target.name,
-            segment.name,
+        if (segment.servingRules && segment.servingRules.length > 0) {
+          // Use enhanced rules first if they're available
+          const sortedServingRules = segment.servingRules.sort(
+            (r1, r2) => r1.priority - r2.priority,
           );
-          return true;
+
+          for (const servingRule of sortedServingRules) {
+            if (await this.evaluateClauses_v2(servingRule.clauses, target)) {
+              return true;
+            }
+          }
+        } else {
+          // Fall back to legacy rules
+          // Should Target be included via segment rules
+          if (
+            segment.rules &&
+            (await this.evaluateClauses(segment.rules, target))
+          ) {
+            this.log.debug(
+              'Target %s included in segment %s via rules\n',
+              target.name,
+              segment.name,
+            );
+            return true;
+          }
         }
       }
     }
@@ -226,6 +240,20 @@ export class Evaluator {
     }
     // all clauses conditions failed so return false
     return false;
+  }
+
+  private async evaluateClauses_v2(
+    clauses: Clause[],
+    target: Target,
+  ): Promise<boolean> {
+    for (const clause of clauses) {
+      if (!(await this.evaluateClause(clause, target))) {
+        // first clause to false, short-circuit and exit with false
+        return false;
+      }
+    }
+    // all clauses have passed
+    return true;
   }
 
   private evaluateRule(rule: ServingRule, target: Target): Promise<boolean> {
