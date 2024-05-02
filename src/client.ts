@@ -304,7 +304,7 @@ export default class Client {
       };
     }
 
-    const instance = axios.create(axiosConfig);
+    const instance: AxiosInstance = axios.create(axiosConfig);
     axiosRetry(instance, {
       retries: 3,
       retryDelay: axiosRetry.exponentialDelay,
