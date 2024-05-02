@@ -1,6 +1,6 @@
 import EventEmitter from 'events';
 import jwt_decode from 'jwt-decode';
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import axiosRetry from 'axios-retry';
 import { Claims, Options, StreamEvent, Target } from './types';
 import { Configuration, ClientApi, FeatureConfig, Variation } from './openapi';
@@ -109,22 +109,13 @@ export default class Client {
     );
     this.evaluator = new Evaluator(this.repository, this.log);
 
-    if (options.tlsTrustedCa) {
-      this.httpsCa = fs.readFileSync(options.tlsTrustedCa);
-      this.httpsClient = axios.create({
-        httpsAgent: new https.Agent({
-          ca: this.httpsCa,
-        }),
-      });
-
-      this.api = new ClientApi(
-        this.configuration,
-        this.options.baseUrl,
-        this.httpsClient,
-      );
-    } else {
-      this.api = new ClientApi(this.configuration);
-    }
+    // Setup https client for sass or on-prem connections
+    this.httpsClient = this.createCustomAxiosInstance(options);
+    this.api = new ClientApi(
+      this.configuration,
+      this.options.baseUrl,
+      this.httpsClient
+    );
 
     this.processEvents();
     this.run();
@@ -295,6 +286,27 @@ export default class Client {
     }
 
     return this.waitForInitializePromise;
+  }
+
+  private createCustomAxiosInstance(options: Options): AxiosInstance {
+    let axiosConfig: AxiosRequestConfig = {
+      timeout: 30000,  // Apply timeout to this specific instance
+    };
+
+    if (options.tlsTrustedCa) {
+      const httpsCa = fs.readFileSync(options.tlsTrustedCa);
+      // Expanding axiosConfig with httpsAgent when TLS config is provided
+      axiosConfig = {
+        ...axiosConfig,
+        httpsAgent: new https.Agent({
+          ca: httpsCa
+        })
+      };
+    }
+
+    const instance = axios.create(axiosConfig);
+    axiosRetry(instance, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
+    return instance;
   }
 
   private initialize(processor: Processor): void {
