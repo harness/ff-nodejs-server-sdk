@@ -87,7 +87,7 @@ export class MetricsProcessor implements MetricsProcessorInterface {
       basePath: options.eventsUrl,
     });
     if (httpsClient) {
-      this.api = new MetricsApi(this.conf, options.eventsUrl, this.httpsClient);
+      this.api = new MetricsApi(configuration, options.eventsUrl, this.httpsClient);
     } else {
       this.api = new MetricsApi(configuration);
     }
