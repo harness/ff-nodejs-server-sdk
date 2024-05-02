@@ -1,6 +1,6 @@
 import EventEmitter from 'events';
 import jwt_decode from 'jwt-decode';
-import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import axiosRetry from 'axios-retry';
 import { Claims, Options, StreamEvent, Target } from './types';
 import { Configuration, ClientApi, FeatureConfig, Variation } from './openapi';
@@ -114,7 +114,7 @@ export default class Client {
     this.api = new ClientApi(
       this.configuration,
       this.options.baseUrl,
-      this.httpsClient
+      this.httpsClient,
     );
 
     this.processEvents();
@@ -299,13 +299,16 @@ export default class Client {
       axiosConfig = {
         ...axiosConfig,
         httpsAgent: new https.Agent({
-          ca: httpsCa
-        })
+          ca: httpsCa,
+        }),
       };
     }
 
     const instance = axios.create(axiosConfig);
-    axiosRetry(instance, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
+    axiosRetry(instance, {
+      retries: 3,
+      retryDelay: axiosRetry.exponentialDelay,
+    });
     return instance;
   }
 
