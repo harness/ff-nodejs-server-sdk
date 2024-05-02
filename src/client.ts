@@ -31,9 +31,6 @@ import {
 import https from 'https';
 import * as fs from 'fs';
 
-axios.defaults.timeout = 30000;
-axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
-
 enum Processor {
   POLL,
   STREAM,
