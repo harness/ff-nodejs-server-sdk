@@ -107,7 +107,7 @@ export default class Client {
     this.evaluator = new Evaluator(this.repository, this.log);
 
     // Setup https client for sass or on-prem connections
-    this.httpsClient = this.createAxiosInstanceWithRetries(options);
+    this.httpsClient = this.createAxiosInstanceWithRetries(this.options);
     this.api = new ClientApi(
       this.configuration,
       this.options.baseUrl,
