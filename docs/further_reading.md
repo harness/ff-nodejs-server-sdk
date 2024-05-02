@@ -129,6 +129,7 @@ enableAnalytics: boolean;    // enable analytics
 cache: KeyValueStore;        // set custom cache (default lru cache)
 store: AsyncKeyValueStore;   // set custom persistent store (default file store)
 logger: Logger;              // set logger (default console)
+axiosTimeout: number;        // set timeout for requests to Harness (default 30s) 
 ```
 
 ## Singleton example
