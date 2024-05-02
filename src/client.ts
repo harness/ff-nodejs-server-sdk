@@ -2,13 +2,19 @@ import EventEmitter from 'events';
 import jwt_decode from 'jwt-decode';
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import axiosRetry from 'axios-retry';
-import { Claims, Options, StreamEvent, Target } from './types';
+import {
+  APIConfiguration,
+  Claims,
+  Options,
+  StreamEvent,
+  Target,
+} from './types';
 import { Configuration, ClientApi, FeatureConfig, Variation } from './openapi';
 import { VERSION } from './version';
 import { PollerEvent, PollingProcessor } from './polling';
 import { StreamProcessor } from './streaming';
 import { Evaluator } from './evaluator';
-import { defaultOptions } from './constants';
+import { apiConfiguration, defaultOptions } from './constants';
 import { Repository, RepositoryEvent, StorageRepository } from './repository';
 import {
   MetricEvent,
@@ -55,6 +61,7 @@ export default class Client {
   private environment: string;
   private configuration: Configuration;
   private options: Options;
+  private apiConfiguration: APIConfiguration = apiConfiguration;
   private cluster = '1';
   private eventBus = new EventEmitter();
   private pollProcessor: PollingProcessor;
@@ -356,6 +363,7 @@ export default class Client {
       this.environment,
       this.cluster,
       this.api,
+      this.apiConfiguration,
       this.options,
       this.eventBus,
       this.repository,
@@ -367,6 +375,7 @@ export default class Client {
       this.streamProcessor = new StreamProcessor(
         this.api,
         this.sdkKey,
+        apiConfiguration,
         this.environment,
         this.authToken,
         this.options,

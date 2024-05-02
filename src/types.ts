@@ -16,6 +16,10 @@ export interface Options {
   axiosTimeout?: number;
 }
 
+export interface APIConfiguration {
+  targetSegmentRulesQueryParameter: string;
+}
+
 export interface Claims {
   environment: string;
   environmentIdentifier: string;
