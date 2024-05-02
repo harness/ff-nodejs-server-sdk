@@ -18,6 +18,7 @@ type FetchFunction = (
   identifier: string,
   environment: string,
   cluster: string,
+  // Only target-segment requests require this, and it will be safely ignored for feature calls.
   targetSegmentRulesQueryParameter: string,
 ) => AxiosPromise<FeatureConfig | Segment>;
 
