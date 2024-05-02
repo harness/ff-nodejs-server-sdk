@@ -44,4 +44,5 @@ export const defaultOptions: Options = {
   cache: new LRU({ max: 100 }),
   store: new FileStore(),
   logger: new ConsoleLog(),
+  axiosTimeout: 3000,
 };

@@ -290,7 +290,7 @@ export default class Client {
 
   private createCustomAxiosInstance(options: Options): AxiosInstance {
     let axiosConfig: AxiosRequestConfig = {
-      timeout: 30000,  // Apply timeout to this specific instance
+      timeout: options.axiosTimeout,
     };
 
     if (options.tlsTrustedCa) {

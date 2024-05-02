@@ -13,6 +13,7 @@ export interface Options {
   store?: AsyncKeyValueStore;
   logger?: Logger;
   tlsTrustedCa?: string;
+  axiosTimeout?: number;
 }
 
 export interface Claims {
