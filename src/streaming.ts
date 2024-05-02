@@ -1,7 +1,7 @@
 import EventEmitter from 'events';
 import { AxiosPromise } from 'axios';
 import { ClientApi, FeatureConfig, Segment } from './openapi';
-import { StreamEvent, Options, StreamMsg, APIConfiguration } from "./types";
+import { StreamEvent, Options, StreamMsg, APIConfiguration } from './types';
 import { Repository } from './repository';
 import { ConsoleLog } from './log';
 
@@ -18,8 +18,7 @@ type FetchFunction = (
   identifier: string,
   environment: string,
   cluster: string,
-  targetSegmentRulesQueryParameter: string
-
+  targetSegmentRulesQueryParameter: string,
 ) => AxiosPromise<FeatureConfig | Segment>;
 
 export class StreamProcessor {
