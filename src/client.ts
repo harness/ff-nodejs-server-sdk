@@ -110,7 +110,7 @@ export default class Client {
     this.evaluator = new Evaluator(this.repository, this.log);
 
     // Setup https client for sass or on-prem connections
-    this.httpsClient = this.createCustomAxiosInstance(options);
+    this.httpsClient = this.createAxiosInstanceWithRetries(options);
     this.api = new ClientApi(
       this.configuration,
       this.options.baseUrl,
@@ -288,7 +288,7 @@ export default class Client {
     return this.waitForInitializePromise;
   }
 
-  private createCustomAxiosInstance(options: Options): AxiosInstance {
+  private createAxiosInstanceWithRetries(options: Options): AxiosInstance {
     let axiosConfig: AxiosRequestConfig = {
       timeout: options.axiosTimeout,
     };
