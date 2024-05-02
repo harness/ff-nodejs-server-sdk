@@ -295,7 +295,7 @@ export default class Client {
 
     if (options.tlsTrustedCa) {
       const httpsCa = fs.readFileSync(options.tlsTrustedCa);
-      // Expanding axiosConfig with httpsAgent when TLS config is provided
+      // Set axiosConfig with httpsAgent when TLS config is provided
       axiosConfig = {
         ...axiosConfig,
         httpsAgent: new https.Agent({
