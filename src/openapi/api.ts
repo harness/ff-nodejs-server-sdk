@@ -22,63 +22,63 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
 
 /**
- * 
+ *
  * @export
  * @interface AuthenticationRequest
  */
 export interface AuthenticationRequest {
     /**
-     * 
+     *
      * @type {string}
      * @memberof AuthenticationRequest
      */
     apiKey: string;
     /**
-     * 
+     *
      * @type {AuthenticationRequestTarget}
      * @memberof AuthenticationRequest
      */
     target?: AuthenticationRequestTarget;
 }
 /**
- * 
+ *
  * @export
  * @interface AuthenticationRequestTarget
  */
 export interface AuthenticationRequestTarget {
     /**
-     * 
+     *
      * @type {string}
      * @memberof AuthenticationRequestTarget
      */
     identifier: string;
     /**
-     * 
+     *
      * @type {string}
      * @memberof AuthenticationRequestTarget
      */
     name?: string;
     /**
-     * 
+     *
      * @type {boolean}
      * @memberof AuthenticationRequestTarget
      */
     anonymous?: boolean;
     /**
-     * 
+     *
      * @type {object}
      * @memberof AuthenticationRequestTarget
      */
     attributes?: object;
 }
 /**
- * 
+ *
  * @export
  * @interface AuthenticationResponse
  */
 export interface AuthenticationResponse {
     /**
-     * 
+     *
      * @type {string}
      * @memberof AuthenticationResponse
      */
@@ -141,110 +141,110 @@ export interface Distribution {
     variations: Array<WeightedVariation>;
 }
 /**
- * 
+ *
  * @export
  * @interface Evaluation
  */
 export interface Evaluation {
     /**
-     * 
+     *
      * @type {string}
      * @memberof Evaluation
      */
     flag: string;
     /**
-     * 
+     *
      * @type {string}
      * @memberof Evaluation
      */
     value: string;
     /**
-     * 
+     *
      * @type {string}
      * @memberof Evaluation
      */
     kind: string;
     /**
-     * 
+     *
      * @type {string}
      * @memberof Evaluation
      */
     identifier?: string;
 }
 /**
- * 
+ *
  * @export
  * @interface FeatureConfig
  */
 export interface FeatureConfig {
     /**
-     * 
+     *
      * @type {string}
      * @memberof FeatureConfig
      */
     project: string;
     /**
-     * 
+     *
      * @type {string}
      * @memberof FeatureConfig
      */
     environment: string;
     /**
-     * 
+     *
      * @type {string}
      * @memberof FeatureConfig
      */
     feature: string;
     /**
-     * 
+     *
      * @type {FeatureState}
      * @memberof FeatureConfig
      */
     state: FeatureState;
     /**
-     * 
+     *
      * @type {string}
      * @memberof FeatureConfig
      */
     kind: FeatureConfigKindEnum;
     /**
-     * 
+     *
      * @type {Array<Variation>}
      * @memberof FeatureConfig
      */
     variations: Array<Variation>;
     /**
-     * 
+     *
      * @type {Array<ServingRule>}
      * @memberof FeatureConfig
      */
     rules?: Array<ServingRule>;
     /**
-     * 
+     *
      * @type {Serve}
      * @memberof FeatureConfig
      */
     defaultServe: Serve;
     /**
-     * 
+     *
      * @type {string}
      * @memberof FeatureConfig
      */
     offVariation: string;
     /**
-     * 
+     *
      * @type {Array<Prerequisite>}
      * @memberof FeatureConfig
      */
     prerequisites?: Array<Prerequisite>;
     /**
-     * 
+     *
      * @type {Array<VariationMap>}
      * @memberof FeatureConfig
      */
     variationToTargetMap?: Array<VariationMap>;
     /**
-     * 
+     *
      * @type {number}
      * @memberof FeatureConfig
      */
@@ -299,58 +299,58 @@ export interface GroupServingRule {
     clauses: Array<Clause>;
 }
 /**
- * 
+ *
  * @export
  * @interface InlineObject
  */
 export interface InlineObject {
     /**
-     * 
+     *
      * @type {string}
      * @memberof InlineObject
      */
     proxyKey: string;
 }
 /**
- * 
+ *
  * @export
  * @interface KeyValue
  */
 export interface KeyValue {
     /**
-     * 
+     *
      * @type {string}
      * @memberof KeyValue
      */
     key: string;
     /**
-     * 
+     *
      * @type {string}
      * @memberof KeyValue
      */
     value: string;
 }
 /**
- * 
+ *
  * @export
  * @interface Metrics
  */
 export interface Metrics {
     /**
-     * 
+     *
      * @type {Array<TargetData>}
      * @memberof Metrics
      */
     targetData?: Array<TargetData>;
     /**
-     * 
+     *
      * @type {Array<MetricsData>}
      * @memberof Metrics
      */
     metricsData?: Array<MetricsData>;
 }
 /**
- * 
+ *
  * @export
  * @interface MetricsData
  */
@@ -362,7 +362,7 @@ export interface MetricsData {
      */
     timestamp: number;
     /**
-     * 
+     *
      * @type {number}
      * @memberof MetricsData
      */
@@ -374,7 +374,7 @@ export interface MetricsData {
      */
     metricsType: MetricsDataMetricsTypeEnum;
     /**
-     * 
+     *
      * @type {Array<KeyValue>}
      * @memberof MetricsData
      */
@@ -390,7 +390,7 @@ export enum MetricsDataMetricsTypeEnum {
 }
 
 /**
- * 
+ *
  * @export
  * @interface ModelError
  */
@@ -415,7 +415,7 @@ export interface ModelError {
     details?: object;
 }
 /**
- * 
+ *
  * @export
  * @interface Pagination
  */
@@ -507,51 +507,51 @@ export interface ProxyConfig {
      */
     pageIndex: number;
     /**
-     * 
+     *
      * @type {Array<ProxyConfigAllOfEnvironments>}
      * @memberof ProxyConfig
      */
     environments?: Array<ProxyConfigAllOfEnvironments>;
 }
 /**
- * 
+ *
  * @export
  * @interface ProxyConfigAllOf
  */
 export interface ProxyConfigAllOf {
     /**
-     * 
+     *
      * @type {Array<ProxyConfigAllOfEnvironments>}
      * @memberof ProxyConfigAllOf
      */
     environments?: Array<ProxyConfigAllOfEnvironments>;
 }
 /**
- * 
+ *
  * @export
  * @interface ProxyConfigAllOfEnvironments
  */
 export interface ProxyConfigAllOfEnvironments {
     /**
-     * 
+     *
      * @type {string}
      * @memberof ProxyConfigAllOfEnvironments
      */
     id?: string;
     /**
-     * 
+     *
      * @type {Array<string>}
      * @memberof ProxyConfigAllOfEnvironments
      */
     apiKeys?: Array<string>;
     /**
-     * 
+     *
      * @type {Array<FeatureConfig>}
      * @memberof ProxyConfigAllOfEnvironments
      */
     featureConfigs?: Array<FeatureConfig>;
     /**
-     * 
+     *
      * @type {Array<Segment>}
      * @memberof ProxyConfigAllOfEnvironments
      */
@@ -600,7 +600,7 @@ export interface Segment {
      */
     excluded?: Array<Target>;
     /**
-     * 
+     *
      * @type {Array<Clause>}
      * @memberof Segment
      */
@@ -637,13 +637,13 @@ export interface Segment {
  */
 export interface Serve {
     /**
-     * 
+     *
      * @type {Distribution}
      * @memberof Serve
      */
     distribution?: Distribution;
     /**
-     * 
+     *
      * @type {string}
      * @memberof Serve
      */
@@ -674,7 +674,7 @@ export interface ServingRule {
      */
     clauses: Array<Clause>;
     /**
-     * 
+     *
      * @type {Serve}
      * @memberof ServingRule
      */
@@ -767,25 +767,25 @@ export interface Target {
     segments?: Array<Segment>;
 }
 /**
- * 
+ *
  * @export
  * @interface TargetData
  */
 export interface TargetData {
     /**
-     * 
+     *
      * @type {string}
      * @memberof TargetData
      */
     identifier: string;
     /**
-     * 
+     *
      * @type {string}
      * @memberof TargetData
      */
     name: string;
     /**
-     * 
+     *
      * @type {Array<KeyValue>}
      * @memberof TargetData
      */
@@ -895,7 +895,7 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
         /**
          * Used to retrieve all target segments for certain account id.
          * @summary Authenticate with the admin server.
-         * @param {AuthenticationRequest} [authenticationRequest] 
+         * @param {AuthenticationRequest} [authenticationRequest]
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -913,7 +913,7 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             const localVarQueryParameter = {} as any;
 
 
-    
+
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
@@ -964,7 +964,7 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             }
 
 
-    
+
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -975,7 +975,7 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
-         * 
+         *
          * @summary Get feature evaluations for target
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
          * @param {string} feature Unique identifier for the flag object in the API.
@@ -1015,7 +1015,7 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             }
 
 
-    
+
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -1026,7 +1026,7 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
-         * 
+         *
          * @summary Get feature evaluations for target
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
          * @param {string} target Unique identifier for the target object in the API.
@@ -1062,7 +1062,7 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             }
 
 
-    
+
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -1105,7 +1105,7 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             }
 
 
-    
+
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -1116,7 +1116,7 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
-         * 
+         *
          * @summary Get feature config
          * @param {string} identifier Unique identifier for the flag object in the API.
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
@@ -1152,7 +1152,7 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             }
 
 
-    
+
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -1204,7 +1204,7 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             }
 
 
-    
+
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -1215,9 +1215,9 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
-         * 
+         *
          * @summary Stream endpoint.
-         * @param {string} aPIKey 
+         * @param {string} aPIKey
          * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1250,7 +1250,7 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             }
 
 
-    
+
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -1273,7 +1273,7 @@ export const ClientApiFp = function(configuration?: Configuration) {
         /**
          * Used to retrieve all target segments for certain account id.
          * @summary Authenticate with the admin server.
-         * @param {AuthenticationRequest} [authenticationRequest] 
+         * @param {AuthenticationRequest} [authenticationRequest]
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -1295,7 +1295,7 @@ export const ClientApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * 
+         *
          * @summary Get feature evaluations for target
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
          * @param {string} feature Unique identifier for the flag object in the API.
@@ -1309,7 +1309,7 @@ export const ClientApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * 
+         *
          * @summary Get feature evaluations for target
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
          * @param {string} target Unique identifier for the target object in the API.
@@ -1317,7 +1317,7 @@ export const ClientApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getEvaluations(environmentUUID: string, target: string, cluster?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Pagination & Array>> {
+        async getEvaluations(environmentUUID: string, target: string, cluster?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Pagination & Array<object>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getEvaluations(environmentUUID, target, cluster, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1334,7 +1334,7 @@ export const ClientApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * 
+         *
          * @summary Get feature config
          * @param {string} identifier Unique identifier for the flag object in the API.
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
@@ -1361,9 +1361,9 @@ export const ClientApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * 
+         *
          * @summary Stream endpoint.
-         * @param {string} aPIKey 
+         * @param {string} aPIKey
          * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1385,7 +1385,7 @@ export const ClientApiFactory = function (configuration?: Configuration, basePat
         /**
          * Used to retrieve all target segments for certain account id.
          * @summary Authenticate with the admin server.
-         * @param {AuthenticationRequest} [authenticationRequest] 
+         * @param {AuthenticationRequest} [authenticationRequest]
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -1405,7 +1405,7 @@ export const ClientApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.getAllSegments(environmentUUID, cluster, rules, options).then((request) => request(axios, basePath));
         },
         /**
-         * 
+         *
          * @summary Get feature evaluations for target
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
          * @param {string} feature Unique identifier for the flag object in the API.
@@ -1418,7 +1418,7 @@ export const ClientApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.getEvaluationByIdentifier(environmentUUID, feature, target, cluster, options).then((request) => request(axios, basePath));
         },
         /**
-         * 
+         *
          * @summary Get feature evaluations for target
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
          * @param {string} target Unique identifier for the target object in the API.
@@ -1426,7 +1426,7 @@ export const ClientApiFactory = function (configuration?: Configuration, basePat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getEvaluations(environmentUUID: string, target: string, cluster?: string, options?: any): AxiosPromise<Pagination & Array> {
+        getEvaluations(environmentUUID: string, target: string, cluster?: string, options?: any): AxiosPromise<Pagination & Array<object>> {
             return localVarFp.getEvaluations(environmentUUID, target, cluster, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1441,7 +1441,7 @@ export const ClientApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.getFeatureConfig(environmentUUID, cluster, options).then((request) => request(axios, basePath));
         },
         /**
-         * 
+         *
          * @summary Get feature config
          * @param {string} identifier Unique identifier for the flag object in the API.
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
@@ -1466,9 +1466,9 @@ export const ClientApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.getSegmentByIdentifier(identifier, environmentUUID, cluster, rules, options).then((request) => request(axios, basePath));
         },
         /**
-         * 
+         *
          * @summary Stream endpoint.
-         * @param {string} aPIKey 
+         * @param {string} aPIKey
          * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1489,7 +1489,7 @@ export class ClientApi extends BaseAPI {
     /**
      * Used to retrieve all target segments for certain account id.
      * @summary Authenticate with the admin server.
-     * @param {AuthenticationRequest} [authenticationRequest] 
+     * @param {AuthenticationRequest} [authenticationRequest]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ClientApi
@@ -1513,7 +1513,7 @@ export class ClientApi extends BaseAPI {
     }
 
     /**
-     * 
+     *
      * @summary Get feature evaluations for target
      * @param {string} environmentUUID Unique identifier for the environment object in the API.
      * @param {string} feature Unique identifier for the flag object in the API.
@@ -1528,7 +1528,7 @@ export class ClientApi extends BaseAPI {
     }
 
     /**
-     * 
+     *
      * @summary Get feature evaluations for target
      * @param {string} environmentUUID Unique identifier for the environment object in the API.
      * @param {string} target Unique identifier for the target object in the API.
@@ -1555,7 +1555,7 @@ export class ClientApi extends BaseAPI {
     }
 
     /**
-     * 
+     *
      * @summary Get feature config
      * @param {string} identifier Unique identifier for the flag object in the API.
      * @param {string} environmentUUID Unique identifier for the environment object in the API.
@@ -1584,9 +1584,9 @@ export class ClientApi extends BaseAPI {
     }
 
     /**
-     * 
+     *
      * @summary Stream endpoint.
-     * @param {string} aPIKey 
+     * @param {string} aPIKey
      * @param {string} [cluster] Unique identifier for the cluster for the account
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1609,7 +1609,7 @@ export const MetricsApiAxiosParamCreator = function (configuration?: Configurati
          * @summary Send metrics to the Analytics server.
          * @param {string} environmentUUID environment parameter in query.
          * @param {string} [cluster] Unique identifier for the cluster for the account
-         * @param {Metrics} [metrics] 
+         * @param {Metrics} [metrics]
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -1641,7 +1641,7 @@ export const MetricsApiAxiosParamCreator = function (configuration?: Configurati
             }
 
 
-    
+
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
@@ -1669,7 +1669,7 @@ export const MetricsApiFp = function(configuration?: Configuration) {
          * @summary Send metrics to the Analytics server.
          * @param {string} environmentUUID environment parameter in query.
          * @param {string} [cluster] Unique identifier for the cluster for the account
-         * @param {Metrics} [metrics] 
+         * @param {Metrics} [metrics]
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -1692,7 +1692,7 @@ export const MetricsApiFactory = function (configuration?: Configuration, basePa
          * @summary Send metrics to the Analytics server.
          * @param {string} environmentUUID environment parameter in query.
          * @param {string} [cluster] Unique identifier for the cluster for the account
-         * @param {Metrics} [metrics] 
+         * @param {Metrics} [metrics]
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -1714,7 +1714,7 @@ export class MetricsApi extends BaseAPI {
      * @summary Send metrics to the Analytics server.
      * @param {string} environmentUUID environment parameter in query.
      * @param {string} [cluster] Unique identifier for the cluster for the account
-     * @param {Metrics} [metrics] 
+     * @param {Metrics} [metrics]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MetricsApi
@@ -1734,7 +1734,7 @@ export const ProxyApiAxiosParamCreator = function (configuration?: Configuration
         /**
          * Endpoint that the Proxy can use to authenticate with the client server
          * @summary Endpoint that the Proxy can use to authenticate with the client server
-         * @param {InlineObject} [inlineObject] 
+         * @param {InlineObject} [inlineObject]
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -1752,7 +1752,7 @@ export const ProxyApiAxiosParamCreator = function (configuration?: Configuration
             const localVarQueryParameter = {} as any;
 
 
-    
+
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
@@ -1816,7 +1816,7 @@ export const ProxyApiAxiosParamCreator = function (configuration?: Configuration
             }
 
 
-    
+
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -1839,7 +1839,7 @@ export const ProxyApiFp = function(configuration?: Configuration) {
         /**
          * Endpoint that the Proxy can use to authenticate with the client server
          * @summary Endpoint that the Proxy can use to authenticate with the client server
-         * @param {InlineObject} [inlineObject] 
+         * @param {InlineObject} [inlineObject]
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -1875,7 +1875,7 @@ export const ProxyApiFactory = function (configuration?: Configuration, basePath
         /**
          * Endpoint that the Proxy can use to authenticate with the client server
          * @summary Endpoint that the Proxy can use to authenticate with the client server
-         * @param {InlineObject} [inlineObject] 
+         * @param {InlineObject} [inlineObject]
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -1909,7 +1909,7 @@ export class ProxyApi extends BaseAPI {
     /**
      * Endpoint that the Proxy can use to authenticate with the client server
      * @summary Endpoint that the Proxy can use to authenticate with the client server
-     * @param {InlineObject} [inlineObject] 
+     * @param {InlineObject} [inlineObject]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ProxyApi
