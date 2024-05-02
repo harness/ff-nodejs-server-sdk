@@ -14,6 +14,8 @@ servers:
 tags:
   - name: client
   - name: metrics
+  - name: Proxy
+    description: APIs used by the ff-proxy
 paths:
   '/client/env/{environmentUUID}/feature-configs':
     get:
@@ -85,6 +87,7 @@ paths:
           schema:
             type: string
         - $ref: '#/components/parameters/clusterQueryOptionalParam'
+        - $ref: '#/components/parameters/segmentRulesV2QueryParam'
       security:
         - BearerAuth: []
       responses:
@@ -125,6 +128,7 @@ paths:
           schema:
             type: string
         - $ref: '#/components/parameters/clusterQueryOptionalParam'
+        - $ref: '#/components/parameters/segmentRulesV2QueryParam'
       security:
         - BearerAuth: []
       responses:
@@ -199,10 +203,7 @@ paths:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/Pagination'
-                  - type: object
-                    properties:
-                      evaluations:
-                        $ref: '#/components/schemas/Evaluations'
+                  - $ref: '#/components/schemas/Evaluations'
   '/client/env/{environmentUUID}/target/{target}/evaluations/{feature}':
     get:
       summary: Get feature evaluations for target
@@ -302,6 +303,84 @@ paths:
                 default: '*'
         '503':
           description: Service Unavailable
+  /proxy/config:
+    get:
+      summary: Gets Proxy config for multiple environments
+      description: >-
+        Gets Proxy config for multiple environments if the Key query param is
+        provided or gets config for a single environment if an environment query
+        param is provided
+      operationId: GetProxyConfig
+      tags:
+        - Proxy
+      parameters:
+        - $ref: '#/components/parameters/pageNumber'
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/clusterQueryOptionalParam'
+        - in: query
+          name: environment
+          description: >-
+            Accepts an EnvironmentID. If this is provided then the endpoint will
+            only return config for this environment. If this is left empty then
+            the Proxy will return config for all environments associated with
+            the Proxy Key.
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: key
+          description: Accpets a Proxy Key.
+          required: true
+          schema:
+            type: string
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/ProxyConfigResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /proxy/auth:
+    post:
+      summary: Endpoint that the Proxy can use to authenticate with the client server
+      description: Endpoint that the Proxy can use to authenticate with the client server
+      operationId: AuthenticateProxyKey
+      tags:
+        - Proxy
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                proxyKey:
+                  type: string
+                  example: 896045f3-42ee-4e73-9154-086644768b96
+              required:
+                - proxyKey
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticationResponse'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 components:
   schemas:
     FeatureState:
@@ -833,6 +912,31 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/MetricsData'
+    ProxyConfig:
+      type: object
+      description: TBD
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - properties:
+            environments:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  apiKeys:
+                    type: array
+                    items:
+                      type: string
+                  featureConfigs:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FeatureConfig'
+                  segments:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Segment'
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
@@ -848,6 +952,17 @@ components:
       in: query
       required: false
       description: Unique identifier for the cluster for the account
+      schema:
+        type: string
+    segmentRulesV2QueryParam:
+      name: rules
+      in: query
+      required: false
+      description: >-
+        When set to rules=v2 will return AND rule compatible serving_rules
+        field. When not set or set to any other value will return old rules
+        field only compatible with OR rules.
+      allowEmptyValue: true
       schema:
         type: string
     environmentPathParam:
@@ -896,6 +1011,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
+    ProxyConfigResponse:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProxyConfig'
     BadRequest:
       description: Bad request
       content:

@@ -51,7 +51,7 @@
     "coverage": "jest --coverage",
     "test:junit": "jest --reporters=default --reporters=jest-junit",
     "test:watch": "jest --watch",
-    "generate": "openapi-generator-cli generate -i ./api.yaml -g typescript-axios -o src/openapi"
+    "generate": "openapi-generator-cli generate -i client-v1.yaml -g typescript-axios -o src/openapi"
   },
   "author": "Enver Bisevac <enver.bisevac@harness.io>",
   "license": "Apache-2.0",
