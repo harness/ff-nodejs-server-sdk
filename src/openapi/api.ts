@@ -22,63 +22,63 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
 
 /**
- * 
+ *
  * @export
  * @interface AuthenticationRequest
  */
 export interface AuthenticationRequest {
     /**
-     * 
+     *
      * @type {string}
      * @memberof AuthenticationRequest
      */
     apiKey: string;
     /**
-     * 
+     *
      * @type {AuthenticationRequestTarget}
      * @memberof AuthenticationRequest
      */
     target?: AuthenticationRequestTarget;
 }
 /**
- * 
+ *
  * @export
  * @interface AuthenticationRequestTarget
  */
 export interface AuthenticationRequestTarget {
     /**
-     * 
+     *
      * @type {string}
      * @memberof AuthenticationRequestTarget
      */
     identifier: string;
     /**
-     * 
+     *
      * @type {string}
      * @memberof AuthenticationRequestTarget
      */
     name?: string;
     /**
-     * 
+     *
      * @type {boolean}
      * @memberof AuthenticationRequestTarget
      */
     anonymous?: boolean;
     /**
-     * 
+     *
      * @type {object}
      * @memberof AuthenticationRequestTarget
      */
     attributes?: object;
 }
 /**
- * 
+ *
  * @export
  * @interface AuthenticationResponse
  */
 export interface AuthenticationResponse {
     /**
-     * 
+     *
      * @type {string}
      * @memberof AuthenticationResponse
      */
@@ -141,110 +141,110 @@ export interface Distribution {
     variations: Array<WeightedVariation>;
 }
 /**
- * 
+ *
  * @export
  * @interface Evaluation
  */
 export interface Evaluation {
     /**
-     * 
+     *
      * @type {string}
      * @memberof Evaluation
      */
     flag: string;
     /**
-     * 
+     *
      * @type {string}
      * @memberof Evaluation
      */
     value: string;
     /**
-     * 
+     *
      * @type {string}
      * @memberof Evaluation
      */
     kind: string;
     /**
-     * 
+     *
      * @type {string}
      * @memberof Evaluation
      */
     identifier?: string;
 }
 /**
- * 
+ *
  * @export
  * @interface FeatureConfig
  */
 export interface FeatureConfig {
     /**
-     * 
+     *
      * @type {string}
      * @memberof FeatureConfig
      */
     project: string;
     /**
-     * 
+     *
      * @type {string}
      * @memberof FeatureConfig
      */
     environment: string;
     /**
-     * 
+     *
      * @type {string}
      * @memberof FeatureConfig
      */
     feature: string;
     /**
-     * 
+     *
      * @type {FeatureState}
      * @memberof FeatureConfig
      */
     state: FeatureState;
     /**
-     * 
+     *
      * @type {string}
      * @memberof FeatureConfig
      */
     kind: FeatureConfigKindEnum;
     /**
-     * 
+     *
      * @type {Array<Variation>}
      * @memberof FeatureConfig
      */
     variations: Array<Variation>;
     /**
-     * 
+     *
      * @type {Array<ServingRule>}
      * @memberof FeatureConfig
      */
     rules?: Array<ServingRule>;
     /**
-     * 
+     *
      * @type {Serve}
      * @memberof FeatureConfig
      */
     defaultServe: Serve;
     /**
-     * 
+     *
      * @type {string}
      * @memberof FeatureConfig
      */
     offVariation: string;
     /**
-     * 
+     *
      * @type {Array<Prerequisite>}
      * @memberof FeatureConfig
      */
     prerequisites?: Array<Prerequisite>;
     /**
-     * 
+     *
      * @type {Array<VariationMap>}
      * @memberof FeatureConfig
      */
     variationToTargetMap?: Array<VariationMap>;
     /**
-     * 
+     *
      * @type {number}
      * @memberof FeatureConfig
      */
@@ -299,45 +299,58 @@ export interface GroupServingRule {
     clauses: Array<Clause>;
 }
 /**
- * 
+ *
+ * @export
+ * @interface InlineObject
+ */
+export interface InlineObject {
+    /**
+     *
+     * @type {string}
+     * @memberof InlineObject
+     */
+    proxyKey: string;
+}
+/**
+ *
  * @export
  * @interface KeyValue
  */
 export interface KeyValue {
     /**
-     * 
+     *
      * @type {string}
      * @memberof KeyValue
      */
     key: string;
     /**
-     * 
+     *
      * @type {string}
      * @memberof KeyValue
      */
     value: string;
 }
 /**
- * 
+ *
  * @export
  * @interface Metrics
  */
 export interface Metrics {
     /**
-     * 
+     *
      * @type {Array<TargetData>}
      * @memberof Metrics
      */
     targetData?: Array<TargetData>;
     /**
-     * 
+     *
      * @type {Array<MetricsData>}
      * @memberof Metrics
      */
     metricsData?: Array<MetricsData>;
 }
 /**
- * 
+ *
  * @export
  * @interface MetricsData
  */
@@ -349,7 +362,7 @@ export interface MetricsData {
      */
     timestamp: number;
     /**
-     * 
+     *
      * @type {number}
      * @memberof MetricsData
      */
@@ -361,7 +374,7 @@ export interface MetricsData {
      */
     metricsType: MetricsDataMetricsTypeEnum;
     /**
-     * 
+     *
      * @type {Array<KeyValue>}
      * @memberof MetricsData
      */
@@ -377,7 +390,7 @@ export enum MetricsDataMetricsTypeEnum {
 }
 
 /**
- * 
+ *
  * @export
  * @interface ModelError
  */
@@ -402,7 +415,7 @@ export interface ModelError {
     details?: object;
 }
 /**
- * 
+ *
  * @export
  * @interface Pagination
  */
@@ -458,6 +471,93 @@ export interface Prerequisite {
     variations: Array<string>;
 }
 /**
+ * TBD
+ * @export
+ * @interface ProxyConfig
+ */
+export interface ProxyConfig {
+    /**
+     * The version of this object.  The version will be incremented each time the object is modified
+     * @type {number}
+     * @memberof ProxyConfig
+     */
+    version?: number;
+    /**
+     * The total number of pages
+     * @type {number}
+     * @memberof ProxyConfig
+     */
+    pageCount: number;
+    /**
+     * The total number of items
+     * @type {number}
+     * @memberof ProxyConfig
+     */
+    itemCount: number;
+    /**
+     * The number of items per page
+     * @type {number}
+     * @memberof ProxyConfig
+     */
+    pageSize: number;
+    /**
+     * The current page
+     * @type {number}
+     * @memberof ProxyConfig
+     */
+    pageIndex: number;
+    /**
+     *
+     * @type {Array<ProxyConfigAllOfEnvironments>}
+     * @memberof ProxyConfig
+     */
+    environments?: Array<ProxyConfigAllOfEnvironments>;
+}
+/**
+ *
+ * @export
+ * @interface ProxyConfigAllOf
+ */
+export interface ProxyConfigAllOf {
+    /**
+     *
+     * @type {Array<ProxyConfigAllOfEnvironments>}
+     * @memberof ProxyConfigAllOf
+     */
+    environments?: Array<ProxyConfigAllOfEnvironments>;
+}
+/**
+ *
+ * @export
+ * @interface ProxyConfigAllOfEnvironments
+ */
+export interface ProxyConfigAllOfEnvironments {
+    /**
+     *
+     * @type {string}
+     * @memberof ProxyConfigAllOfEnvironments
+     */
+    id?: string;
+    /**
+     *
+     * @type {Array<string>}
+     * @memberof ProxyConfigAllOfEnvironments
+     */
+    apiKeys?: Array<string>;
+    /**
+     *
+     * @type {Array<FeatureConfig>}
+     * @memberof ProxyConfigAllOfEnvironments
+     */
+    featureConfigs?: Array<FeatureConfig>;
+    /**
+     *
+     * @type {Array<Segment>}
+     * @memberof ProxyConfigAllOfEnvironments
+     */
+    segments?: Array<Segment>;
+}
+/**
  * A Target Group (Segment) response
  * @export
  * @interface Segment
@@ -500,7 +600,7 @@ export interface Segment {
      */
     excluded?: Array<Target>;
     /**
-     * 
+     *
      * @type {Array<Clause>}
      * @memberof Segment
      */
@@ -537,13 +637,13 @@ export interface Segment {
  */
 export interface Serve {
     /**
-     * 
+     *
      * @type {Distribution}
      * @memberof Serve
      */
     distribution?: Distribution;
     /**
-     * 
+     *
      * @type {string}
      * @memberof Serve
      */
@@ -574,7 +674,7 @@ export interface ServingRule {
      */
     clauses: Array<Clause>;
     /**
-     * 
+     *
      * @type {Serve}
      * @memberof ServingRule
      */
@@ -667,25 +767,25 @@ export interface Target {
     segments?: Array<Segment>;
 }
 /**
- * 
+ *
  * @export
  * @interface TargetData
  */
 export interface TargetData {
     /**
-     * 
+     *
      * @type {string}
      * @memberof TargetData
      */
     identifier: string;
     /**
-     * 
+     *
      * @type {string}
      * @memberof TargetData
      */
     name: string;
     /**
-     * 
+     *
      * @type {Array<KeyValue>}
      * @memberof TargetData
      */
@@ -795,7 +895,7 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
         /**
          * Used to retrieve all target segments for certain account id.
          * @summary Authenticate with the admin server.
-         * @param {AuthenticationRequest} [authenticationRequest] 
+         * @param {AuthenticationRequest} [authenticationRequest]
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -813,7 +913,7 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             const localVarQueryParameter = {} as any;
 
 
-    
+
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
@@ -831,10 +931,11 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
          * @summary Retrieve all segments.
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
          * @param {string} [cluster] Unique identifier for the cluster for the account
+         * @param {string} [rules] When set to rules&#x3D;v2 will return AND rule compatible serving_rules field. When not set or set to any other value will return old rules field only compatible with OR rules.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAllSegments: async (environmentUUID: string, cluster?: string, options: any = {}): Promise<RequestArgs> => {
+        getAllSegments: async (environmentUUID: string, cluster?: string, rules?: string, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'environmentUUID' is not null or undefined
             assertParamExists('getAllSegments', 'environmentUUID', environmentUUID)
             const localVarPath = `/client/env/{environmentUUID}/target-segments`
@@ -858,8 +959,12 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
                 localVarQueryParameter['cluster'] = cluster;
             }
 
+            if (rules !== undefined) {
+                localVarQueryParameter['rules'] = rules;
+            }
 
-    
+
+
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -870,7 +975,7 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
-         * 
+         *
          * @summary Get feature evaluations for target
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
          * @param {string} feature Unique identifier for the flag object in the API.
@@ -910,7 +1015,7 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             }
 
 
-    
+
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -921,7 +1026,7 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
-         * 
+         *
          * @summary Get feature evaluations for target
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
          * @param {string} target Unique identifier for the target object in the API.
@@ -957,7 +1062,7 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             }
 
 
-    
+
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -1000,7 +1105,7 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             }
 
 
-    
+
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -1011,7 +1116,7 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
-         * 
+         *
          * @summary Get feature config
          * @param {string} identifier Unique identifier for the flag object in the API.
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
@@ -1047,7 +1152,7 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             }
 
 
-    
+
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -1063,10 +1168,11 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
          * @param {string} identifier Unique identifier for the segment object in the API
          * @param {string} environmentUUID Unique identifier for the environment object in the API
          * @param {string} [cluster] Unique identifier for the cluster for the account
+         * @param {string} [rules] When set to rules&#x3D;v2 will return AND rule compatible serving_rules field. When not set or set to any other value will return old rules field only compatible with OR rules.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getSegmentByIdentifier: async (identifier: string, environmentUUID: string, cluster?: string, options: any = {}): Promise<RequestArgs> => {
+        getSegmentByIdentifier: async (identifier: string, environmentUUID: string, cluster?: string, rules?: string, options: any = {}): Promise<RequestArgs> => {
             // verify required parameter 'identifier' is not null or undefined
             assertParamExists('getSegmentByIdentifier', 'identifier', identifier)
             // verify required parameter 'environmentUUID' is not null or undefined
@@ -1093,8 +1199,12 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
                 localVarQueryParameter['cluster'] = cluster;
             }
 
+            if (rules !== undefined) {
+                localVarQueryParameter['rules'] = rules;
+            }
 
-    
+
+
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -1105,9 +1215,9 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
-         * 
+         *
          * @summary Stream endpoint.
-         * @param {string} aPIKey 
+         * @param {string} aPIKey
          * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1140,7 +1250,7 @@ export const ClientApiAxiosParamCreator = function (configuration?: Configuratio
             }
 
 
-    
+
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -1163,7 +1273,7 @@ export const ClientApiFp = function(configuration?: Configuration) {
         /**
          * Used to retrieve all target segments for certain account id.
          * @summary Authenticate with the admin server.
-         * @param {AuthenticationRequest} [authenticationRequest] 
+         * @param {AuthenticationRequest} [authenticationRequest]
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -1176,15 +1286,16 @@ export const ClientApiFp = function(configuration?: Configuration) {
          * @summary Retrieve all segments.
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
          * @param {string} [cluster] Unique identifier for the cluster for the account
+         * @param {string} [rules] When set to rules&#x3D;v2 will return AND rule compatible serving_rules field. When not set or set to any other value will return old rules field only compatible with OR rules.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAllSegments(environmentUUID: string, cluster?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Segment>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getAllSegments(environmentUUID, cluster, options);
+        async getAllSegments(environmentUUID: string, cluster?: string, rules?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Segment>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getAllSegments(environmentUUID, cluster, rules, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * 
+         *
          * @summary Get feature evaluations for target
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
          * @param {string} feature Unique identifier for the flag object in the API.
@@ -1198,7 +1309,7 @@ export const ClientApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * 
+         *
          * @summary Get feature evaluations for target
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
          * @param {string} target Unique identifier for the target object in the API.
@@ -1206,7 +1317,7 @@ export const ClientApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getEvaluations(environmentUUID: string, target: string, cluster?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Pagination & object>> {
+        async getEvaluations(environmentUUID: string, target: string, cluster?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Pagination & Array<object>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getEvaluations(environmentUUID, target, cluster, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1223,7 +1334,7 @@ export const ClientApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * 
+         *
          * @summary Get feature config
          * @param {string} identifier Unique identifier for the flag object in the API.
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
@@ -1241,17 +1352,18 @@ export const ClientApiFp = function(configuration?: Configuration) {
          * @param {string} identifier Unique identifier for the segment object in the API
          * @param {string} environmentUUID Unique identifier for the environment object in the API
          * @param {string} [cluster] Unique identifier for the cluster for the account
+         * @param {string} [rules] When set to rules&#x3D;v2 will return AND rule compatible serving_rules field. When not set or set to any other value will return old rules field only compatible with OR rules.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getSegmentByIdentifier(identifier: string, environmentUUID: string, cluster?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Segment>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getSegmentByIdentifier(identifier, environmentUUID, cluster, options);
+        async getSegmentByIdentifier(identifier: string, environmentUUID: string, cluster?: string, rules?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Segment>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getSegmentByIdentifier(identifier, environmentUUID, cluster, rules, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * 
+         *
          * @summary Stream endpoint.
-         * @param {string} aPIKey 
+         * @param {string} aPIKey
          * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1273,7 +1385,7 @@ export const ClientApiFactory = function (configuration?: Configuration, basePat
         /**
          * Used to retrieve all target segments for certain account id.
          * @summary Authenticate with the admin server.
-         * @param {AuthenticationRequest} [authenticationRequest] 
+         * @param {AuthenticationRequest} [authenticationRequest]
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -1285,14 +1397,15 @@ export const ClientApiFactory = function (configuration?: Configuration, basePat
          * @summary Retrieve all segments.
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
          * @param {string} [cluster] Unique identifier for the cluster for the account
+         * @param {string} [rules] When set to rules&#x3D;v2 will return AND rule compatible serving_rules field. When not set or set to any other value will return old rules field only compatible with OR rules.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAllSegments(environmentUUID: string, cluster?: string, options?: any): AxiosPromise<Array<Segment>> {
-            return localVarFp.getAllSegments(environmentUUID, cluster, options).then((request) => request(axios, basePath));
+        getAllSegments(environmentUUID: string, cluster?: string, rules?: string, options?: any): AxiosPromise<Array<Segment>> {
+            return localVarFp.getAllSegments(environmentUUID, cluster, rules, options).then((request) => request(axios, basePath));
         },
         /**
-         * 
+         *
          * @summary Get feature evaluations for target
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
          * @param {string} feature Unique identifier for the flag object in the API.
@@ -1305,7 +1418,7 @@ export const ClientApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.getEvaluationByIdentifier(environmentUUID, feature, target, cluster, options).then((request) => request(axios, basePath));
         },
         /**
-         * 
+         *
          * @summary Get feature evaluations for target
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
          * @param {string} target Unique identifier for the target object in the API.
@@ -1313,7 +1426,7 @@ export const ClientApiFactory = function (configuration?: Configuration, basePat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getEvaluations(environmentUUID: string, target: string, cluster?: string, options?: any): AxiosPromise<Pagination & object> {
+        getEvaluations(environmentUUID: string, target: string, cluster?: string, options?: any): AxiosPromise<Pagination & Array<object>> {
             return localVarFp.getEvaluations(environmentUUID, target, cluster, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1328,7 +1441,7 @@ export const ClientApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.getFeatureConfig(environmentUUID, cluster, options).then((request) => request(axios, basePath));
         },
         /**
-         * 
+         *
          * @summary Get feature config
          * @param {string} identifier Unique identifier for the flag object in the API.
          * @param {string} environmentUUID Unique identifier for the environment object in the API.
@@ -1345,16 +1458,17 @@ export const ClientApiFactory = function (configuration?: Configuration, basePat
          * @param {string} identifier Unique identifier for the segment object in the API
          * @param {string} environmentUUID Unique identifier for the environment object in the API
          * @param {string} [cluster] Unique identifier for the cluster for the account
+         * @param {string} [rules] When set to rules&#x3D;v2 will return AND rule compatible serving_rules field. When not set or set to any other value will return old rules field only compatible with OR rules.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getSegmentByIdentifier(identifier: string, environmentUUID: string, cluster?: string, options?: any): AxiosPromise<Segment> {
-            return localVarFp.getSegmentByIdentifier(identifier, environmentUUID, cluster, options).then((request) => request(axios, basePath));
+        getSegmentByIdentifier(identifier: string, environmentUUID: string, cluster?: string, rules?: string, options?: any): AxiosPromise<Segment> {
+            return localVarFp.getSegmentByIdentifier(identifier, environmentUUID, cluster, rules, options).then((request) => request(axios, basePath));
         },
         /**
-         * 
+         *
          * @summary Stream endpoint.
-         * @param {string} aPIKey 
+         * @param {string} aPIKey
          * @param {string} [cluster] Unique identifier for the cluster for the account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1375,7 +1489,7 @@ export class ClientApi extends BaseAPI {
     /**
      * Used to retrieve all target segments for certain account id.
      * @summary Authenticate with the admin server.
-     * @param {AuthenticationRequest} [authenticationRequest] 
+     * @param {AuthenticationRequest} [authenticationRequest]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ClientApi
@@ -1389,16 +1503,17 @@ export class ClientApi extends BaseAPI {
      * @summary Retrieve all segments.
      * @param {string} environmentUUID Unique identifier for the environment object in the API.
      * @param {string} [cluster] Unique identifier for the cluster for the account
+     * @param {string} [rules] When set to rules&#x3D;v2 will return AND rule compatible serving_rules field. When not set or set to any other value will return old rules field only compatible with OR rules.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ClientApi
      */
-    public getAllSegments(environmentUUID: string, cluster?: string, options?: any) {
-        return ClientApiFp(this.configuration).getAllSegments(environmentUUID, cluster, options).then((request) => request(this.axios, this.basePath));
+    public getAllSegments(environmentUUID: string, cluster?: string, rules?: string, options?: any) {
+        return ClientApiFp(this.configuration).getAllSegments(environmentUUID, cluster, rules, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
-     * 
+     *
      * @summary Get feature evaluations for target
      * @param {string} environmentUUID Unique identifier for the environment object in the API.
      * @param {string} feature Unique identifier for the flag object in the API.
@@ -1413,7 +1528,7 @@ export class ClientApi extends BaseAPI {
     }
 
     /**
-     * 
+     *
      * @summary Get feature evaluations for target
      * @param {string} environmentUUID Unique identifier for the environment object in the API.
      * @param {string} target Unique identifier for the target object in the API.
@@ -1440,7 +1555,7 @@ export class ClientApi extends BaseAPI {
     }
 
     /**
-     * 
+     *
      * @summary Get feature config
      * @param {string} identifier Unique identifier for the flag object in the API.
      * @param {string} environmentUUID Unique identifier for the environment object in the API.
@@ -1459,18 +1574,19 @@ export class ClientApi extends BaseAPI {
      * @param {string} identifier Unique identifier for the segment object in the API
      * @param {string} environmentUUID Unique identifier for the environment object in the API
      * @param {string} [cluster] Unique identifier for the cluster for the account
+     * @param {string} [rules] When set to rules&#x3D;v2 will return AND rule compatible serving_rules field. When not set or set to any other value will return old rules field only compatible with OR rules.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ClientApi
      */
-    public getSegmentByIdentifier(identifier: string, environmentUUID: string, cluster?: string, options?: any) {
-        return ClientApiFp(this.configuration).getSegmentByIdentifier(identifier, environmentUUID, cluster, options).then((request) => request(this.axios, this.basePath));
+    public getSegmentByIdentifier(identifier: string, environmentUUID: string, cluster?: string, rules?: string, options?: any) {
+        return ClientApiFp(this.configuration).getSegmentByIdentifier(identifier, environmentUUID, cluster, rules, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
-     * 
+     *
      * @summary Stream endpoint.
-     * @param {string} aPIKey 
+     * @param {string} aPIKey
      * @param {string} [cluster] Unique identifier for the cluster for the account
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1493,7 +1609,7 @@ export const MetricsApiAxiosParamCreator = function (configuration?: Configurati
          * @summary Send metrics to the Analytics server.
          * @param {string} environmentUUID environment parameter in query.
          * @param {string} [cluster] Unique identifier for the cluster for the account
-         * @param {Metrics} [metrics] 
+         * @param {Metrics} [metrics]
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -1525,7 +1641,7 @@ export const MetricsApiAxiosParamCreator = function (configuration?: Configurati
             }
 
 
-    
+
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
@@ -1553,7 +1669,7 @@ export const MetricsApiFp = function(configuration?: Configuration) {
          * @summary Send metrics to the Analytics server.
          * @param {string} environmentUUID environment parameter in query.
          * @param {string} [cluster] Unique identifier for the cluster for the account
-         * @param {Metrics} [metrics] 
+         * @param {Metrics} [metrics]
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -1576,7 +1692,7 @@ export const MetricsApiFactory = function (configuration?: Configuration, basePa
          * @summary Send metrics to the Analytics server.
          * @param {string} environmentUUID environment parameter in query.
          * @param {string} [cluster] Unique identifier for the cluster for the account
-         * @param {Metrics} [metrics] 
+         * @param {Metrics} [metrics]
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -1598,13 +1714,224 @@ export class MetricsApi extends BaseAPI {
      * @summary Send metrics to the Analytics server.
      * @param {string} environmentUUID environment parameter in query.
      * @param {string} [cluster] Unique identifier for the cluster for the account
-     * @param {Metrics} [metrics] 
+     * @param {Metrics} [metrics]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MetricsApi
      */
     public postMetrics(environmentUUID: string, cluster?: string, metrics?: Metrics, options?: any) {
         return MetricsApiFp(this.configuration).postMetrics(environmentUUID, cluster, metrics, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * ProxyApi - axios parameter creator
+ * @export
+ */
+export const ProxyApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Endpoint that the Proxy can use to authenticate with the client server
+         * @summary Endpoint that the Proxy can use to authenticate with the client server
+         * @param {InlineObject} [inlineObject]
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        authenticateProxyKey: async (inlineObject?: InlineObject, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/proxy/auth`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(inlineObject, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Gets Proxy config for multiple environments if the Key query param is provided or gets config for a single environment if an environment query param is provided
+         * @summary Gets Proxy config for multiple environments
+         * @param {string} key Accpets a Proxy Key.
+         * @param {number} [pageNumber] PageNumber
+         * @param {number} [pageSize] PageSize
+         * @param {string} [cluster] Unique identifier for the cluster for the account
+         * @param {string} [environment] Accepts an EnvironmentID. If this is provided then the endpoint will only return config for this environment. If this is left empty then the Proxy will return config for all environments associated with the Proxy Key.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getProxyConfig: async (key: string, pageNumber?: number, pageSize?: number, cluster?: string, environment?: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'key' is not null or undefined
+            assertParamExists('getProxyConfig', 'key', key)
+            const localVarPath = `/proxy/config`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication BearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (pageNumber !== undefined) {
+                localVarQueryParameter['pageNumber'] = pageNumber;
+            }
+
+            if (pageSize !== undefined) {
+                localVarQueryParameter['pageSize'] = pageSize;
+            }
+
+            if (cluster !== undefined) {
+                localVarQueryParameter['cluster'] = cluster;
+            }
+
+            if (environment !== undefined) {
+                localVarQueryParameter['environment'] = environment;
+            }
+
+            if (key !== undefined) {
+                localVarQueryParameter['key'] = key;
+            }
+
+
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * ProxyApi - functional programming interface
+ * @export
+ */
+export const ProxyApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = ProxyApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Endpoint that the Proxy can use to authenticate with the client server
+         * @summary Endpoint that the Proxy can use to authenticate with the client server
+         * @param {InlineObject} [inlineObject]
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async authenticateProxyKey(inlineObject?: InlineObject, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AuthenticationResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.authenticateProxyKey(inlineObject, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Gets Proxy config for multiple environments if the Key query param is provided or gets config for a single environment if an environment query param is provided
+         * @summary Gets Proxy config for multiple environments
+         * @param {string} key Accpets a Proxy Key.
+         * @param {number} [pageNumber] PageNumber
+         * @param {number} [pageSize] PageSize
+         * @param {string} [cluster] Unique identifier for the cluster for the account
+         * @param {string} [environment] Accepts an EnvironmentID. If this is provided then the endpoint will only return config for this environment. If this is left empty then the Proxy will return config for all environments associated with the Proxy Key.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getProxyConfig(key: string, pageNumber?: number, pageSize?: number, cluster?: string, environment?: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProxyConfig>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getProxyConfig(key, pageNumber, pageSize, cluster, environment, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * ProxyApi - factory interface
+ * @export
+ */
+export const ProxyApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = ProxyApiFp(configuration)
+    return {
+        /**
+         * Endpoint that the Proxy can use to authenticate with the client server
+         * @summary Endpoint that the Proxy can use to authenticate with the client server
+         * @param {InlineObject} [inlineObject]
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        authenticateProxyKey(inlineObject?: InlineObject, options?: any): AxiosPromise<AuthenticationResponse> {
+            return localVarFp.authenticateProxyKey(inlineObject, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Gets Proxy config for multiple environments if the Key query param is provided or gets config for a single environment if an environment query param is provided
+         * @summary Gets Proxy config for multiple environments
+         * @param {string} key Accpets a Proxy Key.
+         * @param {number} [pageNumber] PageNumber
+         * @param {number} [pageSize] PageSize
+         * @param {string} [cluster] Unique identifier for the cluster for the account
+         * @param {string} [environment] Accepts an EnvironmentID. If this is provided then the endpoint will only return config for this environment. If this is left empty then the Proxy will return config for all environments associated with the Proxy Key.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getProxyConfig(key: string, pageNumber?: number, pageSize?: number, cluster?: string, environment?: string, options?: any): AxiosPromise<ProxyConfig> {
+            return localVarFp.getProxyConfig(key, pageNumber, pageSize, cluster, environment, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * ProxyApi - object-oriented interface
+ * @export
+ * @class ProxyApi
+ * @extends {BaseAPI}
+ */
+export class ProxyApi extends BaseAPI {
+    /**
+     * Endpoint that the Proxy can use to authenticate with the client server
+     * @summary Endpoint that the Proxy can use to authenticate with the client server
+     * @param {InlineObject} [inlineObject]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProxyApi
+     */
+    public authenticateProxyKey(inlineObject?: InlineObject, options?: any) {
+        return ProxyApiFp(this.configuration).authenticateProxyKey(inlineObject, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Gets Proxy config for multiple environments if the Key query param is provided or gets config for a single environment if an environment query param is provided
+     * @summary Gets Proxy config for multiple environments
+     * @param {string} key Accpets a Proxy Key.
+     * @param {number} [pageNumber] PageNumber
+     * @param {number} [pageSize] PageSize
+     * @param {string} [cluster] Unique identifier for the cluster for the account
+     * @param {string} [environment] Accepts an EnvironmentID. If this is provided then the endpoint will only return config for this environment. If this is left empty then the Proxy will return config for all environments associated with the Proxy Key.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProxyApi
+     */
+    public getProxyConfig(key: string, pageNumber?: number, pageSize?: number, cluster?: string, environment?: string, options?: any) {
+        return ProxyApiFp(this.configuration).getProxyConfig(key, pageNumber, pageSize, cluster, environment, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

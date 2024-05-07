@@ -1,7 +1,7 @@
 import EventEmitter from 'events';
 import { AxiosPromise } from 'axios';
 import { ClientApi, FeatureConfig, Segment } from './openapi';
-import { StreamEvent, Options, StreamMsg } from './types';
+import { StreamEvent, Options, StreamMsg, APIConfiguration } from './types';
 import { Repository } from './repository';
 import { ConsoleLog } from './log';
 
@@ -18,6 +18,8 @@ type FetchFunction = (
   identifier: string,
   environment: string,
   cluster: string,
+  // Only target-segment requests require this, and it will be safely ignored for feature calls.
+  targetSegmentRulesQueryParameter: string,
 ) => AxiosPromise<FeatureConfig | Segment>;
 
 export class StreamProcessor {
@@ -31,6 +33,7 @@ export class StreamProcessor {
   private readonly environment: string;
   private readonly cluster: string;
   private readonly api: ClientApi;
+  private readonly apiConfiguration: APIConfiguration;
   private readonly repository: Repository;
   private readonly retryDelayMs: number;
   private readonly headers: Record<string, string>;
@@ -46,6 +49,7 @@ export class StreamProcessor {
   constructor(
     api: ClientApi,
     apiKey: string,
+    apiConfiguration: APIConfiguration,
     environment: string,
     jwtToken: string,
     options: Options,
@@ -57,6 +61,7 @@ export class StreamProcessor {
   ) {
     this.api = api;
     this.apiKey = apiKey;
+    this.apiConfiguration = apiConfiguration;
     this.environment = environment;
     this.jwtToken = jwtToken;
     this.options = options;
@@ -221,6 +226,7 @@ export class StreamProcessor {
           msg.identifier,
           this.environment,
           this.cluster,
+          this.apiConfiguration.targetSegmentRulesQueryParameter,
         );
         setFn(msg.identifier, data);
       } else if (msg.event === 'delete') {

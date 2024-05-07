@@ -1,5 +1,5 @@
 import { ClientApi, FeatureConfig, Segment } from './openapi';
-import { Options } from './types';
+import { APIConfiguration, Options } from './types';
 import EventEmitter from 'events';
 import { Repository } from './repository';
 import { ConsoleLog } from './log';
@@ -14,6 +14,7 @@ export class PollingProcessor {
   private environment: string;
   private cluster: string;
   private api: ClientApi;
+  private apiConfiguration: APIConfiguration;
   private stopped = true;
   private options: Options;
   private repository: Repository;
@@ -27,11 +28,13 @@ export class PollingProcessor {
     environment: string,
     cluster: string,
     api: ClientApi,
+    apiConfiguration: APIConfiguration,
     options: Options,
     eventBus: EventEmitter,
     repository: Repository,
   ) {
     this.api = api;
+    this.apiConfiguration = apiConfiguration;
     this.options = options;
     this.environment = environment;
     this.cluster = cluster;
@@ -113,6 +116,7 @@ export class PollingProcessor {
       const response = await this.api.getAllSegments(
         this.environment,
         this.cluster,
+        this.apiConfiguration.targetSegmentRulesQueryParameter,
       );
       this.log.debug('Fetching segments finished');
       // prepare cache for storing segments
