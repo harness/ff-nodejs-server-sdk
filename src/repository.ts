@@ -58,6 +58,10 @@ export class StorageRepository implements Repository {
     if (await this.isSegmentOutdated(identifier, segment)) {
       return;
     }
+
+    // Sort the serving rules before storing the segment
+    this.sortSegmentServingRules(segment);
+
     const segmentKey = this.formatSegmentKey(identifier);
     if (this.store) {
       await this.store.set(segmentKey, segment);
@@ -165,6 +169,12 @@ export class StorageRepository implements Repository {
     return oldSegment?.version && oldSegment.version >= segment?.version;
   }
 
+  private sortSegmentServingRules(segment: Segment): void {
+    if (segment.servingRules && segment.servingRules.length > 1) {
+      segment.servingRules.sort((r1, r2) => r1.priority - r2.priority);
+    }
+  }
+
   private formatFlagKey(key: string): string {
     return `flags/${key}`;
   }
@@ -172,6 +182,4 @@ export class StorageRepository implements Repository {
   private formatSegmentKey(key: string): string {
     return `segments/${key}`;
   }
-
-
 }
