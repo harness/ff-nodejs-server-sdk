@@ -154,8 +154,6 @@ export class Evaluator {
 
         if (segment?.servingRules?.length) {
           // Use enhanced rules first if they're available
-          segment.servingRules.sort((r1, r2) => r1.priority - r2.priority);
-
           for (const servingRule of segment.servingRules) {
             if (await this.evaluateClauses_v2(servingRule.clauses, target)) {
               return true;
