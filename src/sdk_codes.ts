@@ -160,7 +160,7 @@ export function warnAuthRetrying(
 
 // Track disconnect attempts for throttling warning logs
 let disconnectAttempts = 0;
-let lastConnectionSuccess = 0;
+let lastConnectionSuccess = Date.now(); // Initialize with current time to avoid huge numbers
 
 // Restart disconnect counter when connection succeeds
 export function restartDisconnectCounter(): void {
@@ -171,7 +171,7 @@ export function restartDisconnectCounter(): void {
 // Reset disconnect counter
 export function resetDisconnectCounter(): void {
   disconnectAttempts = 0;
-  lastConnectionSuccess = 0;
+  lastConnectionSuccess = Date.now();
 }
 
 
@@ -184,20 +184,21 @@ export function warnStreamDisconnectedWithRetry(reason: string, ms: number, logg
   const combinedMessage = `${getSDKCodeMessage(5001)} ${reason} - ${getSDKCodeMessage(5003)} ${ms}ms`;
 
   if (disconnectAttempts === 1) {
-    // Inform that subsequent logs will be at debug level until the 10th attempt
     logger.warn(`${combinedMessage} (subsequent logs until 10th attempt will be at DEBUG level to reduce noise)`);
   }
-  // 10th disconnect - warn again with count information
   else if (disconnectAttempts === 10) {
-    const timeSinceConnection = Math.floor((Date.now() - lastConnectionSuccess)/1000);
+    const timeSince = Date.now() - lastConnectionSuccess;
+    const timeSinceConnection = Math.floor(timeSince/1000);
     logger.warn(`${combinedMessage} (10th attempt, connection unstable for ${timeSinceConnection} seconds, subsequent logs will be at DEBUG level except every 50th attempt)`);
   }
-  // Every 50th disconnect after that - warn with count
+
   else if (disconnectAttempts > 10 && disconnectAttempts % 50 === 0) {
-    const timeSinceConnection = Math.floor((Date.now() - lastConnectionSuccess)/1000);
+    const timeSince = Date.now() - lastConnectionSuccess;
+    const timeSinceConnection = Math.floor(timeSince/1000);
     const nextWarnAt = disconnectAttempts + 50;
     logger.warn(`${combinedMessage} (${disconnectAttempts}th attempt, connection unstable for ${timeSinceConnection} seconds, next warning at ${nextWarnAt}th attempt)`);
   }
+
   // All other disconnect attempts - log at debug level
   else {
     logger.debug(`${combinedMessage} (attempt ${disconnectAttempts}, logging at debug level to reduce noise)`);
