@@ -104,9 +104,7 @@ export class StreamProcessor {
 
       // Reset disconnect counter when connection succeeds
       resetDisconnectCounter();
-
-      // Signal to client.ts that we're connected (used for error log throttling)
-
+      
       this.retryAttempt = 0;
       this.readyState = StreamProcessor.CONNECTED;
       this.eventBus.emit(StreamEvent.CONNECTED);
