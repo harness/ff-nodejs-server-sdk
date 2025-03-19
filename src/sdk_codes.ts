@@ -181,7 +181,7 @@ export function warnStreamDisconnectedWithRetry(reason: string, ms: number, logg
 
   // First disconnect after a successful connection - always warn
   // Combine both codes to create a message with both disconnect reason and retry info
-  const combinedMessage = `${getSDKCodeMessage(5001)} ${reason} - ${getSDKCodeMessage(5003)} ${ms}ms`;
+  const combinedMessage = `${getSdkErrMsg(5001)} ${reason} - ${getSdkErrMsg(5003)} ${ms}ms`;
 
   if (disconnectAttempts === 1) {
     logger.warn(`${combinedMessage} (subsequent logs until 10th attempt will be at DEBUG level to reduce noise)`);
