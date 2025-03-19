@@ -167,7 +167,7 @@ const STREAM_DISCONNECT_LOG_THROTTLE_MS = 5 * 60 * 1000;
 export function warnStreamDisconnected(reason: string, logger: Logger): void {
   const now = Date.now();
   streamDisconnectAttempts++;
-  
+
   if (now - lastStreamDisconnectLogTime >= STREAM_DISCONNECT_LOG_THROTTLE_MS) {
     // First occurrence or enough time has passed since last log
     if (streamDisconnectAttempts > 1) {
@@ -179,7 +179,7 @@ export function warnStreamDisconnected(reason: string, logger: Logger): void {
       // First attempt, log normally
       logger.warn(getSdkErrMsg(5001, reason));
     }
-    
+
     // Reset counter and update timestamp
     streamDisconnectAttempts = 0;
     lastStreamDisconnectLogTime = now;
@@ -196,11 +196,10 @@ const STREAM_RETRY_LOG_THROTTLE_MS = 5 * 60 * 1000;
 export function warnStreamRetrying(seconds: number, logger: Logger): void {
   const now = Date.now();
   streamRetryAttempts++;
-  
+
   if (now - lastStreamRetryLogTime >= STREAM_RETRY_LOG_THROTTLE_MS) {
-    // First occurrence or enough time has passed since last log
+    // Not the first attempt, include count of previous attempts
     if (streamRetryAttempts > 1) {
-      // Not the first attempt, include count of previous attempts
       logger.warn(
         getSdkErrMsg(5003, `${seconds} (retry attempt ${streamRetryAttempts} in the last ${Math.floor((now - lastStreamRetryLogTime)/1000)} seconds)`)
       );
@@ -208,12 +207,11 @@ export function warnStreamRetrying(seconds: number, logger: Logger): void {
       // First attempt, log normally
       logger.warn(getSdkErrMsg(5003, `${seconds}`));
     }
-    
+
     // Reset counter and update timestamp
     streamRetryAttempts = 0;
     lastStreamRetryLogTime = now;
   }
-  // If we don't log, we silently track the attempt
 }
 
 export function warnPostMetricsFailed(reason: string, logger: Logger): void {
