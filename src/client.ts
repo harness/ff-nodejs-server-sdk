@@ -139,11 +139,22 @@ export default class Client {
       this.initialize(Processor.STREAM);
     });
 
+    // Track the last time we logged a streaming retry message to avoid log spam
+    let lastStreamRetryLogTime = 0;
+    // Only log the stream retry message once every 5 minutes
+    const STREAM_RETRY_LOG_THROTTLE_MS = 5 * 60 * 1000;
+    
     this.eventBus.on(StreamEvent.RETRYING, () => {
       this.failure = true;
-      this.log.error(
-        'Issue with streaming: falling back to polling while the SDK attempts to reconnect',
-      );
+      
+      // Check if we should log the error message based on time since last log
+      const now = Date.now();
+      if (now - lastStreamRetryLogTime >= STREAM_RETRY_LOG_THROTTLE_MS) {
+        this.log.error(
+          'Issue with streaming: falling back to polling while the SDK attempts to reconnect',
+        );
+        lastStreamRetryLogTime = now;
+      }
 
       if (!this.closing) {
         this.pollProcessor.start();
