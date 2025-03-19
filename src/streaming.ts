@@ -11,8 +11,8 @@ import {
   debugStreamEventReceived,
   infoStreamStopped,
   warnStreamDisconnectedWithRetry,
-  resetDisconnectCounter,
-} from './sdk_codes';
+  resetDisconnectCounter, restartDisconnectCounter
+} from "./sdk_codes";
 
 type FetchFunction = (
   identifier: string,
@@ -103,8 +103,8 @@ export class StreamProcessor {
       this.log.info(`SSE stream connected OK: ${url}`);
 
       // Reset disconnect counter when connection succeeds
-      resetDisconnectCounter();
-      
+      restartDisconnectCounter();
+
       this.retryAttempt = 0;
       this.readyState = StreamProcessor.CONNECTED;
       this.eventBus.emit(StreamEvent.CONNECTED);
@@ -259,6 +259,7 @@ export class StreamProcessor {
     this.readyState = StreamProcessor.CLOSED;
     this.log.info('Closing StreamProcessor');
 
+    resetDisconnectCounter()
     this.request.destroy();
     this.request = undefined;
 

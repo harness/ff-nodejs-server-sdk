@@ -162,10 +162,16 @@ export function warnAuthRetrying(
 let disconnectAttempts = 0;
 let lastConnectionSuccess = 0;
 
-// Reset disconnect counter when connection succeeds
-export function resetDisconnectCounter(): void {
+// Restart disconnect counter when connection succeeds
+export function restartDisconnectCounter(): void {
   disconnectAttempts = 0;
   lastConnectionSuccess = Date.now();
+}
+
+// Reset disconnect counter
+export function resetDisconnectCounter(): void {
+  disconnectAttempts = 0;
+  lastConnectionSuccess = 0;
 }
 
 
