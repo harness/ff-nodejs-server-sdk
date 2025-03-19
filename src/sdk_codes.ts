@@ -170,12 +170,12 @@ export function resetDisconnectCounter(): void {
 
 
 // Combined warning function for both disconnect and retry in a single message
-export function warnStreamDisconnectedWithRetry(reason: string, seconds: number, logger: Logger): void {
+export function warnStreamDisconnectedWithRetry(reason: string, ms: number, logger: Logger): void {
   disconnectAttempts++;
 
   // First disconnect after a successful connection - always warn
   // Combine both codes to create a message with both disconnect reason and retry info
-  const combinedMessage = `${getSDKCodeMessage(5001)} ${reason} - ${getSDKCodeMessage(5003)} ${seconds}ms`;
+  const combinedMessage = `${getSDKCodeMessage(5001)} ${reason} - ${getSDKCodeMessage(5003)} ${ms}ms`;
 
   if (disconnectAttempts === 1) {
     // Inform that subsequent logs will be at debug level until the 10th attempt
