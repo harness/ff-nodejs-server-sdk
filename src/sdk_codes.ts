@@ -178,17 +178,19 @@ export function warnStreamDisconnectedWithRetry(reason: string, seconds: number,
   const combinedMessage = `${getSDKCodeMessage(5001)} ${reason} - ${getSDKCodeMessage(5003)} ${seconds}ms`;
 
   if (disconnectAttempts === 1) {
-    logger.warn(combinedMessage);
+    // Inform that subsequent logs will be at debug level until the 10th attempt
+    logger.warn(`${combinedMessage} (subsequent logs until 10th attempt will be at DEBUG level to reduce noise)`);
   }
   // 10th disconnect - warn again with count information
   else if (disconnectAttempts === 10) {
     const timeSinceConnection = Math.floor((Date.now() - lastConnectionSuccess)/1000);
-    logger.warn(`${combinedMessage} (10th attempt, connection unstable for ${timeSinceConnection} seconds)`);
+    logger.warn(`${combinedMessage} (10th attempt, connection unstable for ${timeSinceConnection} seconds, subsequent logs will be at DEBUG level except every 50th attempt)`);
   }
   // Every 50th disconnect after that - warn with count
   else if (disconnectAttempts > 10 && disconnectAttempts % 50 === 0) {
     const timeSinceConnection = Math.floor((Date.now() - lastConnectionSuccess)/1000);
-    logger.warn(`${combinedMessage} (${disconnectAttempts}th attempt, connection unstable for ${timeSinceConnection} seconds)`);
+    const nextWarnAt = disconnectAttempts + 50;
+    logger.warn(`${combinedMessage} (${disconnectAttempts}th attempt, connection unstable for ${timeSinceConnection} seconds, next warning at ${nextWarnAt}th attempt)`);
   }
   // All other disconnect attempts - log at debug level
   else {
