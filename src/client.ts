@@ -141,18 +141,18 @@ export default class Client {
 
     // Track if we've already logged the streaming error since the last successful connection
     let streamingErrorLogged = false;
-    
+
     // Reset the error logging flag when we connect successfully
     this.eventBus.on(StreamEvent.CONNECTED, () => {
       // Reset the streaming error logged state when we successfully connect
       streamingErrorLogged = false;
       this.pollProcessor.stop();
     });
-    
+
     // Handle stream retry events
     this.eventBus.on(StreamEvent.RETRYING, () => {
       this.failure = true;
-      
+
       // Only log the error message if it's the first time since the last successful connection
       if (!streamingErrorLogged) {
         this.log.error(
@@ -191,10 +191,6 @@ export default class Client {
     this.eventBus.on(MetricEvent.ERROR, () => {
       this.failure = true;
       this.eventBus.emit(Event.FAILED);
-    });
-
-    this.eventBus.on(StreamEvent.CONNECTED, () => {
-      this.pollProcessor.stop();
     });
 
     this.eventBus.on(StreamEvent.DISCONNECTED, () => {
