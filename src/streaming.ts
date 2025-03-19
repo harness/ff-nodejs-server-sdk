@@ -99,38 +99,10 @@ export class StreamProcessor {
       options.ca = this.httpsCa;
     }
 
-    // Track connection patterns to detect unstable connections
-    let lastLoggedConnectionTime = 0;
-    let reconnectionCount = 0;
-    const CONNECTION_THROTTLE_MS = 5 * 60 * 1000; // 5 minutes
-
     const onConnected = () => {
-      const now = Date.now();
+      this.log.info(`SSE stream connected OK: ${url}`);
       
-      // Determine if this is initial connection or a reconnection
-      if (lastLoggedConnectionTime === 0) {
-        // This is the initial connection after startup - always log it
-        this.log.info(`SSE stream connected OK: ${url}`);
-        lastLoggedConnectionTime = now;
-        // Reset reconnection counter since this is the first connection
-        reconnectionCount = 0;
-      } else {
-        // This is a reconnection
-        reconnectionCount++;
-        
-        // Only log reconnection if it's been a while since our last logged connection
-        if (now - lastLoggedConnectionTime >= CONNECTION_THROTTLE_MS) {
-          // Log the reconnection with count information
-          this.log.warn(`SSE stream connected OK: ${url} (reconnected ${reconnectionCount} times in the last ${Math.floor((now - lastLoggedConnectionTime)/1000)} seconds)`);
-          
-          // Reset the counter and update last logged time
-          lastLoggedConnectionTime = now;
-          reconnectionCount = 0;
-        } else {
-          // Silently log reconnection to reduce spam during unstable periods
-          this.log.debug(`SSE stream reconnected OK: ${url} (silent, reducing log spam)`);
-        }
-      }
+      // Signal to client.ts that we're connected (used for error log throttling)
 
       this.retryAttempt = 0;
       this.readyState = StreamProcessor.CONNECTED;
