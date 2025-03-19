@@ -10,8 +10,8 @@ import http, { ClientRequest } from 'http';
 import {
   debugStreamEventReceived,
   infoStreamStopped,
-  warnStreamDisconnected,
-  warnStreamRetrying,
+  warnStreamDisconnectedWithRetry,
+  resetDisconnectCounter,
 } from './sdk_codes';
 
 type FetchFunction = (
@@ -101,7 +101,10 @@ export class StreamProcessor {
 
     const onConnected = () => {
       this.log.info(`SSE stream connected OK: ${url}`);
-      
+
+      // Reset disconnect counter when connection succeeds
+      resetDisconnectCounter();
+
       // Signal to client.ts that we're connected (used for error log throttling)
 
       this.retryAttempt = 0;
@@ -114,8 +117,7 @@ export class StreamProcessor {
         this.retryAttempt += 1;
 
         const delayMs = this.getRandomRetryDelayMs();
-        warnStreamDisconnected(msg, this.log);
-        warnStreamRetrying(delayMs, this.log);
+        warnStreamDisconnectedWithRetry(msg, delayMs, this.log);
         this.readyState = StreamProcessor.RETRYING;
         this.eventBus.emit(StreamEvent.RETRYING);
 
