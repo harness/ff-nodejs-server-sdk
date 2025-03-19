@@ -20,7 +20,7 @@ const sdkCodes: Record<number, string> = {
   4001: 'Polling stopped',
   // SDK_STREAM_5xxx
   5000: 'SSE stream successfully connected',
-  5001: 'SSE stream disconnected, reason:',
+  5001: 'SSE stream disconnected, reason:',  // When used with retrying, will combine with 5003
   5002: 'SSE event received',
   5003: 'SSE retrying to connect in',
   5004: 'SSE stopped',
@@ -158,13 +158,53 @@ export function warnAuthRetrying(
   );
 }
 
-export function warnStreamDisconnected(reason: string, logger: Logger): void {
-  logger.warn(getSdkErrMsg(5001, reason));
+// Track disconnect attempts for throttling warning logs
+let disconnectAttempts = 0;
+let lastConnectionSuccess = Date.now(); // Initialize with current time to avoid huge numbers
+
+// Restart disconnect counter when connection succeeds
+export function restartDisconnectCounter(): void {
+  disconnectAttempts = 0;
+  lastConnectionSuccess = Date.now();
 }
 
-export function warnStreamRetrying(seconds: number, logger: Logger): void {
-  logger.warn(getSdkErrMsg(5003, `${seconds}`));
+// Reset disconnect counter
+export function resetDisconnectCounter(): void {
+  disconnectAttempts = 0;
+  lastConnectionSuccess = Date.now();
 }
+
+
+// Combined warning function for both disconnect and retry in a single message
+export function warnStreamDisconnectedWithRetry(reason: string, ms: number, logger: Logger): void {
+  disconnectAttempts++;
+
+  // First disconnect after a successful connection - always warn
+  // Combine both codes to create a message with both disconnect reason and retry info
+  const combinedMessage = `${getSdkErrMsg(5001)} ${reason} - ${getSdkErrMsg(5003)} ${ms}ms`;
+
+  if (disconnectAttempts === 1) {
+    logger.warn(`${combinedMessage} (subsequent logs until 10th attempt will be at DEBUG level to reduce noise)`);
+  }
+  else if (disconnectAttempts === 10) {
+    const timeSince = Date.now() - lastConnectionSuccess;
+    const timeSinceConnection = Math.floor(timeSince/1000);
+    logger.warn(`${combinedMessage} (10th attempt, connection unstable for ${timeSinceConnection} seconds, subsequent logs will be at DEBUG level except every 50th attempt)`);
+  }
+
+  else if (disconnectAttempts > 10 && disconnectAttempts % 50 === 0) {
+    const timeSince = Date.now() - lastConnectionSuccess;
+    const timeSinceConnection = Math.floor(timeSince/1000);
+    const nextWarnAt = disconnectAttempts + 50;
+    logger.warn(`${combinedMessage} (${disconnectAttempts}th attempt, connection unstable for ${timeSinceConnection} seconds, next warning at ${nextWarnAt}th attempt)`);
+  }
+
+  // All other disconnect attempts - log at debug level
+  else {
+    logger.debug(`${combinedMessage} (attempt ${disconnectAttempts}, logging at debug level to reduce noise)`);
+  }
+}
+
 
 export function warnPostMetricsFailed(reason: string, logger: Logger): void {
   logger.warn(getSdkErrMsg(7002, reason));

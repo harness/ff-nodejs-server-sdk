@@ -131,7 +131,7 @@ export class PollingProcessor {
 
   start(): void {
     if (!this.stopped) {
-      this.log.info('PollingProcessor already started');
+      this.log.debug('PollingProcessor already started');
       return;
     }
     this.log.info(

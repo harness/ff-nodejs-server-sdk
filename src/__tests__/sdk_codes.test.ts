@@ -39,8 +39,7 @@ describe('SDK Codes', () => {
     ['warnFailedInitAuthError', [logger]],
     ['warnAuthFailedExceedRetries', [logger]],
     ['warnAuthRetrying', [1, 'dummy error', logger]],
-    ['warnStreamDisconnected', ['dummy reason', logger]],
-    ['warnStreamRetrying', [4, logger]],
+    ['warnStreamDisconnectedWithRetry', ['dummy reason', 1, logger]],
     ['warnPostMetricsFailed', ['dummy error', logger]],
     [
       'warnDefaultVariationServed',

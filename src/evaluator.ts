@@ -348,7 +348,7 @@ export class Evaluator {
     target: Target,
   ): Promise<boolean> {
     if (parent.prerequisites) {
-      this.log.info(
+      this.log.debug(
         'Checking pre requisites %s of parent feature %s',
         parent.prerequisites,
         parent.feature,
