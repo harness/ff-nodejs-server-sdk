@@ -45,6 +45,7 @@ export const defaultOptions: Options = {
   store: new FileStore(),
   logger: new ConsoleLog(),
   axiosTimeout: 30000,
+  axiosRetries: 3,
 };
 
 const TARGET_SEGMENT_RULES_QUERY_PARAMETER = 'v2';

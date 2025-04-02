@@ -327,8 +327,14 @@ export default class Client {
 
     const instance: AxiosInstance = axios.create(axiosConfig);
     axiosRetry(instance, {
-      retries: 3,
+      retries: options.axiosRetries || 3,
       retryDelay: axiosRetry.exponentialDelay,
+      retryCondition: (error) => {
+        // Retry on timeout errors (ECONNABORTED) in addition to network errors
+        return axiosRetry.isNetworkOrIdempotentRequestError(error) || 
+               (error.code === 'ECONNABORTED' && error.message.includes('timeout'));
+      },
+      shouldResetTimeout: true // Reset the timeout between retries
     });
     return instance;
   }
