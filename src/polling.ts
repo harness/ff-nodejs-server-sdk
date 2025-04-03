@@ -69,43 +69,28 @@ export class PollingProcessor {
     }
 
     this.lastPollTime = Date.now();
-    
-    // Use try/catch in a wrapper to prevent unhandled promise rejections
-    try {
-      Promise.all([this.retrieveFlags(), this.retrieveSegments()])
-        .then(() => {
-          // when first fetch is successful then poller is ready
-          if (!this.initialized) {
-            setTimeout(() => {
-              this.initialized = true;
-              this.eventBus.emit(PollerEvent.READY);
-            }, 0);
-          }
-        })
-        .catch((error) => {
-          // Emit the error event when either flags or segments fail
-          this.log.error('Error during polling operation', error);
-          this.eventBus.emit(PollerEvent.ERROR, { error });
-        })
-        .finally(() => {
-          // we will check one more time if processor is stopped
-          if (this.stopped) {
-            this.log.info('PollingProcessor stopped');
-            infoPollingStopped(this.log);
-            return;
-          }
-          pollAgain();
-        });
-    } catch (error) {
-      // This outer try/catch captures any synchronous errors or issues with the Promise creation
-      this.log.error('Unexpected error in polling process', error);
-      this.eventBus.emit(PollerEvent.ERROR, { error });
-      
-      // Continue with the polling cycle even if there was an error
-      if (!this.stopped) {
+    Promise.all([this.retrieveFlags(), this.retrieveSegments()])
+      .then(() => {
+        // when first fetch is successful then poller is ready
+        if (!this.initialized) {
+          setTimeout(() => {
+            this.initialized = true;
+            this.eventBus.emit(PollerEvent.READY);
+          }, 0);
+        }
+      })
+      .catch((error) => {
+        this.eventBus.emit(PollerEvent.ERROR, { error });
+      })
+      .finally(() => {
+        // we will check one more time if processor is stopped
+        if (this.stopped) {
+          this.log.info('PollingProcessor stopped');
+          infoPollingStopped(this.log);
+          return;
+        }
         pollAgain();
-      }
-    }
+      });
   }
 
   private async retrieveFlags(): Promise<void> {
@@ -119,16 +104,9 @@ export class PollingProcessor {
       response.data.forEach((fc: FeatureConfig) =>
         this.repository.setFlag(fc.feature, fc),
       );
-      return; // Successful completion
     } catch (error) {
-      // Log the error, but don't throw it to prevent unhandled promise rejections
       this.log.error('Error loading flags', error);
-      
-      // Emit an error event so the client can handle it if needed
-      this.eventBus.emit(PollerEvent.ERROR, { error, source: 'retrieveFlags' });
-      
-      // Don't throw, just return to avoid unhandled promise rejections
-      return;
+      throw error;
     }
   }
 
@@ -145,16 +123,9 @@ export class PollingProcessor {
       response.data.forEach((segment: Segment) =>
         this.repository.setSegment(segment.identifier, segment),
       );
-      return; // Successful completion
     } catch (error) {
-      // Log the error, but don't throw it to prevent unhandled promise rejections
       this.log.error('Error loading segments', error);
-      
-      // Emit an error event so the client can handle it if needed
-      this.eventBus.emit(PollerEvent.ERROR, { error, source: 'retrieveSegments' });
-      
-      // Don't throw, just return to avoid unhandled promise rejections
-      return;
+      throw error;
     }
   }
 
