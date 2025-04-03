@@ -340,11 +340,16 @@ export default class Client {
         const url = requestConfig.url?.split('?')[0] || 'unknown URL';
         const method = requestConfig.method?.toUpperCase() || 'unknown method';
         
-        // Log the retry attempt with details
-        this.log.warn(
-          `Retrying request (${retryCount}/${options.axiosRetries || 3}) to ${method} ${url} - ` +
-          `Error: ${error.code || 'unknown'} - ${error.message}`
-        );
+        // Create the retry message
+        const retryMessage = `Retrying request (${retryCount}/${options.axiosRetries || 3}) to ${method} ${url} - ` +
+                            `Error: ${error.code || 'unknown'} - ${error.message}`;
+        
+        // Log first retry as WARN, subsequent retries as DEBUG to reduce noise
+        if (retryCount === 1) {
+          this.log.warn(retryMessage);
+        } else {
+          this.log.debug(retryMessage);
+        }
       }
     });
     return instance;
