@@ -305,7 +305,7 @@ export default class Client {
         });
       }
     }
-
+    infoSDKInitOK(this.log);
     return this.waitForInitializePromise;
   }
 
@@ -331,25 +331,37 @@ export default class Client {
       retryDelay: axiosRetry.exponentialDelay,
       retryCondition: (error) => {
         // Retry on timeout errors (ECONNABORTED) in addition to network errors
-        return axiosRetry.isNetworkOrIdempotentRequestError(error) || 
+        return axiosRetry.isNetworkOrIdempotentRequestError(error) ||
                (error.code === 'ECONNABORTED' && error.message.includes('timeout'));
       },
-      shouldResetTimeout: true, // Reset the timeout between retries
+      shouldResetTimeout: true,
       onRetry: (retryCount, error, requestConfig) => {
         // Get the URL without query parameters for cleaner logs
         const url = requestConfig.url?.split('?')[0] || 'unknown URL';
         const method = requestConfig.method?.toUpperCase() || 'unknown method';
-        
+
         // Create the retry message
         const retryMessage = `Retrying request (${retryCount}/${options.axiosRetries || 3}) to ${method} ${url} - ` +
                             `Error: ${error.code || 'unknown'} - ${error.message}`;
-        
+
         // Log first retry as WARN, subsequent retries as DEBUG to reduce noise
         if (retryCount === 1) {
-          this.log.warn(retryMessage);
+          this.log.warn(`${retryMessage} (subsequent retries will be logged at DEBUG level)`);
         } else {
           this.log.debug(retryMessage);
         }
+      },
+      onMaxRetryTimesExceeded: (error, retryCount) => {
+        // Get request details for better error reporting
+        const config = error.config || {};
+        // Use type assertion to handle the config object
+        const axiosConfig = config as AxiosRequestConfig;
+        const url = axiosConfig.url?.split('?')[0] || 'unknown URL';
+        const method = axiosConfig.method?.toUpperCase() || 'unknown method';
+
+        // Log a clear message that all retries have been exhausted
+        this.log.error(`Request failed permanently after ${retryCount} retries: ${method} ${url} - ` +
+                       `Error: ${error.code || 'unknown'} - ${error.message}`);
       }
     });
     return instance;
