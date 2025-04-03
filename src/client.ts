@@ -130,9 +130,9 @@ export default class Client {
       this.initialize(Processor.POLL);
     });
 
-    this.eventBus.on(PollerEvent.ERROR, () => {
+    this.eventBus.on(PollerEvent.ERROR, (error) => {
       this.failure = true;
-      this.eventBus.emit(Event.FAILED);
+      this.eventBus.emit(Event.FAILED, new Error(`Failed to load flags or groups: ${error?.message ?? "unknown"}`));
     });
 
     this.eventBus.on(StreamEvent.READY, () => {
