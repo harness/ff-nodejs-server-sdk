@@ -80,7 +80,7 @@ export class PollingProcessor {
         }
       })
       .catch((error) => {
-        this.eventBus.emit(PollerEvent.ERROR, { error });
+        this.eventBus.emit(PollerEvent.ERROR, error);
       })
       .finally(() => {
         // we will check one more time if processor is stopped
