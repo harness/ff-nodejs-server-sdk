@@ -105,7 +105,9 @@ export class PollingProcessor {
         this.repository.setFlag(fc.feature, fc),
       );
     } catch (error) {
-      this.log.error('Error loading flags', error);
+      this.log.error(
+        `Error loading flags (${error.code ?? "UNKNOWN"}): ${error.message}`
+      );
       throw error;
     }
   }
@@ -124,7 +126,9 @@ export class PollingProcessor {
         this.repository.setSegment(segment.identifier, segment),
       );
     } catch (error) {
-      this.log.error('Error loading segments', error);
+      this.log.error(
+        `Error loading segments (${error.code ?? "UNKNOWN"}): ${error.message}`
+      );
       throw error;
     }
   }
