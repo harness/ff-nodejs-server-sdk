@@ -334,7 +334,18 @@ export default class Client {
         return axiosRetry.isNetworkOrIdempotentRequestError(error) || 
                (error.code === 'ECONNABORTED' && error.message.includes('timeout'));
       },
-      shouldResetTimeout: true // Reset the timeout between retries
+      shouldResetTimeout: true, // Reset the timeout between retries
+      onRetry: (retryCount, error, requestConfig) => {
+        // Get the URL without query parameters for cleaner logs
+        const url = requestConfig.url?.split('?')[0] || 'unknown URL';
+        const method = requestConfig.method?.toUpperCase() || 'unknown method';
+        
+        // Log the retry attempt with details
+        this.log.warn(
+          `Retrying request (${retryCount}/${options.axiosRetries || 3}) to ${method} ${url} - ` +
+          `Error: ${error.code || 'unknown'} - ${error.message}`
+        );
+      }
     });
     return instance;
   }
