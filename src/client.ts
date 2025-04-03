@@ -425,6 +425,7 @@ export default class Client {
       return;
     }
 
+    this.initialized = true;
     this.eventBus.emit(Event.READY);
     infoSDKInitOK(this.log);
   }
@@ -482,7 +483,6 @@ export default class Client {
     }
 
     this.log.info('finished setting up processors');
-    this.initialized = true;
   }
 
   boolVariation(
