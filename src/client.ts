@@ -290,7 +290,6 @@ export default class Client {
     if (!this.waitForInitializePromise) {
       if (this.initialized) {
         this.waitForInitializePromise = Promise.resolve(this);
-        infoSDKInitOK(this.log);
       } else if (!this.initialized && this.failure) {
         // We unblock the call even if initialization has failed. We've
         // already warned the user that initialization has failed with the reason and that
@@ -305,7 +304,6 @@ export default class Client {
         });
       }
     }
-    infoSDKInitOK(this.log);
     return this.waitForInitializePromise;
   }
 
@@ -360,7 +358,7 @@ export default class Client {
         const method = axiosConfig.method?.toUpperCase() || 'unknown method';
 
         // Log a clear message that all retries have been exhausted
-        this.log.error(`Request failed permanently after ${retryCount} retries: ${method} ${url} - ` +
+        this.log.warn(`Request failed permanently after ${retryCount} retries: ${method} ${url} - ` +
                        `Error: ${error.code || 'unknown'} - ${error.message}`);
       }
     });
@@ -399,6 +397,7 @@ export default class Client {
     }
 
     this.eventBus.emit(Event.READY);
+    infoSDKInitOK(this.log);
   }
 
   private async run(): Promise<void> {
@@ -455,7 +454,6 @@ export default class Client {
 
     this.log.info('finished setting up processors');
     this.initialized = true;
-    infoSDKInitOK(this.log);
   }
 
   boolVariation(
