@@ -130,9 +130,14 @@ export default class Client {
       this.initialize(Processor.POLL);
     });
 
-    this.eventBus.on(PollerEvent.ERROR, () => {
+    this.eventBus.on(PollerEvent.ERROR, (error) => {
       this.failure = true;
-      this.eventBus.emit(Event.FAILED);
+      this.eventBus.emit(
+        Event.FAILED,
+        new Error(
+          `Failed to load flags or groups: ${error?.message ?? 'unknown'}`,
+        ),
+      );
     });
 
     this.eventBus.on(StreamEvent.READY, () => {
@@ -290,7 +295,6 @@ export default class Client {
     if (!this.waitForInitializePromise) {
       if (this.initialized) {
         this.waitForInitializePromise = Promise.resolve(this);
-        infoSDKInitOK(this.log);
       } else if (!this.initialized && this.failure) {
         // We unblock the call even if initialization has failed. We've
         // already warned the user that initialization has failed with the reason and that
@@ -305,8 +309,33 @@ export default class Client {
         });
       }
     }
-
     return this.waitForInitializePromise;
+  }
+
+  private axiosRetryCondition(error) {
+    if (axiosRetry.isNetworkOrIdempotentRequestError(error)) {
+      return true;
+    }
+
+    // retry if connection is aborted
+    if (error.code === 'ECONNABORTED') {
+      return true;
+    }
+
+    // Auth is a POST request so not covered by isNetworkOrIdempotentRequestError and it's not an aborted connection
+    const status = error?.response?.status;
+    const url = error?.config?.url ?? '';
+
+    if (
+      url.includes('client/auth') &&
+      status >= 500 &&
+      status <= 599
+    ) {
+      return true;
+    }
+
+    // Otherwise do not retry
+    return false;
   }
 
   private createAxiosInstanceWithRetries(options: Options): AxiosInstance {
@@ -327,8 +356,40 @@ export default class Client {
 
     const instance: AxiosInstance = axios.create(axiosConfig);
     axiosRetry(instance, {
-      retries: 3,
+      retries: options.axiosRetries,
       retryDelay: axiosRetry.exponentialDelay,
+      retryCondition: this.axiosRetryCondition,
+      shouldResetTimeout: true,
+      onRetry: (retryCount, error, requestConfig) => {
+        // Get the URL without query parameters for cleaner logs
+        const url = requestConfig.url?.split('?')[0] || 'unknown URL';
+        const method = requestConfig.method?.toUpperCase() || 'unknown method';
+
+        const retryMessage =
+          `Retrying request (${retryCount}/${options.axiosRetries}) to ${method} ${url} - ` +
+          `Error: ${error.code || 'unknown'} - ${error.message}`;
+
+        // Log first retry as warn and subsequent retries as debug to reduce noise
+        if (retryCount === 1) {
+          this.log.warn(
+            `${retryMessage} (subsequent retries will be logged at DEBUG level)`,
+          );
+        } else {
+          this.log.debug(retryMessage);
+        }
+      },
+      onMaxRetryTimesExceeded: (error, retryCount) => {
+        // Get request details to use in error log
+        const config = error.config || {};
+        const axiosConfig = config as AxiosRequestConfig;
+        const url = axiosConfig.url?.split('?')[0] || 'unknown URL';
+        const method = axiosConfig.method?.toUpperCase() || 'unknown method';
+
+        this.log.warn(
+          `Request failed permanently after ${retryCount} retries: ${method} ${url} - ` +
+            `Error: ${error.code || 'unknown'} - ${error.message}`,
+        );
+      },
     });
     return instance;
   }
@@ -364,7 +425,9 @@ export default class Client {
       return;
     }
 
+    this.initialized = true;
     this.eventBus.emit(Event.READY);
+    infoSDKInitOK(this.log);
   }
 
   private async run(): Promise<void> {
@@ -420,8 +483,6 @@ export default class Client {
     }
 
     this.log.info('finished setting up processors');
-    this.initialized = true;
-    infoSDKInitOK(this.log);
   }
 
   boolVariation(

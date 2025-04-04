@@ -14,6 +14,7 @@ export interface Options {
   logger?: Logger;
   tlsTrustedCa?: string;
   axiosTimeout?: number;
+  axiosRetries?: number;
 }
 
 export interface APIConfiguration {
