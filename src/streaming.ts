@@ -45,6 +45,7 @@ export class StreamProcessor {
   private readyState: number;
   private log: ConsoleLog;
   private retryAttempt = 0;
+  private retryTimeout: NodeJS.Timeout | undefined;
 
   constructor(
     api: ClientApi,
@@ -111,7 +112,7 @@ export class StreamProcessor {
     };
 
     const onFailed = (msg: string) => {
-      if (this.readyState !== StreamProcessor.CLOSED) {
+      if (this.readyState !== StreamProcessor.CLOSED && !this.retryTimeout) {
         this.retryAttempt += 1;
 
         const delayMs = this.getRandomRetryDelayMs();
@@ -119,8 +120,11 @@ export class StreamProcessor {
         this.readyState = StreamProcessor.RETRYING;
         this.eventBus.emit(StreamEvent.RETRYING);
 
-        setTimeout(() => {
-          this.connect(url, options, onConnected, onFailed);
+        this.retryTimeout = setTimeout(() => {
+          this.retryTimeout = undefined;
+          if (this.readyState !== StreamProcessor.CLOSED) {
+            this.connect(url, options, onConnected, onFailed);
+          }
         }, delayMs);
       }
     };
@@ -135,6 +139,14 @@ export class StreamProcessor {
     return Math.min(delayMs, 60000);
   }
 
+  private cleanupConnection(): void {
+    if (this.request) {
+      this.request.removeAllListeners();
+      this.request.destroy();
+      this.request = undefined;
+    }
+  }
+
   private connect(
     url: string,
     options: RequestOptions,
@@ -145,6 +157,8 @@ export class StreamProcessor {
       this.log.debug('SSE already connected, skip retry');
       return;
     }
+
+    this.cleanupConnection();
 
     const isSecure = url.startsWith('https:');
     this.log.debug('SSE HTTP start request', url);
@@ -174,8 +188,8 @@ export class StreamProcessor {
       .on('timeout', () => {
         onFailed(
           'SSE request timed out after ' +
-            StreamProcessor.SSE_TIMEOUT_MS +
-            'ms',
+          StreamProcessor.SSE_TIMEOUT_MS +
+          'ms',
         );
       })
       .setTimeout(StreamProcessor.SSE_TIMEOUT_MS);
@@ -255,6 +269,8 @@ export class StreamProcessor {
       this.log.info('SteamProcessor already closed');
       return;
     }
+
+    clearTimeout(this.retryTimeout);
 
     this.readyState = StreamProcessor.CLOSED;
     this.log.info('Closing StreamProcessor');
