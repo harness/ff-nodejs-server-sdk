@@ -112,7 +112,7 @@ export class StreamProcessor {
     };
 
     const onFailed = (msg: string) => {
-      if (this.readyState !== StreamProcessor.CLOSED) {
+      if (this.readyState !== StreamProcessor.CLOSED && !this.retryTimeout) {
         this.retryAttempt += 1;
 
         const delayMs = this.getRandomRetryDelayMs();
@@ -121,6 +121,7 @@ export class StreamProcessor {
         this.eventBus.emit(StreamEvent.RETRYING);
 
         this.retryTimeout = setTimeout(() => {
+          this.retryTimeout = undefined;
           if (this.readyState !== StreamProcessor.CLOSED) {
             this.connect(url, options, onConnected, onFailed);
           }
