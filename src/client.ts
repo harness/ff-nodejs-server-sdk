@@ -331,10 +331,13 @@ export default class Client {
     const status = error?.response?.status;
     const url = error?.config?.url ?? '';
 
+    if (url.includes('client/auth') && status === 403) {
+      // No point retrying with wrong SDK key
+      return false;
+    }
+
     if (
-      url.includes('client/auth') &&
-      status >= 500 &&
-      status <= 599
+      url.includes('client/auth') && ((status >= 500 && status <= 599) || (status >= 400 && status <= 499))
     ) {
       return true;
     }
