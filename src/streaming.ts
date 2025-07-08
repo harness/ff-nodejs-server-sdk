@@ -217,14 +217,16 @@ export class StreamProcessor {
           this.api.getFeatureConfigByIdentifier.bind(this.api),
           this.repository.setFlag.bind(this.repository),
           this.repository.deleteFlag.bind(this.repository),
-        );
+        ).then(_ => this.log.info(">>SSE Got flag for:", msg.identifier),
+            e => this.log.error(">>SSE Failed to get flag for:", msg.identifier, e))
       } else if (msg.domain === 'target-segment') {
         this.msgProcessor(
           msg,
           this.api.getSegmentByIdentifier.bind(this.api),
           this.repository.setSegment.bind(this.repository),
           this.repository.deleteSegment.bind(this.repository),
-        );
+        ).then(_ => this.log.info("SSE Got target-segment for:", msg.identifier),
+          e => this.log.error(">>SSE Failed to get target-segment for:", msg.identifier, e));
       }
     }
   }
