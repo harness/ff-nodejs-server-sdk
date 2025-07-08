@@ -11,8 +11,9 @@ import {
   debugStreamEventReceived,
   infoStreamStopped,
   warnStreamDisconnectedWithRetry,
-  resetDisconnectCounter, restartDisconnectCounter
-} from "./sdk_codes";
+  resetDisconnectCounter,
+  restartDisconnectCounter,
+} from './sdk_codes';
 
 type FetchFunction = (
   identifier: string,
@@ -188,8 +189,8 @@ export class StreamProcessor {
       .on('timeout', () => {
         onFailed(
           'SSE request timed out after ' +
-          StreamProcessor.SSE_TIMEOUT_MS +
-          'ms',
+            StreamProcessor.SSE_TIMEOUT_MS +
+            'ms',
         );
       })
       .setTimeout(StreamProcessor.SSE_TIMEOUT_MS);
@@ -217,6 +218,10 @@ export class StreamProcessor {
           this.api.getFeatureConfigByIdentifier.bind(this.api),
           this.repository.setFlag.bind(this.repository),
           this.repository.deleteFlag.bind(this.repository),
+        ).then(
+          (_) => this.log.info('>>SSE Got flag for:', msg.identifier),
+          (e) =>
+            this.log.error('>>SSE Failed to get flag for:', msg.identifier, e),
         );
       } else if (msg.domain === 'target-segment') {
         this.msgProcessor(
@@ -224,6 +229,14 @@ export class StreamProcessor {
           this.api.getSegmentByIdentifier.bind(this.api),
           this.repository.setSegment.bind(this.repository),
           this.repository.deleteSegment.bind(this.repository),
+        ).then(
+          (_) => this.log.info('SSE Got target-segment for:', msg.identifier),
+          (e) =>
+            this.log.error(
+              '>>SSE Failed to get target-segment for:',
+              msg.identifier,
+              e,
+            ),
         );
       }
     }
@@ -275,7 +288,7 @@ export class StreamProcessor {
     this.readyState = StreamProcessor.CLOSED;
     this.log.info('Closing StreamProcessor');
 
-    resetDisconnectCounter()
+    resetDisconnectCounter();
     this.request.destroy();
     this.request = undefined;
 
