@@ -322,14 +322,22 @@ export default class Client {
       return true;
     }
 
+    // DNS issues, service down, etc
+    if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
+      return true;
+    }
+
     // Auth is a POST request so not covered by isNetworkOrIdempotentRequestError and it's not an aborted connection
     const status = error?.response?.status;
     const url = error?.config?.url ?? '';
 
+    if (url.includes('client/auth') && status === 403) {
+      // No point retrying with wrong SDK key
+      return false;
+    }
+
     if (
-      url.includes('client/auth') &&
-      status >= 500 &&
-      status <= 599
+      url.includes('client/auth') && ((status >= 500 && status <= 599) || (status >= 400 && status <= 499))
     ) {
       return true;
     }
@@ -357,7 +365,7 @@ export default class Client {
     const instance: AxiosInstance = axios.create(axiosConfig);
     axiosRetry(instance, {
       retries: options.axiosRetries,
-      retryDelay: axiosRetry.exponentialDelay,
+      retryDelay: (retryCount, error) => axiosRetry.exponentialDelay((retryCount > 7 ? 7 : retryCount), error, 500), // cap to 7 to avoid exponential delays getting too long
       retryCondition: this.axiosRetryCondition,
       shouldResetTimeout: true,
       onRetry: (retryCount, error, requestConfig) => {
