@@ -113,8 +113,15 @@ export default class Client {
     );
     this.evaluator = new Evaluator(this.repository, this.log);
 
+    if (this.options.tlsTrustedCa) {
+      this.httpsCa = fs.readFileSync(this.options.tlsTrustedCa);
+    }
+
     // Setup https client for sass or on-prem connections
-    this.httpsClient = this.createAxiosInstanceWithRetries(this.options);
+    this.httpsClient = this.createAxiosInstanceWithRetries(
+      this.options,
+      this.httpsCa,
+    );
     this.api = new ClientApi(
       this.configuration,
       this.options.baseUrl,
@@ -346,13 +353,15 @@ export default class Client {
     return false;
   }
 
-  private createAxiosInstanceWithRetries(options: Options): AxiosInstance {
+  private createAxiosInstanceWithRetries(
+    options: Options,
+    httpsCa: Buffer,
+  ): AxiosInstance {
     let axiosConfig: AxiosRequestConfig = {
       timeout: options.axiosTimeout,
     };
 
-    if (options.tlsTrustedCa) {
-      const httpsCa = fs.readFileSync(options.tlsTrustedCa);
+    if (httpsCa) {
       // Set axiosConfig with httpsAgent when TLS config is provided
       axiosConfig = {
         ...axiosConfig,
