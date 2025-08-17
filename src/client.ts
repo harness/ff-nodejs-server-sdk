@@ -320,20 +320,6 @@ export default class Client {
   }
 
   private axiosRetryCondition(error) {
-    if (axiosRetry.isNetworkOrIdempotentRequestError(error)) {
-      return true;
-    }
-
-    // retry if connection is aborted
-    if (error.code === 'ECONNABORTED') {
-      return true;
-    }
-
-    // DNS issues, service down, etc
-    if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
-      return true;
-    }
-
     // Auth is a POST request so not covered by isNetworkOrIdempotentRequestError and it's not an aborted connection
     const status = error?.response?.status;
     const url = error?.config?.url ?? '';
@@ -343,14 +329,8 @@ export default class Client {
       return false;
     }
 
-    if (
-      url.includes('client/auth') && ((status >= 500 && status <= 599) || (status >= 400 && status <= 499))
-    ) {
-      return true;
-    }
-
-    // Otherwise do not retry
-    return false;
+    // Otherwise retry: if connection is aborted, DNS issues, service down, network errors, etc
+    return true;
   }
 
   private createAxiosInstanceWithRetries(
