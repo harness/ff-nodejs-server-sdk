@@ -3,17 +3,62 @@ import { FeatureConfig, Segment } from './openapi';
 
 export type Type = boolean | string | number | Record<string, unknown>;
 export interface Options {
+  /**
+   * The URL used to fetch Feature Flag Evaluations. When using the Relay Proxy, change this to: http://localhost:7000
+   *
+   * @defaultValue https://config.ff.harness.io/api/1.0
+   */
   baseUrl?: string;
+  /**
+   * The URL for posting metrics data to the Feature Flag service. When using the Relay Proxy, change this to: http://localhost:7000
+   *
+   * @defaultValue https://events.ff.harness.io/api/1.0
+   */
   eventsUrl?: string;
+  /**
+   * The interval in milliseconds that we poll for changes when you are not using streaming mode.
+   *
+   * @defaultValue 60000
+   */
   pollInterval?: number;
+  /**
+   * The interval in milliseconds to post analytics data to the Feature Flag service.
+   *
+   * @defaultValue 60000
+   */
   eventsSyncInterval?: number;
+  /**
+   * Set to true to enable streaming mode. Set to false to disable streaming mode.
+   *
+   * @defaultValue true
+   */
   enableStream?: boolean;
+  /**
+   * Set to true to enable analytics. Set to false to disable analytics. Note: When enabled, analytics data is posted every `eventsSyncInterval`.
+   *
+   * @defaultValue true
+   */
   enableAnalytics?: boolean;
   cache?: KeyValueStore;
   store?: AsyncKeyValueStore;
+  /**
+   * Set a custom logger to use for logging.
+   *
+   * @defaultValue console
+   */
   logger?: Logger;
   tlsTrustedCa?: string;
+  /**
+   * Set the timeout for requests to the Feature Flag service.
+   *
+   * @defaultValue 30000
+   */
   axiosTimeout?: number;
+  /**
+   * Set the number of retries for requests to the Feature Flag service.
+   *
+   * @defaultValue Infinity
+   */
   axiosRetries?: number;
 }
 
