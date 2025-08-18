@@ -284,6 +284,7 @@ export class StreamProcessor {
     }
 
     clearTimeout(this.retryTimeout);
+    this.retryTimeout = undefined;
 
     this.readyState = StreamProcessor.CLOSED;
     this.log.info('Closing StreamProcessor');
