@@ -497,6 +497,7 @@ export default class Client {
 
       return Promise.resolve(defaultValue);
     }
+    this.validateTargetIdentifier(target);
 
     return this.evaluator.boolVariation(
       identifier,
@@ -525,6 +526,7 @@ export default class Client {
 
       return Promise.resolve(defaultValue);
     }
+    this.validateTargetIdentifier(target);
 
     return this.evaluator.stringVariation(
       identifier,
@@ -553,6 +555,7 @@ export default class Client {
 
       return Promise.resolve(defaultValue);
     }
+    this.validateTargetIdentifier(target);
 
     return this.evaluator.numberVariation(
       identifier,
@@ -581,6 +584,7 @@ export default class Client {
 
       return Promise.resolve(defaultValue);
     }
+    this.validateTargetIdentifier(target);
 
     return this.evaluator.jsonVariation(
       identifier,
@@ -592,6 +596,15 @@ export default class Client {
         }
       },
     );
+  }
+
+  validateTargetIdentifier(target: Target): void {
+    // If the identifier isn't a string, convert it and log a warning
+    if (target && typeof target.identifier !== 'string') {
+      const identifierString = JSON.stringify(target.identifier);
+      this.log.warn(`Target identifier: '${target.identifier}' is not a string, converting to the string value: ${identifierString}`)
+      target.identifier = identifierString
+    }
   }
 
   close(): void {
