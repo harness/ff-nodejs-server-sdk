@@ -323,9 +323,15 @@ export default class Client {
     // Auth is a POST request so not covered by isNetworkOrIdempotentRequestError and it's not an aborted connection
     const status = error?.response?.status;
     const url = error?.config?.url ?? '';
+    const metricsUuidPattern = /metrics\/[0-9a-fA-F-]{36}/;
 
     if (url.includes('client/auth') && status === 403) {
       // No point retrying with wrong SDK key
+      return false;
+    }
+
+    if (metricsUuidPattern.test(url) && status === 400) {
+      // No point retrying with the same bad metrics payload over and over again
       return false;
     }
 
