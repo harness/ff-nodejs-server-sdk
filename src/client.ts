@@ -323,9 +323,15 @@ export default class Client {
     // Auth is a POST request so not covered by isNetworkOrIdempotentRequestError and it's not an aborted connection
     const status = error?.response?.status;
     const url = error?.config?.url ?? '';
+    const metricsUuidPattern = /metrics\/[0-9a-fA-F-]{36}/;
 
     if (url.includes('client/auth') && status === 403) {
       // No point retrying with wrong SDK key
+      return false;
+    }
+
+    if (metricsUuidPattern.test(url) && status === 400) {
+      // No point retrying with the same bad metrics payload over and over again
       return false;
     }
 
@@ -497,6 +503,7 @@ export default class Client {
 
       return Promise.resolve(defaultValue);
     }
+    this.validateTargetIdentifier(target);
 
     return this.evaluator.boolVariation(
       identifier,
@@ -525,6 +532,7 @@ export default class Client {
 
       return Promise.resolve(defaultValue);
     }
+    this.validateTargetIdentifier(target);
 
     return this.evaluator.stringVariation(
       identifier,
@@ -553,6 +561,7 @@ export default class Client {
 
       return Promise.resolve(defaultValue);
     }
+    this.validateTargetIdentifier(target);
 
     return this.evaluator.numberVariation(
       identifier,
@@ -581,6 +590,7 @@ export default class Client {
 
       return Promise.resolve(defaultValue);
     }
+    this.validateTargetIdentifier(target);
 
     return this.evaluator.jsonVariation(
       identifier,
@@ -592,6 +602,15 @@ export default class Client {
         }
       },
     );
+  }
+
+  validateTargetIdentifier(target: Target): void {
+    // If the identifier isn't a string, convert it and log a warning
+    if (target && typeof target.identifier !== 'string') {
+      const identifierString = JSON.stringify(target.identifier);
+      this.log.warn(`Target identifier: '${target.identifier}' is not a string, converting to the string value: ${identifierString}`)
+      target.identifier = identifierString
+    }
   }
 
   close(): void {
