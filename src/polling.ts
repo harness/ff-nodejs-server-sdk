@@ -69,7 +69,7 @@ export class PollingProcessor {
     }
 
     this.lastPollTime = Date.now();
-    Promise.all([this.retrieveFlags(), this.retrieveSegments()])
+    this.refresh()
       .then(() => {
         // when first fetch is successful then poller is ready
         if (!this.initialized) {
@@ -93,6 +93,10 @@ export class PollingProcessor {
       });
   }
 
+  async refresh(): Promise<void> {
+    await Promise.all([this.retrieveFlags(), this.retrieveSegments()]);
+  }
+
   private async retrieveFlags(): Promise<void> {
     try {
       this.log.debug('Fetching flags started');
@@ -101,12 +105,14 @@ export class PollingProcessor {
         this.cluster,
       );
       this.log.debug('Fetching flags finished');
-      response.data.forEach((fc: FeatureConfig) =>
-        this.repository.setFlag(fc.feature, fc),
+      await Promise.all(
+        response.data.map((fc: FeatureConfig) =>
+          this.repository.setFlag(fc.feature, fc),
+        ),
       );
     } catch (error) {
       this.log.error(
-        `Error loading flags (${error.code ?? "UNKNOWN"}): ${error.message}`
+        `Error loading flags (${error.code ?? 'UNKNOWN'}): ${error.message}`,
       );
       throw error;
     }
@@ -122,12 +128,14 @@ export class PollingProcessor {
       );
       this.log.debug('Fetching segments finished');
       // prepare cache for storing segments
-      response.data.forEach((segment: Segment) =>
-        this.repository.setSegment(segment.identifier, segment),
+      await Promise.all(
+        response.data.map((segment: Segment) =>
+          this.repository.setSegment(segment.identifier, segment),
+        ),
       );
     } catch (error) {
       this.log.error(
-        `Error loading segments (${error.code ?? "UNKNOWN"}): ${error.message}`
+        `Error loading segments (${error.code ?? 'UNKNOWN'}): ${error.message}`,
       );
       throw error;
     }

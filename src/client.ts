@@ -153,12 +153,30 @@ export default class Client {
 
     // Track if we've already logged the streaming error since the last successful connection
     let streamingErrorLogged = false;
+    let streamConnection = 0;
 
     // Reset the error logging flag when we connect successfully
     this.eventBus.on(StreamEvent.CONNECTED, () => {
       // Reset the streaming error logged state when we successfully connect
       streamingErrorLogged = false;
-      this.pollProcessor.stop();
+      const connection = ++streamConnection;
+      // Refresh after subscribing so changes missed during reconnect reach the cache.
+      this.pollProcessor.refresh()
+        .then(() => {
+          if (
+            !this.closing &&
+            connection === streamConnection &&
+            this.streamProcessor.connected()
+          ) {
+            this.pollProcessor.stop();
+          }
+        })
+        .catch((error) => {
+          this.log.warn(
+            'Failed to refresh config after stream connection; continuing polling',
+            error,
+          );
+        });
     });
 
     // Handle stream retry events
